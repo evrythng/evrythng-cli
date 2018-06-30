@@ -1,0 +1,12 @@
+{
+  "extends": "airbnb",
+  "rules": {
+    "no-console": 0,
+    "global-require": 0,
+    "no-param-reassign": [ 2, "props": false ]
+  },
+  "env": {
+    "browser": true,
+    "node": true
+  }
+}
