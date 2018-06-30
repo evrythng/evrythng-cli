@@ -11,8 +11,9 @@ Install the `npm` module globally as a command:
 $ npm i -g evrythng-cli
 ```
 
-Then add at leasy one Operator using an Operator API Key available
-from the 'Account Settings' page of the EVRYTHNG Dashboard:
+Then add at least one Operator using an Operator API Key available
+from the 'Account Settings' page of the 
+[EVRYTHNG Dashboard](https://dashboard.evrythng.com):
 
 ```
 $ evrythng operator add $name $region $apiKey
@@ -33,7 +34,7 @@ After installation, the global `npm` module can be used directly. In general,
 the argument structure is:
 
 ```
-$ evrythng <command> <params>... [<switches>...]
+$ evrythng <command> <params>... [<payload>] [<switches>...]
 ```
 
 Run `evrythng` to see all commands and switches. 
@@ -52,7 +53,7 @@ Authentication is provided in two ways.
    provide a separately required key (such as the Application API Key when 
    creating Application Users).
 
-You must add at least one Operator before you can begin using the CLI.
+> You must add at least one Operator before you can begin using the CLI.
 
 
 ## Running Tests
@@ -66,10 +67,10 @@ Afterwards, see `reports/index.html` for code coverage results.
 
 ### Launch Parameters
 
-The structure of launch parameters is thus:
+The structure of launch parameters is as follows:
 
 ```
-$ evrythng <command> <params>... [<switches>...]
+$ evrythng <command> <params>... [<payload>] [<switches>...]
 ```
 
 A command is implemented by adding to `commands.js`, and must have the following 
@@ -103,23 +104,20 @@ parameters that were provided to it. A command is selected when all arguments
 match the `pattern` provided by any given `operations` item, including keywords
 such as `$id` or `$type`.
 
-If no command is matches, the help is displayed. If a command is not fully 
+If no command is matched, the help text is displayed. If a command is not fully 
 matched, but the arguments do start with a module's `startsWith`, the syntax
 for the module's `operations` is printed to help guide the user.
 
-So for example, the `thng` command:
+So for example, the `thng $id read` command:
 
 ```
 $ evrythng thng UnghCKffVg8a9KwRwE5C9qBs read
 ``` 
-would receive all tokens after its own name:
-
-```js
-console.log(args);
-```
+would receive all tokens after its own name as `args` when the operation is 
+called (i.e: all arguments matched its `pattern`):
 
 ```
-[ 'UnghCKffVg8a9KwRwE5C9qBs', 'read' ];
+['UnghCKffVg8a9KwRwE5C9qBs', 'read'];
 ```
 
 and is implemented thus:
@@ -154,17 +152,32 @@ themselves.
 
 ### Use of Swagger
 
-The EVRYTHNG CLI uses the `evrythng-swagger` `npm` module to allow interactive
-building of `POST` request payloads using the `definitions` provided by the
-EVRYTHNG `swagger.json` API description. This is invoked with the `--build` 
-switch:
+The EVRYTHNG CLI uses the 
+[`evrythng-swagger` `npm` module](https://www.npmjs.com/package/evrythng-swagger) 
+to allow interactive building of `POST` request payloads using the `definitions` 
+provided by the EVRYTHNG `swagger.json` API description. This is invoked with 
+the `--build` switch:
 
 ```
 $ evrythng thng create --build
 ```
 
-The CLI then asks for each field in the `definition` specified in the command
-that implements `payloadBuilder.build()`, in this case `ThngDocument`:
+The CLI then asks for each field in the `definition` (that is not marked as 
+`readOnly`) specified in the command that implements `payloadBuilder.build()`, 
+in this case `ThngDocument`:
+
+```js
+createThng: {
+  execute: async ([, json]) => {
+    const payload = await util.buildPayload('ThngDocument', json);
+    return http.post('/thngs', payload);
+  },
+  pattern: 'thng create $payload',
+},
+```
+
+The user is then asked to input their values, including sub-objects such as 
+`customFields`:
 
 ```
 laptop:evrythng-cli chrislewis$ evrythng thng create --build
@@ -237,12 +250,12 @@ $ evrythng thng list --filter tags=test
 
 The value would be read in code as:
 
-```
+```js
 const filter = switches.using(switches.FILTER);
 
 if (filter) console.log(`Filter value was ${filter.value}`);
 ```
 
 ```
-Filter value was tags-test
+Filter value was tags=test
 ```

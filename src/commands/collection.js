@@ -22,10 +22,7 @@ module.exports = {
       pattern: 'collection list',
     },
     updateCollection: {
-      execute: async ([id, , json]) => {
-        const payload = await util.buildPayload('CollectionDocument', json);
-        return http.put(`/collections/${id}`, payload);
-      },
+      execute: async ([id, , json]) => http.put(`/collections/${id}`, JSON.parse(json)),
       pattern: 'collection $id update $payload',
     },
     deleteCollection: {

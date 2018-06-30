@@ -21,10 +21,7 @@ module.exports = {
       pattern: 'batch list',
     },
     updateBatch: {
-      execute: async ([id, , json]) => {
-        const payload = await util.buildPayload('BatchDocument', json);
-        return http.put(`/batches/${id}`, payload);
-      },
+      execute: async ([id, , json]) => http.put(`/batches/${id}`, JSON.parse(json)),
       pattern: 'batch $id update $payload',
     },
     deleteBatch: {

@@ -22,10 +22,7 @@ module.exports = {
       pattern: 'product list',
     },
     updateProduct: {
-      execute: async ([id, , json]) => {
-        const payload = await util.buildPayload('ProductDocument', json);
-        return http.put(`/products/${id}`, payload);
-      },
+      execute: async ([id, , json]) => http.put(`/products/${id}`, JSON.parse(json)),
       pattern: 'product $id update $payload',
     },
     deleteProduct: {

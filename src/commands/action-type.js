@@ -17,10 +17,7 @@ module.exports = {
       pattern: 'action-type list',
     },
     updateActionType: {
-      execute: async ([type, , json]) => {
-        const payload = await util.buildPayload('ActionTypeDocument', json);
-        return http.put(`/actions/${type}`, payload);
-      },
+      execute: async ([type, , json]) => http.put(`/actions/${type}`, JSON.parse(json)),
       pattern: 'action-type $type update $payload',
     },
     deleteActionType: {

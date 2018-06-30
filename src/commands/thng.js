@@ -22,10 +22,7 @@ module.exports = {
       pattern: 'thng list',
     },
     updateThng: {
-      execute: async ([id, , json]) => {
-        const payload = await util.buildPayload('ThngDocument', json);
-        return http.put(`/thngs/${id}`, payload);
-      },
+      execute: async ([id, , json]) => http.put(`/thngs/${id}`, JSON.parse(json)),
       pattern: 'thng $id update $payload',
     },
     deleteThng: {
@@ -47,7 +44,10 @@ module.exports = {
       pattern: 'thng $id property $key read',
     },
     updateProperty: {
-      execute: async ([id, , key, , json]) => http.put(`/thngs/${id}/properties/${key}`, JSON.parse(json)),
+      execute: async ([id, , key, , json]) => {
+        const url = `/thngs/${id}/properties/${key}`;
+        return http.put(url, JSON.parse(json));
+      },
       pattern: 'thng $id property $key update $payload',
     },
     deleteProperty: {

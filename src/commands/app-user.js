@@ -9,8 +9,7 @@ module.exports = {
       execute: async ([, json]) => {
         util.requireKey('Application');
 
-        const payload = await util.buildPayload('ApplicationUserDocument', json);
-        return http.post('/auth/evrythng/users', payload);
+        return http.post('/auth/evrythng/users', JSON.parse(json));
       },
       pattern: 'app-user create $payload',
     },
@@ -18,8 +17,7 @@ module.exports = {
       execute: async ([id, , json]) => {
         util.requireKey('Application');
 
-        const payload = await util.buildPayload('ActivationCodeDocument', json);
-        return http.post(`/auth/evrythng/users/${id}/validate`, payload);
+        return http.post(`/auth/evrythng/users/${id}/validate`, JSON.parse(json));
       },
       pattern: 'app-user $id validate $payload',
     },
@@ -41,10 +39,7 @@ module.exports = {
       pattern: 'app-user list',
     },
     updateApplicationUser: {
-      execute: async ([id, , json]) => {
-        const payload = await util.buildPayload('ApplicationUserDocument', json);
-        return http.put(`/users/${id}`, payload);
-      },
+      execute: async ([id, , json]) => http.put(`/users/${id}`, JSON.parse(json)),
       pattern: 'app-user $id update $payload',
     },
     deleteApplicationUser: {

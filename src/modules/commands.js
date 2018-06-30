@@ -55,12 +55,7 @@ const matchArg = (arg, spec) => {
   return map[spec] ? map[spec]() : (arg === spec);
 };
 
-const matchArgs = (args, pattern) => {
-  const specs = pattern.split(' ');
-  if (args.length !== specs.length) return false;
-
-  return specs.every((item, i) => matchArg(args[i], item));
-};
+const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => matchArg(args[i], item));
 
 const identify = args => COMMAND_LIST.reduce((result, item) => {
   if (result) return result;
@@ -80,5 +75,4 @@ module.exports = {
   showSyntax,
   matchArg,
   matchArgs,
-  identify,
 };

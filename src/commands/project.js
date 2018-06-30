@@ -22,10 +22,7 @@ module.exports = {
       pattern: 'project $id read',
     },
     updateProject: {
-      execute: async ([projectId, , json]) => {
-        const payload = await util.buildPayload('ProjectDocument', json);
-        return http.put(`/projects/${projectId}`, payload);
-      },
+      execute: async ([projectId, , json]) => http.put(`/projects/${projectId}`, JSON.parse(json)),
       pattern: 'project $id update $payload',
     },
     deleteProject: {
@@ -54,8 +51,8 @@ module.exports = {
     },
     updateApplication: {
       execute: async ([projectId, , applicationId, , json]) => {
-        const payload = await util.buildPayload('ApplicationDocument', json);
-        return http.put(`/projects/${projectId}/applications/${applicationId}`, payload);
+        const url = `/projects/${projectId}/applications/${applicationId}`;
+        return http.put(url, JSON.parse(json));
       },
       pattern: 'project $id application $id update $payload',
     },

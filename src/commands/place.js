@@ -21,10 +21,7 @@ module.exports = {
       pattern: 'place list',
     },
     update: {
-      execute: async ([placeId, , json]) => {
-        const payload = await util.buildPayload('PlaceDocument', json);
-        return http.put(`/places/${placeId}`, payload);
-      },
+      execute: async ([placeId, , json]) => http.put(`/places/${placeId}`, JSON.parse(json)),
       pattern: 'place $id update $payload',
     },
     delete: {
