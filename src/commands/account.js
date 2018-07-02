@@ -2,7 +2,7 @@ const http = require('../modules/http');
 
 module.exports = {
   about: 'Work with accounts and account accesses.',
-  startsWith: 'account',
+  firstArg: 'account',
   operations: {
     listAccount: {
       execute: async () => http.get('/accounts'),

@@ -11,7 +11,7 @@ const execute = () => {
 
 module.exports = {
   about: 'Print version information.',
-  startsWith: 'version',
+  firstArg: 'version',
   operations: {
     default: {
       execute,

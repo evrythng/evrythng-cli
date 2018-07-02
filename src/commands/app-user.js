@@ -3,7 +3,7 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with Application User resources.',
-  startsWith: 'app-user',
+  firstArg: 'app-user',
   operations: {
     createApplicationUser: {
       execute: async ([, json]) => {

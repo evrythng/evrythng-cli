@@ -3,12 +3,12 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with project and application resources.',
-  startsWith: 'project',
+  firstArg: 'project',
   operations: {
     // CRUD projects
     createProject: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('ProjectDocument', json);
+        const payload = await util.getPayload('ProjectDocument', json);
         return http.post('/projects', payload);
       },
       pattern: 'project create $payload',
@@ -33,7 +33,7 @@ module.exports = {
     // CRUD applications
     createApplication: {
       execute: async ([projectId, , , json]) => {
-        const payload = await util.buildPayload('ApplicationDocument', json);
+        const payload = await util.getPayload('ApplicationDocument', json);
         return http.post(`/projects/${projectId}/applications`, payload);
       },
       pattern: 'project $id application create $payload',

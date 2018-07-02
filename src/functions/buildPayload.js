@@ -97,10 +97,12 @@ const filteredPropertyKeys = properties => Object.keys(properties)
   .filter(item => !properties[item].readOnly)
   .filter(item => !NON_CREATE_PROPERTIES.includes(item));
 
-const buildObject = async (payload, properties, name) => {
+const buildObject = async (properties, name) => {
   const propertyKeys = filteredPropertyKeys(properties);
   const context = name ? `of ${name} ` : '';
   console.log(`Provide values for each field ${context}(or leave blank to skip):\n`);
+
+  const payload = {};
   for (let i = 0; i < propertyKeys.length; i += 1) {
     const key = propertyKeys[i];
     await buildProperty(i, propertyKeys.length, payload, key, properties[key]);
@@ -109,19 +111,14 @@ const buildObject = async (payload, properties, name) => {
   return payload;
 };
 
-const build = async (defName) => {
+module.exports = async (defName) => {
   spec = await jsonSchemaParser.dereference(evrythngSwagger);
   if (!spec.definitions[defName]) throw new Error(`\ndefName ${defName} not found in spec!`);
 
   console.log();
   const { properties } = spec.definitions[defName];
-  const payload = {};
-  await buildObject(payload, properties);
+  const payload = await buildObject(properties);
 
   console.log();
   return payload;
-};
-
-module.exports = {
-  build,
 };

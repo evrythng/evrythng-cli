@@ -39,11 +39,11 @@ const upload = async (args) => {
 
 module.exports = {
   about: 'Work with file resources and upload file data.',
-  startsWith: 'file',
+  firstArg: 'file',
   operations: {
     create: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('FileDocument', json);
+        const payload = await util.getPayload('FileDocument', json);
         return http.post('/files', payload);
       },
       pattern: 'file create $payload',

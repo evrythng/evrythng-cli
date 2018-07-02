@@ -61,11 +61,11 @@ const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => match
 const identify = args => COMMAND_LIST.reduce((result, item) => {
   if (result) return result;
 
-  const { operations, startsWith } = item;
+  const { operations, firstArg } = item;
   const match = Object.keys(operations)
     .find(item2 => matchArgs(args, operations[item2].pattern));
   if (match) return operations[match];
-  if (args[0] === startsWith) showSyntax(item);
+  if (args[0] === firstArg) showSyntax(item);
 
   return result;
 }, false);

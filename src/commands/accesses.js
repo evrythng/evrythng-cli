@@ -3,7 +3,7 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with user accesses.',
-  startsWith: 'accesses',
+  firstArg: 'accesses',
   operations: {
     create: {
       execute: async ([, json]) => http.post('/accesses', JSON.parse(json)),

@@ -37,7 +37,7 @@ the argument structure is:
 $ evrythng <command> <params>... [<payload>] [<switches>...]
 ```
 
-Run `evrythng` to see all commands and switches. 
+Run `evrythng` to see all commands, switches, and options. 
 
 
 ## Authentication
@@ -79,7 +79,7 @@ exported structure:
 ```js
 {
   about,
-  startsWith,
+  firstArg,
   operations,
 }
 ```
@@ -89,7 +89,7 @@ For example:
 ```js
 module.exports = {
   about: 'View rate limit information',
-  startsWith: 'rate-limit',
+  firstArg: 'rate-limit',
   operations: {
     read: {
       execute: async () => http.get('/rateLimits'),
@@ -105,7 +105,7 @@ match the `pattern` provided by any given `operations` item, including keywords
 such as `$id` or `$type`.
 
 If no command is matched, the help text is displayed. If a command is not fully 
-matched, but the arguments do start with a module's `startsWith`, the syntax
+matched, but the arguments do start with a module's `firstArg`, the syntax
 for the module's `operations` is printed to help guide the user.
 
 So for example, the `thng $id read` command:
@@ -117,7 +117,7 @@ would receive all tokens after its own name as `args` when the operation is
 called (i.e: all arguments matched its `pattern`):
 
 ```
-['UnghCKffVg8a9KwRwE5C9qBs', 'read'];
+['UnghCKffVg8a9KwRwE5C9qBs', 'read']
 ```
 
 and is implemented thus:
@@ -125,7 +125,7 @@ and is implemented thus:
 ```js
 module.exports = {
   about: 'Work with Thng resources.',
-  startsWith: 'thng',
+  firstArg: 'thng',
   operations: {
     readThng: {
       execute: async ([id]) => http.get(`/thngs/${id}`),

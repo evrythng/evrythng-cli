@@ -3,11 +3,11 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with place resources.',
-  startsWith: 'place',
+  firstArg: 'place',
   operations: {
     create: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('PlaceDocument', json);
+        const payload = await util.getPayload('PlaceDocument', json);
         return http.post('/places', payload);
       },
       pattern: 'place create $payload',

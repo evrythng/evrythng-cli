@@ -9,18 +9,18 @@ const operator = require('../src/commands/operator');
 
 describe('CLI', () => {
   before(async () => {
+    // Save user settings
     ctx.options = config.get('options');
 
     await cli('option no-output true');
     await cli('option no-confirm true');
+    await cli('option show-http false');
 
     operator.applyRegion();
   });
 
   after(async () => {
-    await cli('option no-output false');
-    await cli('option no-confirm false');
-
+    // Restore user settings
     config.set(ctx.options);
   });
 

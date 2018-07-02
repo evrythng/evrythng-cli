@@ -103,7 +103,7 @@ const getKey = () => {
 
 module.exports = {
   about: 'View and choose an Operator API Key for global use.',
-  startsWith: 'operator',
+  firstArg: 'operator',
   operations: {
     add: {
       execute: addOperator,

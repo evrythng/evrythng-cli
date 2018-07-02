@@ -3,12 +3,12 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with collection resources.',
-  startsWith: 'collection',
+  firstArg: 'collection',
   operations: {
     // CRUD
     createCollection: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('CollectionDocument', json);
+        const payload = await util.getPayload('CollectionDocument', json);
         return http.post('/collections', payload);
       },
       pattern: 'collection create $payload',

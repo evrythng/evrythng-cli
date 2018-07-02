@@ -3,11 +3,11 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with batches.',
-  startsWith: 'batch',
+  firstArg: 'batch',
   operations: {
     createBatch: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('BatchDocument', json);
+        const payload = await util.getPayload('BatchDocument', json);
         return http.post('/batches', payload);
       },
       pattern: 'batch create $payload',

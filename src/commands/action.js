@@ -3,11 +3,11 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with actions.',
-  startsWith: 'action',
+  firstArg: 'action',
   operations: {
     createAction: {
       execute: async ([type, , json]) => {
-        const payload = await util.buildPayload('ActionDocument', json);
+        const payload = await util.getPayload('ActionDocument', json);
         return http.post(`/actions/${type}`, payload);
       },
       pattern: 'action $type create $payload',

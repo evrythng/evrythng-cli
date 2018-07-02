@@ -2,7 +2,7 @@ const http = require('../modules/http');
 
 module.exports = {
   about: 'Work with account Redirector.',
-  startsWith: 'redirector',
+  firstArg: 'redirector',
   operations: {
     read: {
       execute: async () => http.get('/redirector'),

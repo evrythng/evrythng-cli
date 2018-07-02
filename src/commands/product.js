@@ -3,12 +3,12 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with product resources.',
-  startsWith: 'product',
+  firstArg: 'product',
   operations: {
     // CRUD
     createProduct: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('ProductDocument', json);
+        const payload = await util.getPayload('ProductDocument', json);
         return http.post('/products', payload);
       },
       pattern: 'product create $payload',

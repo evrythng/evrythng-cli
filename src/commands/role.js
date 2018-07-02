@@ -2,7 +2,7 @@ const http = require('../modules/http');
 
 module.exports = {
   about: 'Work with role and permission resources.',
-  startsWith: 'role',
+  firstArg: 'role',
   operations: {
     // CRUD - roles
     createRole: {

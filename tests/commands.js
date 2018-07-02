@@ -36,7 +36,7 @@ describe('commands', () => {
   it('should identify a command from some args', () => {
     const args = ['thng', 'UKAVpbnsVDPa9Kaaam7a5tdp', 'read'];
     const expected = commands.COMMAND_LIST
-      .find(item => item.startsWith === 'thng').operations.readThng;
+      .find(item => item.firstArg === 'thng').operations.readThng;
 
     const res = commands.identify(args);
     expect(res).to.deep.equal(expected);

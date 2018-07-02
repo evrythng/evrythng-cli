@@ -5,24 +5,42 @@ const version = require('../commands/version');
 const indent = require('./indent');
 
 const EXAMPLES = [{
-  command: '    operator list',
-  about: 'See all Operators',  
+  command: 'operator list',
+  about: 'See all Operators',
 }, {
-  command: '   operator add prod us AGiWrH5OteA4aHiM...',
+  command: 'operator add prod us AGiWrH5OteA4aHiM...',
   about: 'Add a new Operator',
 }, {
-  command: ' thng list',
+  command: 'thng list',
   about: 'Read a page of Thngs',
 }, {
-  command: '    thng UpUxnWAXeMPNQraRaGmKQdHr read',
+  command: 'thng UpUxnWAXeMPNQraRaGmKQdHr read',
   about: 'Read a known Thng',
 }, {
-  command: ' product create \'{"name": "My New Product"}\'',
+  command: 'product create \'{"name": "My New Product"}\'',
   about: 'Create a new product',
 }, {
-  command: ' thng list --filter tags=testing --perpage 1',
+  command: 'thng list --filter tags=testing --perpage 1',
   about: 'Find one tagged Thng',
 }];
+
+const getPaddingLength = (items) => items.reduce((result, item) => {
+  const newLength = item.length;
+  return (newLength > result) ? newLength : result;
+}, 0);
+
+const formatList = (list, label, descriptor, sort = true) => {
+  let labels = list.map(item => item[label]);
+  if (sort) labels = labels.sort();
+
+  const maxPadLength = getPaddingLength(labels);
+  list.forEach((item) => {
+    const padLength = maxPadLength - item[label].length;
+    item[label] = `${item[label]} ${' '.repeat(padLength)}`;
+  });
+
+  list.forEach(item => console.log(indent(`${item[label]} ${item[descriptor]}`, 4)));
+};
 
 module.exports = () => {
   version.operations.default.execute();
@@ -32,24 +50,21 @@ module.exports = () => {
 
   console.log('\nAvailable Commands:\n');
   console.log(indent('Specify a command name below to see syntax for all its operations.\n', 2));
-  COMMAND_LIST.map(item => `${item.startsWith} - ${item.about}`)
-    .sort()
-    .forEach(item => console.log(indent(item, 4)));
+  formatList(COMMAND_LIST, 'firstArg', 'about');
 
   console.log('\nAvailable Switches:\n');
-  SWITCH_LIST.map(item => `${item.name}${item.hasValue ? ' <value>' : ''} - ${item.about}`)
-    .sort()
-    .forEach(item => console.log(indent(item, 4)));
+  const switchList = SWITCH_LIST.map((item) => {
+    item.name = `${item.name}${item.hasValue ? ' <value>' : ''}`;
+    return item;
+  });
+  formatList(switchList, 'name', 'about');
 
   console.log('\nAvailable Options:\n');
   console.log(indent('Use \'option list\' to see option states.\n', 2));
-  OPTION_LIST.map(item => `${item.name} - ${item.about}`)
-    .sort()
-    .forEach(item => console.log(indent(item, 4)));
+  formatList(OPTION_LIST, 'name', 'about');
 
   console.log('\nUsage Examples:\n');
-  EXAMPLES.map(item => `${item.about}: ${item.command}`)
-    .forEach(item => console.log(indent(item, 4)));
+  formatList(EXAMPLES, 'about', 'command', false);
 
   console.log();
 };

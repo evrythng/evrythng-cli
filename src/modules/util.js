@@ -1,6 +1,6 @@
 const config = require('./config');
 const indent = require('../functions/indent');
-const payloadBuilder = require('./payloadBuilder');
+const buildPayload = require('../functions/buildPayload');
 const switches = require('./switches');
 
 const INDENT_SIZE = 2;
@@ -42,8 +42,8 @@ const printSimple = (obj, level) => {
   });
 };
 
-const buildPayload = async (defName, jsonStr) => {
-  if (switches.using(switches.BUILD)) return payloadBuilder.build(defName);
+const getPayload = async (defName, jsonStr) => {
+  if (switches.using(switches.BUILD)) return buildPayload(defName);
 
   return JSON.parse(jsonStr);
 };
@@ -56,7 +56,7 @@ const requireKey = (name) => {
 module.exports = {
   isId,
   pretty,
-  buildPayload,
+  getPayload,
   printListSummary,
   printSimple,
   requireKey,

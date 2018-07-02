@@ -2,7 +2,7 @@ const http = require('../modules/http');
 
 module.exports = {
   about: 'Use any valid EVRYTHNG URL.',
-  startsWith: 'url',
+  firstArg: 'url',
   operations: {
     postUrl: {
       execute: async ([, url, json]) => http.post(url, JSON.parse(json)),

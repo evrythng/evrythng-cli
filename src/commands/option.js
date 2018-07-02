@@ -1,14 +1,14 @@
 const config = require('../modules/config');
 
-const OPTION_LIST = [ { 
+const OPTION_LIST = [{
   key: 'noOutput',
   name: 'no-output',
   about: 'Print no output to the console.',
-}, { 
+}, {
   key: 'errorDetail',
   name: 'error-detail',
   about: 'Show full detail of errors encountered.',
-}, { 
+}, {
   key: 'noConfirm',
   name: 'no-confirm',
   about: 'Skip the \'confirm?\' step for deletions.',
@@ -20,15 +20,18 @@ const OPTION_LIST = [ {
 
 module.exports = {
   about: 'Choose CLI options.',
-  startsWith: 'option',
+  firstArg: 'option',
   operations: {
     listOptions: {
       execute: () => {
         const options = config.get('options');
-        if(options.noOutput) return;
+        if (options.noOutput) return;
 
-        console.log(`\nOptions:\n`);
-        Object.keys(options).forEach(item => console.log(`- ${item}: ${options[item]}`));
+        console.log('\nOptions:\n');
+        Object.keys(options).forEach((item) => {
+          const found = OPTION_LIST.find(item2 => item2.key === item);
+          console.log(`- ${found.name}: ${options[item]}`);
+        });
       },
       pattern: 'option list',
     },

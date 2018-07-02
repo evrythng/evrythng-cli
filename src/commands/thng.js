@@ -3,12 +3,12 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with Thng resources.',
-  startsWith: 'thng',
+  firstArg: 'thng',
   operations: {
     // CRUD
     createThng: {
       execute: async ([, json]) => {
-        const payload = await util.buildPayload('ThngDocument', json);
+        const payload = await util.getPayload('ThngDocument', json);
         return http.post('/thngs', payload);
       },
       pattern: 'thng create $payload',
