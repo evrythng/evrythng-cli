@@ -55,8 +55,10 @@ const showKey = ([name]) => {
 };
 
 const addOperator = ([, name, region, apiKey]) => {
-  if (!REGIONS[region]) throw new Error(`$region must be one of ${Object.keys(REGIONS).join(', ')}`);
   if (apiKey.length !== 80) throw new Error('API key is an invalid length');
+  if (!REGIONS[region]) {
+    throw new Error(`$region must be one of ${Object.keys(REGIONS).join(', ')}`);
+  }
 
   const operators = config.get('operators');
   operators[name] = { apiKey, region };
@@ -92,7 +94,9 @@ const getKey = () => {
   if (key) return key.value;
 
   const operator = config.get('using');
-  if (!operator) throw new Error('No Operator has been selected yet. Use \'operator add\' to add one.');
+  if (!operator) {
+    throw new Error('No Operator has been selected yet. Use \'operator add\' to add one.');
+  }
 
   return resolveKey(operator);
 };

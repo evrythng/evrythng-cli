@@ -23,7 +23,7 @@ const SWITCH_LIST = [{
   hasValue: true,
 }, {
   name: '--expand',
-  about: 'Expand known ID fields, timestamps to date, etc.',
+  about: 'Expand some ID fields, timestamps to date, etc.',
   constant: 'EXPAND',
 }, {
   name: '--field',

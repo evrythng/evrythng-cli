@@ -1,5 +1,23 @@
 const config = require('../modules/config');
 
+const OPTION_LIST = [ { 
+  key: 'noOutput',
+  name: 'no-output',
+  about: 'Print no output to the console.',
+}, { 
+  key: 'errorDetail',
+  name: 'error-detail',
+  about: 'Show full detail of errors encountered.',
+}, { 
+  key: 'noConfirm',
+  name: 'no-confirm',
+  about: 'Skip the \'confirm?\' step for deletions.',
+}, {
+  key: 'showHttp',
+  name: 'show-http',
+  about: 'Show full details of HTTP requests',
+}];
+
 module.exports = {
   about: 'Choose CLI options.',
   startsWith: 'option',
@@ -14,37 +32,19 @@ module.exports = {
       },
       pattern: 'option list',
     },
-    setErrorDetail: {
-      execute: ([, state]) => {
+    setOption: {
+      execute: ([name, state]) => {
+        if (!name) throw new Error('Please specify an option $name');
+
+        const found = OPTION_LIST.find(item => item.name === name);
+        if (!found) throw new Error(`Unknown option name '${name}'`);
+
         const options = config.get('options');
-        options.errorDetail = (state === 'true');
+        options[found.key] = (state === 'true');
         config.set('options', options);
       },
-      pattern: 'option error-detail $state',
-    },
-    setNoConfirm: {
-      execute: ([, state]) => {
-        const options = config.get('options');
-        options.noConfirm = (state === 'true');
-        config.set('options', options);
-      },
-      pattern: 'option no-confirm $state',
-    },
-    setShowHttp: {
-      execute: ([, state]) => {
-        const options = config.get('options');
-        options.showHttp = (state === 'true');
-        config.set('options', options);
-      },
-      pattern: 'option show-http $state',
-    },
-    setNoOutput: {
-      execute: ([, state]) => {
-        const options = config.get('options');
-        options.noOutput = (state === 'true');
-        config.set('options', options);
-      },
-      pattern: 'option no-output $state',
+      pattern: 'option $name $state',
     },
   },
+  OPTION_LIST,
 };
