@@ -42,6 +42,7 @@ describe('CLI', () => {
   require('./commands/redirector');
   require('./commands/role');
   require('./commands/thng');
+  require('./commands/url');
   require('./commands/version');
 
   require('./functions');
