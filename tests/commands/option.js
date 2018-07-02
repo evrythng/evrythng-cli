@@ -4,11 +4,19 @@ const chaiAsPromised = require('chai-as-promised');
 const config = require('../../src/modules/config');
 const cli = require('../../src/functions/cli');
 
+const { expect } = chai;
+
 chai.should();
 chai.use(chaiAsPromised);
 
 // Set each option to the value it is now to not confuse the user
 describe('option', () => {
+  it('should not throw error for \'option list\'', async () => {
+    const optionList = async () => await cli('option list');
+
+    expect(optionList).to.not.throw();
+  });
+
   it('should not throw error for \'option error-detail $state\'', async () => {
     const { errorDetail } = config.get('options');
 

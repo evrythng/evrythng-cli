@@ -4,6 +4,16 @@ module.exports = {
   about: 'Choose CLI options.',
   startsWith: 'option',
   operations: {
+    listOptions: {
+      execute: () => {
+        const options = config.get('options');
+        if(options.noOutput) return;
+
+        console.log(`\nOptions:\n`);
+        Object.keys(options).forEach(item => console.log(`- ${item}: ${options[item]}`));
+      },
+      pattern: 'option list',
+    },
     setErrorDetail: {
       execute: ([, state]) => {
         const options = config.get('options');

@@ -7,7 +7,7 @@ module.exports = () => {
   version.operations.default.execute();
   console.log();
   console.log('Basic Usage:\n');
-  console.log(indent('$ evrythng <command> <params>... [<switches>...]', 4));
+  console.log(indent('$ evrythng <command> <params>... [<payload>] [<switches>...]', 4));
 
   console.log('\n');
   console.log('Available Commands:\n');
