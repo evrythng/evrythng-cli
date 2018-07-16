@@ -32,61 +32,63 @@ const buildCustomObject = async () => {
   return result;
 };
 
-const buildProperty = async (index, total, target, key, propertyDef) => {
-  // Hardcoded value?
+const buildDefObject = async (opts) => {
+  const { key, target, index, total, propertyDef } = opts;
+
+  // User-definable fields are not documented, present free-form
+  if (key === 'customFields' || key === 'identifiers') {
+    console.log(`${index + 1}/${total}: ${key} (object, leave 'key' blank to finish)`);
+    target[key] = await buildCustomObject();
+    return;
+  }
+
+  // Recurse
+  target[key] = {};
+  await buildObject(target[key], propertyDef.properties, key);
+};
+
+const buildDefProperty = async (opts) => {
+  const { index, total, target, key, propertyDef } = opts;
+  
+  // Fields with only one allowed value
   if (HARDCODE_MAP[key]) {
     target[key] = HARDCODE_MAP[key];
     console.log(`${index + 1}/${total}: ${key} is always ${JSON.stringify(HARDCODE_MAP[key])}`);
     return;
   }
 
+  // Build sub-object
+  // TODO handle sub-object properties
+  if (propertyDef.type === 'object') {
+    await buildDefObject({ key, target, index, total, propertyDef });
+    return;
+  }
+
+  // Determine type hint string
   let typeStr = propertyDef.type;
   if (propertyDef.type === 'array') {
     typeStr = `comma-separated list of ${propertyDef.items.type}`;
   }
-
-  // If enum, present options
   if (propertyDef.enum) {
     typeStr = `${propertyDef.type}, one of '${propertyDef.enum.join('\', \'')}'`;
-  }
-
-  // TODO handle sub-object properties
-  if (propertyDef.type === 'object') {
-    // User-definable fields are not documented, present free-form
-    if (key === 'customFields' || key === 'identifiers') {
-      console.log(`${index + 1}/${total}: ${key} (object, leave 'key' blank to finish)`);
-      target[key] = await buildCustomObject();
-      return;
-    }
-
-    if (!propertyDef.properties) {
-      console.log(`<no definition available> for '${key}'`);
-      return;
-    }
-
-    // Recurse
-    target[key] = {};
-    await buildObject(target[key], propertyDef.properties, key);
   }
 
   // Get a simple value
   const input = await askFor(`${index + 1}/${total}: ${key} (${typeStr})`);
   if (!input) return;
 
-  // Handle arrays as csv
+  // Handle input arrays as comma-separated values
+  // TODO handle arrays of non-strings?
   if (propertyDef.type === 'array') {
     if (propertyDef.items.type === 'string') {
       target[key] = input.split(',');
       return;
     }
 
-    if (propertyDef.items.type === 'string') {
+    if (['integer', 'number'].includes(propertyDef.items.type)) {
       target[key] = input.split(',').map(parseInt);
       return;
     }
-
-    // TODO handle arrays of non-strings?
-    return;
   }
 
   // Simple value
@@ -103,9 +105,15 @@ const buildObject = async (properties, name) => {
   console.log(`Provide values for each field ${context}(or leave blank to skip):\n`);
 
   const payload = {};
-  for (let i = 0; i < propertyKeys.length; i += 1) {
-    const key = propertyKeys[i];
-    await buildProperty(i, propertyKeys.length, payload, key, properties[key]);
+  for (let index = 0; index < propertyKeys.length; index += 1) {
+    const key = propertyKeys[index];
+    await buildDefProperty({
+      key, 
+      index, 
+      total: propertyKeys.length, 
+      target: payload, 
+      propertyDef: properties[key],
+    });
   }
 
   return payload;

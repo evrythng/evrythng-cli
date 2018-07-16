@@ -3,16 +3,15 @@ const evrythng = require('evrythng-extended');
 const config = require('../modules/config');
 const switches = require('../modules/switches');
 
-const REGIONS = {
-  us: 'https://api.evrythng.com',
-  eu: 'https://api-eu.evrythng.com',
-};
+const REGIONS = config.get('regions');
 
 const getAvailableOperators = () => Object.keys(config.get('operators'));
 
 const checkOperatorExists = (name) => {
   const items = getAvailableOperators();
-  if (!items.includes(name)) throw new Error(`\nOperator '${name}' not found in ${config.PATH}.`);
+  if (!items.includes(name)) {
+    throw new Error(`\nOperator '${name}' not found in ${config.PATH}.`);
+  }
 };
 
 const resolveKey = (name) => {
@@ -38,8 +37,8 @@ const list = () => {
   const { noOutput } = config.get('options');
   if (!noOutput) {
     const formatted = operators.map(formatOperator).join('\n- ');
-    console.log(`\nCurrent Operator: '${config.get('using')}'`);
-    console.log(`\nAvailable Operators:\n\n- ${formatted}\n`);
+    console.log(`\nCurrent: '${config.get('using')}'`);
+    console.log(`\nAvailable:\n- ${formatted}\n`);
   }
 
   return { operators, using: config.get('using') };

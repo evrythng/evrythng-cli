@@ -27,7 +27,7 @@ module.exports = {
         const options = config.get('options');
         if (options.noOutput) return;
 
-        console.log('\nOptions:\n');
+        console.log('\nOptions:');
         Object.keys(options).forEach((item) => {
           const found = OPTION_LIST.find(item2 => item2.key === item);
           console.log(`- ${found.name}: ${options[item]}`);

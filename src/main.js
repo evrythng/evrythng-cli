@@ -4,7 +4,7 @@ const config = require('./modules/config');
 const printHelp = require('./functions/printHelp');
 const switches = require('./modules/switches');
 
-(async () => {
+const main = async () => {
   try {
     const args = switches.apply(process.argv.slice(2));
     const command = commands.identify(args);
@@ -26,4 +26,6 @@ const switches = require('./modules/switches');
     const errStr = errorDetail ? e.stack : e.message;
     console.log(`\n${errStr}`);
   }
-})();
+};
+
+main();

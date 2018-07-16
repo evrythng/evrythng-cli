@@ -32,7 +32,7 @@ describe('file', () => {
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'file $id upload $file-path $mime-type\'', async () => {
+  it('should not throw error for \'file $id upload $file-path $mime-type\'', async () => {
     const uploadTestFile = async () => cli(`file ${ctx.fileId} upload ./tests/modules/test.txt text/plain`);
    
     expect(uploadTestFile).to.not.throw();

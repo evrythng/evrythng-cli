@@ -4,7 +4,7 @@ const operator = require('../commands/operator');
 
 const expandTimestamp = async timestamp => Promise.resolve(new Date(timestamp).toLocaleString());
 
-const expandResourceId = async (type, id) => evrythng.api({
+const expandResourceId = (type, id) => evrythng.api({
   url: `/${type}s/${id}`,
   authorization: operator.getKey(),
 });

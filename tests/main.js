@@ -9,8 +9,7 @@ const operator = require('../src/commands/operator');
 
 describe('CLI', () => {
   before(async () => {
-    // Save user settings
-    ctx.options = config.get('options');
+    ctx.savedOpts = JSON.parse(JSON.stringify(config.get('options')));
 
     await cli('option no-output true');
     await cli('option no-confirm true');
@@ -20,8 +19,7 @@ describe('CLI', () => {
   });
 
   after(async () => {
-    // Restore user settings
-    config.set(ctx.options);
+    config.set('options', ctx.savedOpts);
   });
 
   require('./commands/access');

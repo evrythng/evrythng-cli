@@ -11,6 +11,10 @@ const DEFAULT_CONFIG = {
     showHttp: false,
     noOutput: false,
   },
+  regions: {
+    us: 'https://api.evrythng.com',
+    eu: 'https://api-eu.evrythng.com',
+  },
 };
 
 let data;
@@ -40,4 +44,4 @@ module.exports = {
   set,
 };
 
-(() => load())();
+load();
