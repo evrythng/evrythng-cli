@@ -3,6 +3,8 @@ const evrythng = require('evrythng-extended');
 const config = require('../modules/config');
 const switches = require('../modules/switches');
 
+const askFor = require('../functions/askFor');
+
 const REGIONS = config.get('regions');
 
 const getAvailableOperators = () => Object.keys(config.get('operators'));
@@ -54,9 +56,14 @@ const showKey = ([name]) => {
 };
 
 const addOperator = ([, name, region, apiKey]) => {
-  if (apiKey.length !== 80) throw new Error('API key is an invalid length');
   if (!REGIONS[region]) {
     throw new Error(`$region must be one of ${Object.keys(REGIONS).join(', ')}`);
+  }
+  if (name.includes(' ')) {
+    throw new Error('Short name must be a single word');
+  }
+  if (apiKey.length !== 80) {
+    throw new Error('API key is an invalid length');
   }
 
   const operators = config.get('operators');
@@ -83,6 +90,27 @@ const applyRegion = () => {
 
   const { region } = config.get('operators')[name];
   evrythng.setup({ apiUrl: REGIONS[region] });
+};
+
+const checkFirstRun = async () => {
+  const operators = config.get('operators');
+  if (Object.keys(operators).length) return;
+
+  console.log('\nWelcome to the EVRYTHNG CLI!\n\nTo get started, please provide the following ' +
+    'to set up your first account Operator:\n');
+
+  const name = await askFor('Short Operator name (e.g: \'personal\')');
+  const region = await askFor('Account region (\'us\' or \'eu\')');
+  const apiKey = await askFor('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
+  addOperator([null, name, region, apiKey]);
+
+  console.log('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. ' +
+    'Some examples to get you started:\n');
+  console.log('  evrythng thng list');
+  console.log('  evrythng thng UnQ8nqfQeD8aQpwRanrXaaPt read');
+  console.log('  evrythng product create \'{"name": "My New Product"}\'\n');
+  console.log('Type \'evrythng\' to see all available commands and options.\n');
+  process.exit();
 };
 
 
@@ -127,4 +155,5 @@ module.exports = {
   },
   getKey,
   applyRegion,
+  checkFirstRun,
 };

@@ -6,6 +6,8 @@ const switches = require('./modules/switches');
 
 const main = async () => {
   try {
+    await operator.checkFirstRun();
+    
     const args = switches.apply(process.argv.slice(2));
     const command = commands.identify(args);
     if (!command) {
