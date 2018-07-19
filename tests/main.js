@@ -46,5 +46,6 @@ describe('CLI', () => {
   require('./functions');
   require('./switches');
   require('./commands');
+  require('./prompt');
   require('./util');
 });

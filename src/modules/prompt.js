@@ -18,18 +18,9 @@ const getChoice = (label, choices) => new Promise(async (resolve) => {
   resolve(input);
 });
 
-const isInteger = (val) => {
-  try { 
-    parseInt(val, 10); 
-    return true;
-  } catch (e) { 
-    return false;
-  }
-};
-
 const getInteger = label => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (integer)`);
-  while (!isInteger(input)) {
+  while (typeof input !== 'number') {
     console.log('Invalid input');
     input = await getValue(label);
   }
@@ -37,11 +28,11 @@ const getInteger = label => new Promise(async (resolve) => {
   resolve(input);
 });
 
-const isBoolean = val => val === 'true' || val === 'false';
+const isBooleanString = val => val === 'true' || val === 'false';
 
 const getBoolean = label => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (true/false)`);
-  while (!isBoolean(input)) {
+  while (!isBooleanString(input)) {
     console.log('Invalid input');
     input = await getValue(label);
   }
@@ -49,7 +40,7 @@ const getBoolean = label => new Promise(async (resolve) => {
   resolve(input === 'true');
 });
 
-const isJSON = (val) => {
+const isJSONString = (val) => {
   try { 
     JSON.parse(val); 
     return true;
@@ -60,7 +51,7 @@ const isJSON = (val) => {
 
 const getJSON = label => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (JSON)`);
-  while (!isJSON(input)) {
+  while (!isJSONString(input)) {
     console.log('Invalid input');
     input = await getValue(label);
   }
@@ -80,6 +71,8 @@ const getConfirmation = async () => {
 };
 
 module.exports = {
+  isBooleanString,
+  isJSONString,
   getValue,
   getChoice,
   getInteger,

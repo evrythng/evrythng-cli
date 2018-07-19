@@ -70,7 +70,7 @@ const goToPage = async (res, endPage) => {
 
 const printResponse = async (res) => {
   if (!res) return;
-  if (!res.data) return; 
+  if (!res.data) return res;
 
   const { showHttp, noOutput } = config.get('options');
 
