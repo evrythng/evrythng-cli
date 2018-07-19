@@ -20,7 +20,7 @@ const EXAMPLES = [{
   command: 'product create \'{"name": "My New Product"}\'',
   about: 'Create a new product',
 }, {
-  command: 'thng list --filter tags=testing --perpage 1',
+  command: 'thng list --filter tags=testing --per-page 1',
   about: 'Find one tagged Thng',
 }];
 

@@ -8,7 +8,7 @@ const SWITCH_LIST = [{
   about: 'Include resource scopes in the response.',
   constant: 'SCOPES',
 }, {
-  name: '--perpage',
+  name: '--per-page',
   about: 'Specify number of resources per page.',
   constant: 'PER_PAGE',
   hasValue: true,
