@@ -1,6 +1,6 @@
 const evrythng = require('evrythng-extended');
 
-const askFor = require('../functions/askFor');
+const { getValue, getConfirmation } = require('./prompt');
 const operator = require('../commands/operator');
 const config = require('./config');
 const expand = require('../functions/expand');
@@ -69,7 +69,8 @@ const goToPage = async (res, endPage) => {
 };
 
 const printResponse = async (res) => {
-  if (!res) return null;
+  if (!res) return;
+  if (!res.data) return; 
 
   const { showHttp, noOutput } = config.get('options');
 
@@ -121,9 +122,9 @@ const apiRequest = async (options) => {
 
   const { showHttp, noConfirm } = config.get('options');
   if (options.method === 'DELETE' && !noConfirm) {
-    const confirm = await askFor('Confirm delete (yes/no)');
-    if (confirm !== 'yes') {
-      console.log('Delete aborted');
+    const confirmation = await getConfirmation();
+    if (!confirmation) {
+      console.log('Cancelled');
       process.exit();
     }
   }

@@ -3,7 +3,7 @@ const evrythng = require('evrythng-extended');
 const config = require('../modules/config');
 const switches = require('../modules/switches');
 
-const askFor = require('../functions/askFor');
+const { getValue } = require('../modules/prompt');
 
 const REGIONS = config.get('regions');
 
@@ -99,9 +99,9 @@ const checkFirstRun = async () => {
   console.log('\nWelcome to the EVRYTHNG CLI!\n\nTo get started, please provide the following ' +
     'to set up your first account Operator:\n');
 
-  const name = await askFor('Short Operator name (e.g: \'personal\')');
-  const region = await askFor('Account region (\'us\' or \'eu\')');
-  const apiKey = await askFor('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
+  const name = await getValue('Short Operator name (e.g: \'personal\')');
+  const region = await getValue('Account region (\'us\' or \'eu\')');
+  const apiKey = await getValue('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
   addOperator([null, name, region, apiKey]);
 
   console.log('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. ' +
@@ -156,4 +156,5 @@ module.exports = {
   getKey,
   applyRegion,
   checkFirstRun,
+  resolveKey,
 };

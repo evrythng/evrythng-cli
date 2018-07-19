@@ -29,7 +29,10 @@ module.exports = {
       pattern: 'batch $id delete',
     },
     createTask: {
-      execute: async ([id, , , json]) => http.post(`/batches/${id}/tasks`, JSON.parse(json)),
+      execute: async ([id, , , json]) => {
+        const payload = await util.getPayload('task', json);
+        return http.post(`/batches/${id}/tasks`, payload);
+      },
       pattern: 'batch $id task create $payload',
     },
     listTasks: {

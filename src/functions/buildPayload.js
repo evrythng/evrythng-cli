@@ -1,7 +1,7 @@
 const jsonSchemaParser = require('json-schema-ref-parser');
 const evrythngSwagger = require('evrythng-swagger');
 
-const askFor = require('../functions/askFor');
+const { getValue } = require('../modules/prompt');
 const indent = require('../functions/indent');
 
 // Some properties are writable, just not at create time
@@ -14,16 +14,20 @@ const HARDCODE_MAP = {
   socialNetworks: {},
 };
 
+const SPECIAL_BUILDERS = {
+  task: require('./buildTask'),
+};
+
 let spec;
 
-const getKeyName = async () => askFor(indent('key', 2));
+const getKeyName = async () => getValue(indent('key', 2));
 
 const buildCustomObject = async () => {
   const result = {};
 
   let key = await getKeyName();
   while (key) {
-    const value = await askFor(indent('value', 2));
+    const value = await getValue(indent('value', 2));
     result[key] = value;
 
     key = await getKeyName();
@@ -74,7 +78,7 @@ const buildDefProperty = async (opts) => {
   }
 
   // Get a simple value
-  const input = await askFor(`${index + 1}/${total}: ${key} (${typeStr})`);
+  const input = await getValue(`${index + 1}/${total}: ${key} (${typeStr})`);
   if (!input) return;
 
   // Handle input arrays as comma-separated values
@@ -120,6 +124,9 @@ const buildObject = async (properties, name) => {
 };
 
 module.exports = async (defName) => {
+  // Special builders
+  if (SPECIAL_BUILDERS[defName]) return SPECIAL_BUILDERS[defName]();
+
   spec = await jsonSchemaParser.dereference(evrythngSwagger);
   if (!spec.definitions[defName]) throw new Error(`\ndefName ${defName} not found in spec!`);
 
