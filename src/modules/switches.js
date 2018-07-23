@@ -4,7 +4,7 @@ const SWITCH_LIST = [{
   constant: 'FILTER',
   hasValue: true,
 }, {
-  name: '--scopes',
+  name: '--with-scopes',
   about: 'Include resource scopes in the response.',
   constant: 'SCOPES',
 }, {

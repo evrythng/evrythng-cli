@@ -229,14 +229,14 @@ After `extract()` is called, a switch's state in any given invocation can be
 determined as shown below for an example command:
 
 ```
-$ evrythng thng list --scopes
+$ evrythng thng list --with-scopes
 ```
 
 ```js
 const switches = require('../modules/switches');
 
 if (switches.using(switches.SCOPES)) {
-  // --scopes was specified
+  // --with-scopes was specified
 }
 ```
 
