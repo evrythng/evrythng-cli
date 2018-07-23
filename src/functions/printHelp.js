@@ -1,8 +1,9 @@
 const { COMMAND_LIST } = require('../modules/commands');
-const { SWITCH_LIST } = require('../modules/switches');
 const { OPTION_LIST } = require('../commands/option');
-const version = require('../commands/version');
+const { SWITCH_LIST } = require('../modules/switches');
 const indent = require('./indent');
+const logger = require('../modules/logger');
+const version = require('../commands/version');
 
 const EXAMPLES = [{
   command: 'operator list',
@@ -31,7 +32,9 @@ const getPaddingLength = (items) => items.reduce((result, item) => {
 
 const formatList = (list, label, descriptor, sort = true) => {
   let labels = list.map(item => item[label]);
-  if (sort) labels = labels.sort();
+  if (sort) {
+    labels = labels.sort();
+  }
 
   const maxPadLength = getPaddingLength(labels);
   list.forEach((item) => {
@@ -39,32 +42,30 @@ const formatList = (list, label, descriptor, sort = true) => {
     item[label] = `${item[label]} ${' '.repeat(padLength)}`;
   });
 
-  list.forEach(item => console.log(indent(`${item[label]} ${item[descriptor]}`, 4)));
+  list.forEach(item => logger.info(indent(`${item[label]} ${item[descriptor]}`, 4)));
 };
 
 module.exports = () => {
   version.operations.default.execute();
-  console.log();
-  console.log('Basic Usage:\n');
-  console.log(indent('$ evrythng <command> <params>... [<payload>] [<switches>...]', 4));
+  logger.info('\nBasic Usage:\n');
+  logger.info(indent('$ evrythng <command> <params>... [<payload>] [<switches>...]', 4));
 
-  console.log('\nAvailable Commands:\n');
-  console.log(indent('Specify a command name below to see syntax for all its operations.\n', 2));
+  logger.info('\nAvailable Commands:\n');
+  logger.info(indent('Specify a command name below to see syntax for all its operations.\n', 2));
   formatList(COMMAND_LIST, 'firstArg', 'about');
 
-  console.log('\nAvailable Switches:\n');
+  logger.info('\nAvailable Switches:\n');
   const switchList = SWITCH_LIST.map((item) => {
     item.name = `${item.name}${item.hasValue ? ' <value>' : ''}`;
     return item;
   });
   formatList(switchList, 'name', 'about');
 
-  console.log('\nAvailable Options:\n');
-  console.log(indent('Use \'option list\' to see option states.\n', 2));
+  logger.info('\nAvailable Options:\n');
+  logger.info(indent('Use \'option list\' to see option states.\n', 2));
   formatList(OPTION_LIST, 'name', 'about');
 
-  console.log('\nUsage Examples:\n');
+  logger.info('\nUsage Examples:\n');
   formatList(EXAMPLES, 'about', 'command', false);
-
-  console.log();
+  logger.info();
 };

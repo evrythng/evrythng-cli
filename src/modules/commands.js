@@ -1,4 +1,5 @@
 const config = require('./config');
+const logger = require('./logger');
 const switches = require('./switches');
 
 const COMMAND_LIST = [
@@ -28,8 +29,7 @@ const showSyntax = (command) => {
   const { operations } = command;
   const specs = Object.keys(operations).map(item => `$ evrythng ${operations[item].pattern}`);
 
-  const { noOutput } = config.get('options');
-  if (!noOutput) console.log(`\nOperations:\n${specs.join('\n')}`);
+  logger.error(`\nOperations:\n${specs.join('\n')}`);
   process.exit();
 };
 
@@ -39,10 +39,12 @@ const matchArg = (arg, spec) => {
     $id: () => arg.length === 24,
     // Value must be JSON
     $payload: () => {
-      if (switches.using(switches.BUILD)) return true;
+      if (switches.using(switches.BUILD)) {
+        return true;
+      }
 
       try {
-        return (typeof arg === 'object') || (typeof JSON.parse(arg) === 'object');
+        return (typeof arg === 'object') && JSON.parse(arg);
       } catch (e) {
         return false;
       }
@@ -50,7 +52,9 @@ const matchArg = (arg, spec) => {
   };
 
   // A labelled value, such as $type for actions
-  if (spec.startsWith('$')) return true;
+  if (spec.startsWith('$')) {
+    return true;
+  }
 
   // Must match a map value, or must be the same
   return map[spec] ? map[spec]() : (arg === spec);
@@ -59,13 +63,19 @@ const matchArg = (arg, spec) => {
 const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => matchArg(args[i], item));
 
 const identify = args => COMMAND_LIST.reduce((result, item) => {
-  if (result) return result;
+  if (result) {
+    return result;
+  }
 
   const { operations, firstArg } = item;
   const match = Object.keys(operations)
     .find(item2 => matchArgs(args, operations[item2].pattern));
-  if (match) return operations[match];
-  if (args[0] === firstArg) showSyntax(item);
+  if (match) {
+    return operations[match];
+  }
+  if (args[0] === firstArg) {
+    showSyntax(item);
+  }
 
   return result;
 }, false);

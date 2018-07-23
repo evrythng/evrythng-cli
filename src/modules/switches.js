@@ -55,7 +55,9 @@ const active = [];
 const apply = (args) => {
   SWITCH_LIST.forEach((item) => {
     const found = args.find(item1 => item1 === item.name);
-    if (!found) return;
+    if (!found) {
+      return;
+    }
 
     const foundIndex = args.indexOf(found);
     active.push({
@@ -74,7 +76,9 @@ const set = (name, value = '') => active.push({ name, value });
 
 const unset = (name) => {
   const found = using(name);
-  if (!found) return;
+  if (!found) {
+    return;
+  }
 
   active.splice(active.indexOf(found), 1);
 };
@@ -84,10 +88,18 @@ const buildParams = () => {
   const filter = using(module.exports.FILTER);
   const perPage = using(module.exports.PER_PAGE);
   const project = using(module.exports.PROJECT);
-  if (filter) result.filter = filter.value;
-  if (perPage) result.perPage = perPage.value;
-  if (project) result.project = project.value;
-  if (using(module.exports.SCOPES)) result.withScopes = true;
+  if (filter) {
+    result.filter = filter.value;
+  }
+  if (perPage) {
+    result.perPage = perPage.value;
+  }
+  if (project) {
+    result.project = project.value;
+  }
+  if (using(module.exports.SCOPES)) {
+    result.withScopes = true;
+  }
 
   return result;
 };
@@ -101,8 +113,6 @@ module.exports = {
   unset,
 };
 
-(() => {
-  SWITCH_LIST.forEach((item) => {
-    module.exports[item.constant] = item.name;
-  });
-})();
+SWITCH_LIST.forEach((item) => {
+  module.exports[item.constant] = item.name;
+});

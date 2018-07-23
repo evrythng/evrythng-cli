@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const switches = require('../src/modules/switches');
 const util = require('../src/modules/util');
 

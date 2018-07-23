@@ -1,9 +1,8 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-
-const config = require('../../src/modules/config');
-const cli = require('../../src/functions/cli');
 const { ctx } = require('../modules/util');
+const cli = require('../../src/functions/cli');
+const config = require('../../src/modules/config');
 
 chai.should();
 chai.use(chaiAsPromised);

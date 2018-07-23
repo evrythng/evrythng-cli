@@ -9,7 +9,9 @@ const DEFAULT_CONFIG = {
     errorDetail: false,
     noConfirm: true,
     showHttp: false,
-    noOutput: false,
+  },
+  logger: {
+    level: 'info',
   },
   regions: {
     us: 'https://api.evrythng.com',

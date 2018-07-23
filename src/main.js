@@ -1,6 +1,7 @@
-const operator = require('./commands/operator');
 const commands = require('./modules/commands');
 const config = require('./modules/config');
+const operator = require('./commands/operator');
+const logger = require('./modules/logger');
 const printHelp = require('./functions/printHelp');
 const switches = require('./modules/switches');
 
@@ -21,12 +22,12 @@ const main = async () => {
     const { errorDetail } = config.get('options');
     if (e.errors) {
       const errStr = errorDetail ? JSON.stringify(e, null, 2) : e.errors[0];
-      console.log(`\nEVRYTHNG Error (${e.status}): ${errStr}`);
+      logger.error(`\nEVRYTHNG Error (${e.status}): ${errStr}`);
       return;
     }
 
     const errStr = errorDetail ? e.stack : e.message;
-    console.log(`\n${errStr}`);
+    logger.error(`\n${errStr}`);
   }
 };
 

@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const commands = require('../src/modules/commands');
 
 describe('commands', () => {

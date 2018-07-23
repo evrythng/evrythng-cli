@@ -1,5 +1,4 @@
 const evrythng = require('evrythng-extended');
-
 const operator = require('../commands/operator');
 
 const expandTimestamp = async timestamp => Promise.resolve(new Date(timestamp).toLocaleString());

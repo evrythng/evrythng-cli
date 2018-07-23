@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const { ctx, createAppUser, createProject, createApplication } = require('../modules/util');
 const cli = require('../../src/functions/cli');
 const operator = require('../../src/commands/operator');

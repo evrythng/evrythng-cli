@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const expand = require('../src/functions/expand');
 const indent = require('../src/functions/indent');
 

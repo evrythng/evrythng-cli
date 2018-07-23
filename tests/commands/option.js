@@ -1,8 +1,7 @@
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-
-const config = require('../../src/modules/config');
 const cli = require('../../src/functions/cli');
+const config = require('../../src/modules/config');
 
 const { expect } = chai;
 
@@ -35,9 +34,9 @@ describe('option', () => {
     return cli(`option show-http ${showHttp}`).should.be.fulfilled;
   });
 
-  it('should not throw error for \'option no-output $state\'', async () => {
-    const { noOutput } = config.get('options');
+  it('should not throw error for \'option log-level $state\'', async () => {
+    const { logLevel } = config.get('options');
 
-    return cli(`option no-output ${noOutput}`).should.be.fulfilled;
+    return cli(`option log-level ${logLevel}`).should.be.fulfilled;
   });
 });

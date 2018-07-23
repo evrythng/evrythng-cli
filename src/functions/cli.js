@@ -1,30 +1,36 @@
 const commands = require('../modules/commands');
 const switches = require('../modules/switches');
 
-const argsWithJson = (argStr) => {
-  let jsonStart;
-  let jsonEnd;
-
-  if (argStr.indexOf('[') > 0 && argStr.indexOf('[') < argStr.indexOf('{')) {
+const extractJsonRange = (argStr) => {
+  if (argStr.includes('[') && argStr.indexOf('[') < argStr.indexOf('{')) {
     // JSON is an object array
-    jsonStart = argStr.indexOf('[');
-    jsonEnd = argStr.lastIndexOf(']') + 1;
+    return [argStr.indexOf('['), argStr.lastIndexOf(']') + 1];
   } else {
     // JSON is an object
-    jsonStart = argStr.indexOf('{');
-    jsonEnd = argStr.lastIndexOf('}') + 1;
+    return [argStr.indexOf('{'), argStr.lastIndexOf('}') + 1];
   }
+};
 
+const argsWithJson = (argStr) => {
+  const [jsonStart, jsonEnd] = extractJsonRange(argStr);
   const jsonArg = argStr.substring(jsonStart, jsonEnd);
+
+  // Args until JSON
   return argStr.substring(0, jsonStart)
     .split(' ')
+
+    // Add on JSON (could contain spaces)
     .concat(jsonArg)
+
+    // Add on switches after JSON arg
     .concat(argStr.substring(jsonEnd).split(' '))
     .filter(item => item.length);
 };
 
+const includesJson = argStr => argStr.includes('{');
+
 module.exports = async (argStr) => {
-  let args = (argStr.includes('{')) ? argsWithJson(argStr) : argStr.split(' ');
+  let args = includesJson(argStr) ? argsWithJson(argStr) : argStr.split(' ');
   args = switches.apply(args);
 
   return commands.identify(args).execute(args.slice(1));

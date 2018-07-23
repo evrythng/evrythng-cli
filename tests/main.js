@@ -1,8 +1,7 @@
 const { expect } = require('chai');
-
-const config = require('../src/modules/config');
 const { ctx } = require('./modules/util');
 const cli = require('../src/functions/cli');
+const config = require('../src/modules/config');
 const expand = require('../src/functions/expand');
 const indent = require('../src/functions/indent');
 const operator = require('../src/commands/operator');
@@ -11,7 +10,7 @@ describe('CLI', () => {
   before(async () => {
     ctx.savedOpts = JSON.parse(JSON.stringify(config.get('options')));
 
-    await cli('option no-output true');
+    await cli('option log-level error');
     await cli('option no-confirm true');
     await cli('option show-http false');
 
@@ -43,9 +42,9 @@ describe('CLI', () => {
   require('./commands/url');
   require('./commands/version');
 
-  require('./functions');
-  require('./switches');
   require('./commands');
+  require('./functions');
   require('./prompt');
+  require('./switches');
   require('./util');
 });

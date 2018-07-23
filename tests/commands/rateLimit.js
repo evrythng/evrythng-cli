@@ -1,5 +1,4 @@
 const { expect } = require('chai');
-
 const cli = require('../../src/functions/cli');
 
 describe('rate-limit', () => {

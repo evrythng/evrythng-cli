@@ -1,8 +1,7 @@
 const evrythng = require('evrythng-extended');
-
 const config = require('../modules/config');
+const logger = require('../modules/logger');
 const operator = require('../commands/operator');
-
 const prompt = require('../modules/prompt');
 
 const TASK_TYPES = ['POPULATING', 'SHORT_ID_GENERATION'];
@@ -149,13 +148,13 @@ module.exports = async () => {
     SHORT_ID_GENERATION: buildShortIdGenerationTask,
   };
   const task = await builders[taskType]();
+  logger.info(`\Task:\n${JSON.stringify(task, null, 2)}\n`);
 
   const confirmation = await prompt.getConfirmation();
   if (!confirmation) {
-    console.log('Cancelled');
+    logger.info('Cancelled');
     process.exit();
   }
 
-  console.log(task);
   return task;
 };

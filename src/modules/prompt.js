@@ -1,4 +1,5 @@
 const readline = require('readline');
+const logger = require('./logger');
 
 const getValue = label => new Promise((resolve) => {
   const rl = readline.createInterface(process.stdin, process.stdout);
@@ -11,7 +12,7 @@ const getValue = label => new Promise((resolve) => {
 const getChoice = (label, choices) => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (${choices.join(', ')})`);
   while (!choices.includes(input)) {
-    console.log('Invalid choice');
+    logger.error('Invalid choice');
     input = await getValue(label);
   }
   
@@ -19,9 +20,9 @@ const getChoice = (label, choices) => new Promise(async (resolve) => {
 });
 
 const getInteger = label => new Promise(async (resolve) => {
-  let input = await getValue(`${label} - (integer)`);
+  let input = Number(await getValue(`${label} - (integer)`));
   while (typeof input !== 'number') {
-    console.log('Invalid input');
+    logger.error('Invalid input');
     input = await getValue(label);
   }
   
@@ -33,7 +34,7 @@ const isBooleanString = val => val === 'true' || val === 'false';
 const getBoolean = label => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (true/false)`);
   while (!isBooleanString(input)) {
-    console.log('Invalid input');
+    logger.error('Invalid input');
     input = await getValue(label);
   }
   
@@ -52,7 +53,7 @@ const isJSONString = (val) => {
 const getJSON = label => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (JSON)`);
   while (!isJSONString(input)) {
-    console.log('Invalid input');
+    logger.error('Invalid input');
     input = await getValue(label);
   }
   
@@ -65,7 +66,7 @@ const getArray = async (label) => {
 };
 
 const getConfirmation = async () => {
-  console.log();
+  logger.info();
   const input = await getValue('Confirm operation (yes/no)');
   return input === 'yes';
 };

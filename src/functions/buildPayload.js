@@ -1,8 +1,8 @@
-const jsonSchemaParser = require('json-schema-ref-parser');
 const evrythngSwagger = require('evrythng-swagger');
-
+const jsonSchemaParser = require('json-schema-ref-parser');
 const { getValue } = require('../modules/prompt');
-const indent = require('../functions/indent');
+const indent = require('./indent');
+const logger = require('../modules/logger');
 
 // Some properties are writable, just not at create time
 const NON_CREATE_PROPERTIES = [
@@ -40,8 +40,8 @@ const buildDefObject = async (opts) => {
   const { key, target, index, total, propertyDef } = opts;
 
   // User-definable fields are not documented, present free-form
-  if (key === 'customFields' || key === 'identifiers') {
-    console.log(`${index + 1}/${total}: ${key} (object, leave 'key' blank to finish)`);
+  if (['customFields', 'identifiers'].includes(key)) {
+    logger.info(`${index + 1}/${total}: ${key} (object, leave 'key' blank to finish)`);
     target[key] = await buildCustomObject();
     return;
   }
@@ -57,7 +57,7 @@ const buildDefProperty = async (opts) => {
   // Fields with only one allowed value
   if (HARDCODE_MAP[key]) {
     target[key] = HARDCODE_MAP[key];
-    console.log(`${index + 1}/${total}: ${key} is always ${JSON.stringify(HARDCODE_MAP[key])}`);
+    logger.info(`${index + 1}/${total}: ${key} is always ${JSON.stringify(HARDCODE_MAP[key])}`);
     return;
   }
 
@@ -79,7 +79,9 @@ const buildDefProperty = async (opts) => {
 
   // Get a simple value
   const input = await getValue(`${index + 1}/${total}: ${key} (${typeStr})`);
-  if (!input) return;
+  if (!input) {
+    return;
+  }
 
   // Handle input arrays as comma-separated values
   // TODO handle arrays of non-strings?
@@ -106,7 +108,7 @@ const filteredPropertyKeys = properties => Object.keys(properties)
 const buildObject = async (properties, name) => {
   const propertyKeys = filteredPropertyKeys(properties);
   const context = name ? `of ${name} ` : '';
-  console.log(`Provide values for each field ${context}(or leave blank to skip):\n`);
+  logger.info(`Provide values for each field ${context}(or leave blank to skip):\n`);
 
   const payload = {};
   for (let index = 0; index < propertyKeys.length; index += 1) {
@@ -125,15 +127,19 @@ const buildObject = async (properties, name) => {
 
 module.exports = async (defName) => {
   // Special builders
-  if (SPECIAL_BUILDERS[defName]) return SPECIAL_BUILDERS[defName]();
+  if (SPECIAL_BUILDERS[defName]) {
+    return SPECIAL_BUILDERS[defName]();
+  }
 
   spec = await jsonSchemaParser.dereference(evrythngSwagger);
-  if (!spec.definitions[defName]) throw new Error(`\ndefName ${defName} not found in spec!`);
+  if (!spec.definitions[defName]) {
+    throw new Error(`\ndefName ${defName} not found in spec!`);
+  }
 
-  console.log();
+  logger.info();
   const { properties } = spec.definitions[defName];
   const payload = await buildObject(properties);
 
-  console.log();
+  logger.info();
   return payload;
 };

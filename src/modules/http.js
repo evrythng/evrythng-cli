@@ -1,9 +1,9 @@
 const evrythng = require('evrythng-extended');
-
 const { getValue, getConfirmation } = require('./prompt');
-const operator = require('../commands/operator');
 const config = require('./config');
 const expand = require('../functions/expand');
+const logger = require('./logger');
+const operator = require('../commands/operator');
 const switches = require('./switches');
 const util = require('./util');
 
@@ -25,7 +25,9 @@ const statusLabels = {
 const buildParams = () => {
   const params = switches.buildParams();
   const keys = Object.keys(params);
-  if (!keys.length) return '';
+  if (!keys.length) {
+    return '';
+  }
 
   return Object.keys(params).reduce((result, item) => {
     const addition = `${item}=${encodeURIComponent(params[item])}&`;
@@ -37,12 +39,11 @@ const formatHeaders = headers => Object.keys(headers)
   .map(item => `${item}: ${headers[item]}`);
 
 const printRequest = (options) => {
-  console.log(`\n>> ${options.method} ${options.url}`);
-  formatHeaders(options.displayHeaders).forEach(item => console.log(item));
-  console.log();
+  logger.info(`\n>> ${options.method} ${options.url}`);
+  formatHeaders(options.displayHeaders).forEach(item => logger.info(item));
+  logger.info();
   if (options.data) {
-    console.log(JSON.stringify(options.data, null, 2));
-    console.log('\n');
+    logger.info(`${JSON.stringify(options.data, null, 2)}\n`);
   }
 };
 
@@ -60,7 +61,9 @@ const goToPage = async (res, endPage) => {
     });
 
     linkStr = nextRes.headers.link;
-    if (!linkStr) throw new Error(`Ran out of pages at page ${currentPage}`);
+    if (!linkStr) {
+      throw new Error(`Ran out of pages at page ${currentPage}`);
+    }
 
     currentPage += 1;
   }
@@ -69,52 +72,63 @@ const goToPage = async (res, endPage) => {
 };
 
 const printResponse = async (res) => {
-  if (!res) return;
-  if (!res.data) return res;
+  if (!res) {
+    return;
+  }
+  if (!res.data) {
+    return res;
+  }
 
-  const { showHttp, noOutput } = config.get('options');
+  const { showHttp } = config.get('options');
 
   // Wait until page reached
   const page = switches.using(switches.PAGE);
-  if (page) res = await goToPage(res, parseInt(page.value, 10));
+  if (page) {
+    res = await goToPage(res, parseInt(page.value, 10));
+  }
 
   // Expand known fields
   const { data, status } = res;
-  if (switches.using(switches.EXPAND)) await expand(data);
+  if (switches.using(switches.EXPAND)) {
+    await expand(data);
+  }
 
   // Print HTTP response information
-  if (showHttp && !noOutput) {
-    console.log(`<< ${status} ${statusLabels[status]}`);
-    formatHeaders(res.headers).forEach(item => console.log(item));
-    console.log();
+  if (showHttp) {
+    logger.info(`<< ${status} ${statusLabels[status]}`);
+    formatHeaders(res.headers).forEach(item => logger.info(item));
+    logger.info();
   }
 
   // Print summary view
   if (switches.using(switches.SUMMARY)) {
-    if (!noOutput) util.printListSummary(data);
+    util.printListSummary(data);
     return res;
   }
 
   // Print simple view
   if (switches.using(switches.SIMPLE)) {
-    if (!noOutput) util.printSimple(data, 1);
+    util.printSimple(data, 1);
     return res;
   }
 
   // Get just one field
   const field = switches.using(switches.FIELD);
   if (field) {
-    if (!noOutput) console.log(data[field.value]);
+    logger.info(data[field.value]);
     return data[field.value];
   }
 
   // Regular pretty JSON output
-  if (!noOutput) console.log(util.pretty(data));
+  logger.info(util.pretty(data));
   return res;
 };
 
 const apiRequest = async (options) => {
-  if (!options.method) options.method = 'GET';
+  if (!options.method) {
+    options.method = 'GET';
+  }
+
   options.displayHeaders = { Authorization: `${options.authorization.substring(0, 4)}...` };
   if (['POST', 'PUT'].includes(options.method)) {
     options.displayHeaders['Content-Type'] = 'application/json';
@@ -124,12 +138,14 @@ const apiRequest = async (options) => {
   if (options.method === 'DELETE' && !noConfirm) {
     const confirmation = await getConfirmation();
     if (!confirmation) {
-      console.log('Cancelled');
+      logger.info('Cancelled');
       process.exit();
     }
   }
 
-  if (showHttp) printRequest(options);
+  if (showHttp) {
+    printRequest(options);
+  }
 
   options.fullResponse = true;
   return evrythng.api(options);

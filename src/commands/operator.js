@@ -1,9 +1,8 @@
 const evrythng = require('evrythng-extended');
-
-const config = require('../modules/config');
-const switches = require('../modules/switches');
-
 const { getValue } = require('../modules/prompt');
+const config = require('../modules/config');
+const logger = require('../modules/logger');
+const switches = require('../modules/switches');
 
 const REGIONS = config.get('regions');
 
@@ -32,26 +31,19 @@ const formatOperator = item => `'${item}' (Key: ${resolveKey(item).substring(0, 
 const list = () => {
   const operators = getAvailableOperators();
   if (!operators.length) {
-    console.log('No Operators available.');
+    logger.error('No Operators available.');
     return { operators: [], using: '' };
   }
 
-  const { noOutput } = config.get('options');
-  if (!noOutput) {
-    const formatted = operators.map(formatOperator).join('\n- ');
-    console.log(`\nCurrent: '${config.get('using')}'`);
-    console.log(`\nAvailable:\n- ${formatted}\n`);
-  }
-
+  const formatted = operators.map(formatOperator).join('\n- ');
+  logger.info(`\nCurrent: '${config.get('using')}'\nAvailable:\n- ${formatted}\n`);
   return { operators, using: config.get('using') };
 };
 
 const showKey = ([name]) => {
   const key = resolveKey(name);
 
-  const { noOutput } = config.get('options');
-  if (!noOutput) console.log(key);
-
+  logger.info(key);
   return key;
 };
 
@@ -71,7 +63,9 @@ const addOperator = ([, name, region, apiKey]) => {
   config.set('operators', operators);
 
   // If this is the first one, automatically use it.
-  if (Object.keys(operators).length === 1) useOperator([name]);
+  if (Object.keys(operators).length === 1) {
+    useOperator([name]);
+  }
 
   return operators[name];
 };
@@ -81,12 +75,16 @@ const removeOperator = ([name]) => {
   delete operators[name];
   config.set('operators', operators);
 
-  if (config.get('using') === name) config.set('using', '');
+  if (config.get('using') === name) {
+    config.set('using', '');
+  }
 };
 
 const applyRegion = () => {
   const name = config.get('using');
-  if (!name) return;
+  if (!name) {
+    return;
+  }
 
   const { region } = config.get('operators')[name];
   evrythng.setup({ apiUrl: REGIONS[region] });
@@ -94,9 +92,11 @@ const applyRegion = () => {
 
 const checkFirstRun = async () => {
   const operators = config.get('operators');
-  if (Object.keys(operators).length) return;
+  if (Object.keys(operators).length) {
+    return;
+  }
 
-  console.log('\nWelcome to the EVRYTHNG CLI!\n\nTo get started, please provide the following ' +
+  logger.info('\nWelcome to the EVRYTHNG CLI!\n\nTo get started, please provide the following ' +
     'to set up your first account Operator:\n');
 
   const name = await getValue('Short Operator name (e.g: \'personal\')');
@@ -104,12 +104,12 @@ const checkFirstRun = async () => {
   const apiKey = await getValue('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
   addOperator([null, name, region, apiKey]);
 
-  console.log('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. ' +
+  logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. ' +
     'Some examples to get you started:\n');
-  console.log('  evrythng thng list');
-  console.log('  evrythng thng UnQ8nqfQeD8aQpwRanrXaaPt read');
-  console.log('  evrythng product create \'{"name": "My New Product"}\'\n');
-  console.log('Type \'evrythng\' to see all available commands and options.\n');
+  logger.info('  evrythng thng list');
+  logger.info('  evrythng thng UnQ8nqfQeD8aQpwRanrXaaPt read');
+  logger.info('  evrythng product create \'{"name": "My New Product"}\'\n');
+  logger.info('Type \'evrythng\' to see all available commands and options.\n');
   process.exit();
 };
 
@@ -118,7 +118,9 @@ const checkFirstRun = async () => {
 
 const getKey = () => {
   const key = switches.using(switches.API_KEY);
-  if (key) return key.value;
+  if (key) {
+    return key.value;
+  }
 
   const operator = config.get('using');
   if (!operator) {
