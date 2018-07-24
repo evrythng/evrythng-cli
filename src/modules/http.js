@@ -161,13 +161,7 @@ const post = async (url, data) => apiRequest({
 const get = async (url, silent = false) => apiRequest({
   url: `${url}${buildParams()}`,
   authorization: operator.getKey(),
-}).then((res) => {
-  if (silent) {
-    return res;
-  }
-
-  printResponse(res)
-});
+}).then(res => silent ? res : printResponse(res));
 
 const put = async (url, data) => apiRequest({
   url,

@@ -10,9 +10,10 @@ describe('CLI', () => {
   before(async () => {
     ctx.savedOpts = JSON.parse(JSON.stringify(config.get('options')));
 
-    await cli('option log-level error');
+    await cli('option error-detail true');
     await cli('option no-confirm true');
     await cli('option show-http false');
+    await cli('option log-level error');
 
     operator.applyRegion();
   });
