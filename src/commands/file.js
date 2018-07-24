@@ -43,11 +43,11 @@ const upload = async (args) => {
   const fullPath = `${process.cwd()}/${filePath}`;
   await checkFileExists(fullPath);
 
-  const { data: existing } = await http.get(`/files/${id}`);
+  const { data: existing } = await http.get(`/files/${id}`, true);
   checkMetaDataMatches(existing, filePath, contentType);
 
   uploadToS3(existing, fullPath, contentType);
-  logger.info(`\nFile uploaded successfully.\nLocation: ${existing.contentUrl}`);
+  logger.info(`File uploaded successfully.\nLocation: ${existing.contentUrl}`);
 };
 
 module.exports = {

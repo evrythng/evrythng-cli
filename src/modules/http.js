@@ -158,10 +158,16 @@ const post = async (url, data) => apiRequest({
   data,
 }).then(printResponse);
 
-const get = async url => apiRequest({
+const get = async (url, silent = false) => apiRequest({
   url: `${url}${buildParams()}`,
   authorization: operator.getKey(),
-}).then(printResponse);
+}).then((res) => {
+  if (silent) {
+    return res;
+  }
+
+  printResponse(res)
+});
 
 const put = async (url, data) => apiRequest({
   url,

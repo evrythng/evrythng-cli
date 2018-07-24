@@ -113,6 +113,8 @@ const checkFirstRun = async () => {
   process.exit();
 };
 
+const getCurrent = () => config.get('operators')[config.get('using')];
+
 
 // ------------------------------------ API ------------------------------------
 
@@ -159,4 +161,5 @@ module.exports = {
   applyRegion,
   checkFirstRun,
   resolveKey,
+  getCurrent,
 };
