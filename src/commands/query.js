@@ -2,12 +2,19 @@ const tq = require('thng-query');
 const evrythng = require('evrythng-extended');
 const operator = require('./operator');
 
+const help = {
+  abstract: 'Runs thng-query queries against EVRYTHNG API',
+  examples: `
+  Examples:  
+  evrythng query run "thngs where properties.temperature=24"  
+  evrythng query run "thngs tagged Wifi where customFields.version~5.0.2"        
+
+  more at https://www.npmjs.com/package/thng-query
+  `
+};
+
 module.exports = {
-  about: 
-`Runs thng-query queries against EVRYTHNG API:
-      evrythng query run "thngs where properties.temperature=24"  
-      evrythng query run "thngs tagged Wifi where customFields.version~5.0.2"  
-`,
+  about: help.abstract,
   firstArg: 'query',
   operations: {
     run: {
@@ -18,6 +25,10 @@ module.exports = {
           .then(console.log),
           
       pattern: 'query run $query'
+    },
+    help: {
+      execute: () => console.log(`${help.abstract}\n${help.examples}`),
+      pattern: 'query help'
     }
   }
 };
