@@ -23,6 +23,7 @@ const COMMAND_LIST = [
   require('../commands/role'),
   require('../commands/thng'),
   require('../commands/url'),
+  require('../commands/query'),
   require('../commands/version'),
 ];
 
