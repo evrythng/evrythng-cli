@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const cli = require('../src/functions/cli');
 const commands = require('../src/modules/commands');
 
 describe('commands', () => {
@@ -39,5 +40,12 @@ describe('commands', () => {
 
     const res = commands.identify(args);
     expect(res).to.deep.equal(expected);
+  });
+
+  it('should accept a pluralized version of a command', async () => {
+    const res = await cli(`thngs list`);
+
+    expect(res.status).to.equal(200);
+    expect(res.data).to.be.an('array');
   });
 });

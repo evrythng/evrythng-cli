@@ -58,7 +58,10 @@ const matchArg = (arg, spec) => {
   }
 
   // Must match a map value, or must be the same
-  return map[spec] ? map[spec]() : (arg === spec);
+  if (map[spec]) return map[spec]();
+
+  // Be identical, or identical as a plural
+  return arg === spec || arg === `${spec}s`;
 };
 
 const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => matchArg(args[i], item));
