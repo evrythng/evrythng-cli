@@ -19,6 +19,7 @@ const COMMAND_LIST = [
   require('../commands/project'),
   require('../commands/rateLimit'),
   require('../commands/redirector'),
+  require('../commands/region'),
   require('../commands/role'),
   require('../commands/thng'),
   require('../commands/url'),
