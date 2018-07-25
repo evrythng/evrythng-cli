@@ -9,21 +9,21 @@ chai.use(chaiAsPromised);
 
 const { expect } = chai;
 
-describe('operator', () => {
+describe('operators', () => {
   before(async () => {
-    const res = await cli('operator list');
+    const res = await cli('operators list');
 
     ctx.using = res.using;
   });
 
   after(async () => {
-    await cli(`operator ${ctx.using} use`);
+    await cli(`operators ${ctx.using} use`);
   });
 
-  it('return object for \'operator add $name $region $apiKey\'', async () => {
+  it('return object for \'operators add $name $region $apiKey\'', async () => {
     ctx.operatorName = 'test-operator';
     const key = '12345687123456812345678123456781234567812345678123456871234568712345678123465781';
-    const res = await cli(`operator add ${ctx.operatorName} us ${key}`);
+    const res = await cli(`operators add ${ctx.operatorName} us ${key}`);
 
     expect(res).to.be.an('object');
     expect(res.apiKey).to.be.a('string');
@@ -33,8 +33,8 @@ describe('operator', () => {
     expect(res.region).to.satisfy(isValidRegionValue);
   });
 
-  it('should return object for \'operator list\'', async () => {
-    const res = await cli('operator list');
+  it('should return object for \'operators list\'', async () => {
+    const res = await cli('operators list');
 
     expect(res).to.be.an('object');
     expect(res.operators).to.be.an('array');
@@ -42,18 +42,18 @@ describe('operator', () => {
     expect(res.using).to.be.a('string');
   });
 
-  it('should return string for \'operator $name read\'', async () => {
-    const res = await cli(`operator ${ctx.operatorName} read`);
+  it('should return string for \'operators $name read\'', async () => {
+    const res = await cli(`operators ${ctx.operatorName} read`);
 
     expect(res).to.be.a('string');
     expect(res).to.have.length(80);
   });
 
-  it('should not throw error for \'operator $name use\'', async () => {
-    return cli(`operator ${ctx.operatorName} use`).should.be.fulfilled;
+  it('should not throw error for \'operators $name use\'', async () => {
+    return cli(`operators ${ctx.operatorName} use`).should.be.fulfilled;
   });
 
-  it('should not throw error for \'operator $name remove\'', async () => {
-    return cli(`operator ${ctx.operatorName} remove`).should.be.fulfilled;
+  it('should not throw error for \'operators $name remove\'', async () => {
+    return cli(`operators ${ctx.operatorName} remove`).should.be.fulfilled;
   });
 });

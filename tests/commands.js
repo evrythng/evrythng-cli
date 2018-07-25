@@ -1,4 +1,5 @@
 const { expect } = require('chai');
+const cli = require('../src/functions/cli');
 const commands = require('../src/modules/commands');
 
 describe('commands', () => {
@@ -25,17 +26,17 @@ describe('commands', () => {
   });
 
   it('should match some args to a pattern', () => {
-    const args = ['thng', 'UKAVpbnsVDPa9Kaaam7a5tdp', 'read'];
-    const pattern = 'thng $id read';
+    const args = ['thngs', 'UKAVpbnsVDPa9Kaaam7a5tdp', 'read'];
+    const pattern = 'thngs $id read';
 
     const res = commands.matchArgs(args, pattern);
     expect(res).to.equal(true);
   });
 
   it('should identify a command from some args', () => {
-    const args = ['thng', 'UKAVpbnsVDPa9Kaaam7a5tdp', 'read'];
+    const args = ['thngs', 'UKAVpbnsVDPa9Kaaam7a5tdp', 'read'];
     const expected = commands.COMMAND_LIST
-      .find(item => item.firstArg === 'thng').operations.readThng;
+      .find(item => item.firstArg === 'thngs').operations.readThng;
 
     const res = commands.identify(args);
     expect(res).to.deep.equal(expected);

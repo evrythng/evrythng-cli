@@ -16,9 +16,9 @@ describe('accesses', () => {
   });
 
   after(async () => {
-    await cli(`app-user ${ctx.appUser1.evrythngUser} delete`);
-    await cli(`app-user ${ctx.appUser2.evrythngUser} delete`);
-    await cli(`project ${ctx.project.id} delete`);
+    await cli(`app-users ${ctx.appUser1.evrythngUser} delete`);
+    await cli(`app-users ${ctx.appUser2.evrythngUser} delete`);
+    await cli(`projects ${ctx.project.id} delete`);
   });
 
   it('should return 201 for \'accesses create $payload\'', async () => {

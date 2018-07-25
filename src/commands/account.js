@@ -2,45 +2,49 @@ const http = require('../modules/http');
 
 module.exports = {
   about: 'Work with accounts and account accesses.',
-  firstArg: 'account',
+  firstArg: 'accounts',
   operations: {
     listAccount: {
       execute: async () => http.get('/accounts'),
-      pattern: 'account list',
+      pattern: 'list',
     },
     readAccount: {
       execute: async ([id]) => http.get(`/accounts/${id}`),
-      pattern: 'account $id read',
+      pattern: '$id read',
     },
     updateAccount: {
       execute: async ([id, , json]) => http.put(`/accounts/${id}`, JSON.parse(json)),
-      pattern: 'account $id update $payload',
+      pattern: '$id update $payload',
     },
+
+    // Account accesses
     listAccountAcccesses: {
       execute: async ([id]) => http.get(`/accounts/${id}/accesses`),
-      pattern: 'account $id access list',
+      pattern: '$id accesses list',
     },
     readAccountAcccess: {
       execute: async ([accountId, , accessId]) => {
         const url = `/accounts/${accountId}/accesses/${accessId}`;
         return http.get(url);
       },
-      pattern: 'account $id access $id read',
+      pattern: '$id accesses $id read',
     },
     updateAccountAcccess: {
       execute: async ([accountId, , accessId, , json]) => {
         const url = `/accounts/${accountId}/accesses/${accessId}`;
         return http.put(url, JSON.parse(json));
       },
-      pattern: 'account $id access $id update $json',
+      pattern: '$id accesses $id update $json',
     },
+
+    // Account domains and short domains
     listAccountDomains: {
       execute: async ([id]) => http.get(`/accounts/${id}/domains`),
-      pattern: 'account $id domain list',
+      pattern: '$id domains list',
     },
     listAccountShortDomains: {
       execute: async ([id]) => http.get(`/accounts/${id}/shortDomains`),
-      pattern: 'account $id short-domain list',
+      pattern: '$id short-domains list',
     },
   },
 };

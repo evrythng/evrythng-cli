@@ -3,49 +3,49 @@ const util = require('../modules/util');
 
 module.exports = {
   about: 'Work with batches.',
-  firstArg: 'batch',
+  firstArg: 'batches',
   operations: {
     createBatch: {
       execute: async ([, json]) => {
         const payload = await util.getPayload('BatchDocument', json);
         return http.post('/batches', payload);
       },
-      pattern: 'batch create $payload',
+      pattern: 'create $payload',
     },
     readBatch: {
       execute: async ([id]) => http.get(`/batches/${id}`),
-      pattern: 'batch $id read',
+      pattern: '$id read',
     },
     listBatch: {
       execute: async () => http.get('/batches'),
-      pattern: 'batch list',
+      pattern: 'list',
     },
     updateBatch: {
       execute: async ([id, , json]) => http.put(`/batches/${id}`, JSON.parse(json)),
-      pattern: 'batch $id update $payload',
+      pattern: '$id update $payload',
     },
     deleteBatch: {
       execute: async ([id]) => http.delete(`/batches/${id}`),
-      pattern: 'batch $id delete',
+      pattern: '$id delete',
     },
     createTask: {
       execute: async ([id, , , json]) => {
         const payload = await util.getPayload('task', json);
         return http.post(`/batches/${id}/tasks`, payload);
       },
-      pattern: 'batch $id task create $payload',
+      pattern: '$id tasks create $payload',
     },
     listTasks: {
       execute: async ([id]) => http.get(`/batches/${id}/tasks`),
-      pattern: 'batch $id task list',
+      pattern: '$id tasks list',
     },
     readTask: {
       execute: async ([batchId, , taskId]) => http.get(`/batches/${batchId}/tasks/${taskId}`),
-      pattern: 'batch $id task $id read',
+      pattern: '$id tasks $id read',
     },
     readTaskLogs: {
       execute: async ([batchId, , taskId]) => http.get(`/batches/${batchId}/tasks/${taskId}/logs`),
-      pattern: 'batch $id task $id logs list',
+      pattern: '$id tasks $id logs list',
     },
   },
 };

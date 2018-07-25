@@ -52,30 +52,30 @@ const upload = async (args) => {
 
 module.exports = {
   about: 'Work with file resources and upload file data.',
-  firstArg: 'file',
+  firstArg: 'files',
   operations: {
     create: {
       execute: async ([, json]) => {
         const payload = await util.getPayload('FileDocument', json);
         return http.post('/files', payload);
       },
-      pattern: 'file create $payload',
+      pattern: 'create $payload',
     },
     read: {
       execute: async ([id]) => http.get(`/files/${id}`),
-      pattern: 'file $id read',
+      pattern: '$id read',
     },
     list: {
       execute: async () => http.get('/files'),
-      pattern: 'file list',
+      pattern: 'list',
     },
     delete: {
       execute: async ([id]) => http.delete(`/files/${id}`),
-      pattern: 'file $id delete',
+      pattern: '$id delete',
     },
     upload: {
       execute: upload,
-      pattern: 'file $id upload $file-path $mime-type',
+      pattern: '$id upload $file-path $mime-type',
     },
   },
 };

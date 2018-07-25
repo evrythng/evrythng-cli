@@ -23,14 +23,13 @@ const COMMAND_LIST = [
   require('../commands/role'),
   require('../commands/thng'),
   require('../commands/url'),
-  require('../commands/version'),
 ];
 
 const showSyntax = (command) => {
-  const { operations } = command;
-  const specs = Object.keys(operations).map(item => `$ evrythng ${operations[item].pattern}`);
+  const { firstArg, operations } = command;
+  const specs = Object.keys(operations).map(item => `evrythng ${firstArg} ${operations[item].pattern}`);
 
-  logger.error(`\nOperations:\n${specs.join('\n')}`);
+  logger.error(`\nAvailable operations for '${firstArg}':\n${specs.join('\n')}`);
   process.exit();
 };
 
@@ -58,7 +57,12 @@ const matchArg = (arg, spec) => {
   }
 
   // Must match a map value, or must be the same
-  return map[spec] ? map[spec]() : (arg === spec);
+  if (map[spec]) {
+    return map[spec]();
+  }
+
+  // Be identical
+  return arg === spec;
 };
 
 const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => matchArg(args[i], item));
@@ -69,13 +73,20 @@ const identify = args => COMMAND_LIST.reduce((result, item) => {
   }
 
   const { operations, firstArg } = item;
-  const match = Object.keys(operations)
-    .find(item2 => matchArgs(args, operations[item2].pattern));
-  if (match) {
-    return operations[match];
-  }
+
+  // firstArg matches
   if (args[0] === firstArg) {
+    const match = Object.keys(operations)
+      .find(item2 => matchArgs(args.slice(1), operations[item2].pattern));
+
+    // Some command pattern matches as well
+    if (match) {
+      return operations[match];
+    }
+
+    // Only a partial match
     showSyntax(item);
+    return result;
   }
 
   return result;

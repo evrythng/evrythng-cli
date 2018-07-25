@@ -2,10 +2,10 @@ const { expect } = require('chai');
 const { ctx } = require('../modules/util');
 const cli = require('../../src/functions/cli');
 
-describe('place', () => {
-  it('should return 201 for \'place create $payload\'', async () => {
+describe('places', () => {
+  it('should return 201 for \'places create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test place' });
-    const res = await cli(`place create ${payload}`);
+    const res = await cli(`places create ${payload}`);
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -13,30 +13,30 @@ describe('place', () => {
     ctx.placeId = res.data.id;
   });
 
-  it('should return 200 for \'place list\'', async () => {
-    const res = await cli('place list');
+  it('should return 200 for \'places list\'', async () => {
+    const res = await cli('places list');
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'place $id read\'', async () => {
-    const res = await cli(`place ${ctx.placeId} read`);
+  it('should return 200 for \'places $id read\'', async () => {
+    const res = await cli(`places ${ctx.placeId} read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'place $id update $payload\'', async () => {
+  it('should return 200 for \'places $id update $payload\'', async () => {
     const payload = JSON.stringify({ tags: ['test'] });
-    const res = await cli(`place ${ctx.placeId} update ${payload}`);
+    const res = await cli(`places ${ctx.placeId} update ${payload}`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'place $id delete\'', async () => {
-    const res = await cli(`place ${ctx.placeId} delete`);
+  it('should return 200 for \'places $id delete\'', async () => {
+    const res = await cli(`places ${ctx.placeId} delete`);
 
     expect(res.status).to.equal(200);
   });

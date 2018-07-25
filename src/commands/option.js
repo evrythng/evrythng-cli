@@ -25,7 +25,7 @@ const OPTION_LIST = [{
 
 module.exports = {
   about: 'Choose CLI options.',
-  firstArg: 'option',
+  firstArg: 'options',
   operations: {
     listOptions: {
       execute: () => {
@@ -37,7 +37,7 @@ module.exports = {
           logger.info(`- ${found.name}: ${options[item]}`);
         });
       },
-      pattern: 'option list',
+      pattern: 'list',
     },
     setOption: {
       execute: ([name, state]) => {
@@ -58,7 +58,7 @@ module.exports = {
         options[found.key] = ['true', 'false'].includes(state) ? (state === 'true') : state;
         config.set('options', options);
       },
-      pattern: 'option $name $state',
+      pattern: '$name $state',
     },
   },
   OPTION_LIST,

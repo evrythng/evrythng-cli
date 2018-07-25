@@ -58,19 +58,19 @@ const removeRegion = ([name]) => {
 
 module.exports = {
   about: 'Manage regions in the CLI configuration.',
-  firstArg: 'region',
+  firstArg: 'regions',
   operations: {
     add: {
       execute: addRegion,
-      pattern: 'region add $name $apiUrl',
+      pattern: 'add $name $apiUrl',
     },
     list: {
       execute: list,
-      pattern: 'region list',
+      pattern: 'list',
     },
     remove: {
       execute: removeRegion,
-      pattern: 'region $name remove',
+      pattern: '$name remove',
     },
   },
 };

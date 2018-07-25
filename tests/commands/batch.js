@@ -2,17 +2,17 @@ const { expect } = require('chai');
 const { ctx } = require('../modules/util');
 const cli = require('../../src/functions/cli');
 
-const readTasks = async () => cli(`batch ${ctx.batchId} task list`);
+const readTasks = async () => cli(`batches ${ctx.batchId} tasks list`);
 
 const waitForTaskCompletion = async () => {
   let res = await readTasks();
   while (res.data[0].status !== 'EXECUTED') res = await readTasks();
 };
 
-describe('batch', async () => {
-  it('should return 201 for \'batch create $payload\'', async () => {
+describe('batches', async () => {
+  it('should return 201 for \'batches create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test batch' });
-    const res = await cli(`batch create ${payload}`);
+    const res = await cli(`batches create ${payload}`);
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -20,29 +20,29 @@ describe('batch', async () => {
     ctx.batchId = res.data.id;
   });
 
-  it('should return 200 for \'batch list\'', async () => {
-    const res = await cli('batch list');
+  it('should return 200 for \'batches list\'', async () => {
+    const res = await cli('batches list');
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'batch $id read\'', async () => {
-    const res = await cli(`batch ${ctx.batchId} read`);
+  it('should return 200 for \'batches $id read\'', async () => {
+    const res = await cli(`batches ${ctx.batchId} read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'batch $id update $payload\'', async () => {
+  it('should return 200 for \'batches $id update $payload\'', async () => {
     const payload = JSON.stringify({ description: 'Updated description' });
-    const res = await cli(`batch ${ctx.batchId} update ${payload}`);
+    const res = await cli(`batches ${ctx.batchId} update ${payload}`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 202 for \'batch $id task create $payload\'', async () => {
+  it('should return 202 for \'batches $id tasks create $payload\'', async () => {
     const payload = JSON.stringify({
       type: 'SHORT_ID_GENERATION',
       inputParameters: {
@@ -56,15 +56,15 @@ describe('batch', async () => {
         },
       },
     });
-    const res = await cli(`batch ${ctx.batchId} task create ${payload}`);
+    const res = await cli(`batches ${ctx.batchId} tasks create ${payload}`);
 
     expect(res.status).to.equal(202);
 
     await waitForTaskCompletion();
   });
 
-  it('should return 200 for \'batch $id task list\'', async () => {
-    const res = await cli(`batch ${ctx.batchId} task list`);
+  it('should return 200 for \'batches $id tasks list\'', async () => {
+    const res = await cli(`batches ${ctx.batchId} tasks list`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
@@ -72,21 +72,21 @@ describe('batch', async () => {
     ctx.taskId = res.data[0].id;
   });
 
-  it('should return 200 for \'batch $id task $id read\'', async () => {
-    const res = await cli(`batch ${ctx.batchId} task ${ctx.taskId} read`);
+  it('should return 200 for \'batches $id tasks $id read\'', async () => {
+    const res = await cli(`batches ${ctx.batchId} tasks ${ctx.taskId} read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'batch $id task $id logs list\'', async () => {
-    const res = await cli(`batch ${ctx.batchId} task ${ctx.taskId} logs list`);
+  it('should return 200 for \'batches $id tasks $id logs list\'', async () => {
+    const res = await cli(`batches ${ctx.batchId} tasks ${ctx.taskId} logs list`);
 
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'batch $id delete\'', async () => {
-    const res = await cli(`batch ${ctx.batchId} delete`);
+  it('should return 200 for \'batches $id delete\'', async () => {
+    const res = await cli(`batches ${ctx.batchId} delete`);
 
     expect(res.status).to.equal(200);
   });

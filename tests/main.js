@@ -10,10 +10,10 @@ describe('CLI', () => {
   before(async () => {
     ctx.savedOpts = JSON.parse(JSON.stringify(config.get('options')));
 
-    await cli('option error-detail true');
-    await cli('option no-confirm true');
-    await cli('option show-http false');
-    await cli('option log-level error');
+    await cli('options error-detail true');
+    await cli('options no-confirm true');
+    await cli('options show-http false');
+    await cli('options log-level error');
 
     operator.applyRegion();
   });
@@ -42,7 +42,6 @@ describe('CLI', () => {
   require('./commands/role');
   require('./commands/thng');
   require('./commands/url');
-  require('./commands/version');
 
   require('./commands');
   require('./functions');

@@ -134,27 +134,27 @@ const getKey = () => {
 
 module.exports = {
   about: 'View and choose an Operator API Key for global use.',
-  firstArg: 'operator',
+  firstArg: 'operators',
   operations: {
     add: {
       execute: addOperator,
-      pattern: 'operator add $name $region $apiKey',
+      pattern: 'add $name $region $apiKey',
     },
     list: {
       execute: list,
-      pattern: 'operator list',
+      pattern: 'list',
     },
     read: {
       execute: showKey,
-      pattern: 'operator $name read',
+      pattern: '$name read',
     },
     use: {
       execute: useOperator,
-      pattern: 'operator $name use',
+      pattern: '$name use',
     },
     remove: {
       execute: removeOperator,
-      pattern: 'operator $name remove',
+      pattern: '$name remove',
     },
   },
   getKey,

@@ -4,22 +4,22 @@ const cli = require('../../src/functions/cli');
 
 const TEST_KEY = 'test';
 
-describe('thng', () => {
+describe('thngs', () => {
   before(async () => {
     const payload = JSON.stringify({ name: `_action-type-${Date.now()}` });
-    const res = await cli(`action-type create ${payload}`);
+    const res = await cli(`action-types create ${payload}`);
 
     ctx.actionType = res.data.name;
   });
 
   after(async () => {
-    await cli(`action-type ${ctx.actionType} delete`);
+    await cli(`action-types ${ctx.actionType} delete`);
   });
 
   // Thng CRUD
-  it('should return 201 for \'thng create $payload\'', async () => {
+  it('should return 201 for \'thngs create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test thng' });
-    const res = await cli(`thng create ${payload}`);
+    const res = await cli(`thngs create ${payload}`);
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -27,67 +27,67 @@ describe('thng', () => {
     ctx.thngId = res.data.id;
   });
 
-  it('should return 200 for \'thng list\'', async () => {
-    const res = await cli('thng list');
+  it('should return 200 for \'thngs list\'', async () => {
+    const res = await cli('thngs list');
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'thng $id read\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} read`);
+  it('should return 200 for \'thngs $id read\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'thng $id update $payload\'', async () => {
+  it('should return 200 for \'thngs $id update $payload\'', async () => {
     const payload = JSON.stringify({ tags: ['test'] });
-    const res = await cli(`thng ${ctx.thngId} update ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} update ${payload}`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
   // Thng properties
-  it('should return 200 for \'thng $id property create $payload\'', async () => {
+  it('should return 200 for \'thngs $id properties create $payload\'', async () => {
     const payload = JSON.stringify([{ key: TEST_KEY, value: 'some value' }]);
-    const res = await cli(`thng ${ctx.thngId} property create ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} properties create ${payload}`);
 
     expect(res.status).to.equal(200);
   });
 
-  it('should return 200 for \'thng $id property list\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} property list`);
-
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
-  });
-
-  it('should return 200 for \'thng $id property $key read\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} property ${TEST_KEY} read`);
+  it('should return 200 for \'thngs $id properties list\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} properties list`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'thng $id property $key update $payload\'', async () => {
+  it('should return 200 for \'thngs $id properties $key read\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} properties ${TEST_KEY} read`);
+
+    expect(res.status).to.equal(200);
+    expect(res.data).to.be.an('array');
+  });
+
+  it('should return 200 for \'thngs $id properties $key update $payload\'', async () => {
     const payload = JSON.stringify([{ value: 'some value' }]);
-    const res = await cli(`thng ${ctx.thngId} property ${TEST_KEY} update ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} properties ${TEST_KEY} update ${payload}`);
 
     expect(res.status).to.equal(200);
   });
 
-  it('should return 200 for \'thng $id property $key delete\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} property ${TEST_KEY} delete`);
+  it('should return 200 for \'thngs $id properties $key delete\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} properties ${TEST_KEY} delete`);
 
     expect(res.status).to.equal(200);
   });
 
   // Thng actions
-  it('should return 201 for \'thng $id action create $payload\'', async () => {
+  it('should return 201 for \'thngs $id actions create $payload\'', async () => {
     const payload = JSON.stringify({ type: ctx.actionType });
-    const res = await cli(`thng ${ctx.thngId} action create ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} actions create ${payload}`);
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -95,101 +95,101 @@ describe('thng', () => {
     ctx.actionId = res.data.id;
   });
 
-  it('should return 200 for \'thng $id action list\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} action list`);
+  it('should return 200 for \'thngs $id actions list\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} actions list`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'thng $id action $id read\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} action ${ctx.actionId} read`);
+  it('should return 200 for \'thngs $id actions $id read\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} actions ${ctx.actionId} read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
   // Thng redirection
-  it('should return 201 for \'thng $id redirection create $payload\'', async () => {
+  it('should return 201 for \'thngs $id redirection create $payload\'', async () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/' });
-    const res = await cli(`thng ${ctx.thngId} redirection create ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} redirection create ${payload}`);
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'thng $id redirection read\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} redirection read`);
+  it('should return 200 for \'thngs $id redirection read\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} redirection read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 201 for \'thng $id redirection update $payload\'', async () => {
+  it('should return 201 for \'thngs $id redirection update $payload\'', async () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
-    const res = await cli(`thng ${ctx.thngId} redirection update ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} redirection update ${payload}`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'thng $id redirection delete\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} redirection delete`);
+  it('should return 200 for \'thngs $id redirection delete\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} redirection delete`);
 
     expect(res.status).to.equal(200);
   });
 
   // Thng location
-  it('should return 200 for \'thng $id location read\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} location read`);
+  it('should return 200 for \'thngs $id location read\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} location read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'thng $id location update $payload\'', async () => {
+  it('should return 200 for \'thngs $id location update $payload\'', async () => {
     const payload = JSON.stringify([{
       position: { type: 'Point', coordinates: [ -17.3, 36 ] },
     }]);
-    const res = await cli(`thng ${ctx.thngId} location update ${payload}`);
+    const res = await cli(`thngs ${ctx.thngId} location update ${payload}`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
 
-  it('should return 200 for \'thng $id location delete\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} location delete`);
+  it('should return 200 for \'thngs $id location delete\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} location delete`);
 
     expect(res.status).to.equal(200);
   });
 
   // Thng Device API Key
-  it('should return 201 for \'thng device-key create $payload\'', async () => {
+  it('should return 201 for \'thngs device-key create $payload\'', async () => {
     const payload = JSON.stringify({ thngId: ctx.thngId });
-    const res = await cli(`thng device-key create ${payload}`);
+    const res = await cli(`thngs device-key create ${payload}`);
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'thng $id device-key read\'', async () => {
+  it('should return 200 for \'thngs $id device-key read\'', async () => {
     const payload = JSON.stringify({ thngId: ctx.thngId });
-    const res = await cli(`thng ${ctx.thngId} device-key read`);
+    const res = await cli(`thngs ${ctx.thngId} device-key read`);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
   });
 
-  it('should return 200 for \'thng $id device-key delete\'', async () => {
+  it('should return 200 for \'thngs $id device-key delete\'', async () => {
     const payload = JSON.stringify({ thngId: ctx.thngId });
-    const res = await cli(`thng ${ctx.thngId} device-key delete`);
+    const res = await cli(`thngs ${ctx.thngId} device-key delete`);
 
     expect(res.status).to.equal(200);
   });
 
   // Finally
-  it('should return 200 for \'thng $id delete\'', async () => {
-    const res = await cli(`thng ${ctx.thngId} delete`);
+  it('should return 200 for \'thngs $id delete\'', async () => {
+    const res = await cli(`thngs ${ctx.thngId} delete`);
 
     expect(res.status).to.equal(200);
   });

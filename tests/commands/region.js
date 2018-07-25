@@ -9,25 +9,25 @@ chai.use(chaiAsPromised);
 
 const { expect } = chai;
 
-describe('region', () => {
-  it('return object for \'region add $name $apiUrl\'', async () => {
+describe('regions', () => {
+  it('return object for \'regions add $name $apiUrl\'', async () => {
     ctx.regionName = 'test-region';
     const apiUrl = 'https://test-api.evrythng.com';
-    const res = await cli(`region add ${ctx.regionName} ${apiUrl}`);
+    const res = await cli(`regions add ${ctx.regionName} ${apiUrl}`);
 
     expect(res).to.be.an('object');
     expect(res[ctx.regionName]).to.be.a('string');
     expect(res[ctx.regionName]).to.equal(apiUrl);
   });
 
-  it('should return array for \'region list\'', async () => {
-    const res = await cli('region list');
+  it('should return array for \'regions list\'', async () => {
+    const res = await cli('regions list');
 
     expect(res).to.be.an('array');
     expect(res).to.have.length.gte(1);
   });
 
-  it('should not throw error for \'region $name remove\'', async () => {
-    return cli(`region ${ctx.regionName} remove`).should.be.fulfilled;
+  it('should not throw error for \'regions $name remove\'', async () => {
+    return cli(`regions ${ctx.regionName} remove`).should.be.fulfilled;
   });
 });

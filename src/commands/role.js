@@ -2,41 +2,41 @@ const http = require('../modules/http');
 
 module.exports = {
   about: 'Work with role and permission resources.',
-  firstArg: 'role',
+  firstArg: 'roles',
   operations: {
     // CRUD - roles
     createRole: {
       execute: async ([, json]) => http.post('/roles', JSON.parse(json)),
-      pattern: 'role create $payload',
+      pattern: 'create $payload',
     },
     readRole: {
       execute: async ([roleId]) => http.get(`/roles/${roleId}`),
-      pattern: 'role $id read',
+      pattern: '$id read',
     },
     listRole: {
       execute: async () => http.get('/roles'),
-      pattern: 'role list',
+      pattern: 'list',
     },
     updateRole: {
       execute: async ([roleId, , json]) => http.put(`/roles/${roleId}`, JSON.parse(json)),
-      pattern: 'role $id update $payload',
+      pattern: '$id update $payload',
     },
     deleteRole: {
       execute: async ([roleId]) => http.delete(`/roles/${roleId}`),
-      pattern: 'role $id delete',
+      pattern: '$id delete',
     },
 
     // Role permissions
     listPermissions: {
       execute: async ([roleId]) => http.get(`/roles/${roleId}/permissions`),
-      pattern: 'role $id permission list',
+      pattern: '$id permissions list',
     },
     updatePermissions: {
       execute: async ([roleId, , , json]) => {
         const url = `/roles/${roleId}/permissions`;
         return http.put(url, JSON.parse(json));
       },
-      pattern: 'role $id permission update $payload',
+      pattern: '$id permissions update $payload',
     },
   },
 };

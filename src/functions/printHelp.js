@@ -3,27 +3,32 @@ const { OPTION_LIST } = require('../commands/option');
 const { SWITCH_LIST } = require('../modules/switches');
 const indent = require('./indent');
 const logger = require('../modules/logger');
-const version = require('../commands/version');
+const pkg = require('../../package.json');
 
 const EXAMPLES = [{
-  command: 'operator list',
+  command: 'operators list',
   about: 'See all Operators',
 }, {
-  command: 'operator add prod us AGiWrH5OteA4aHiM...',
+  command: 'operators add prod us AGiWrH5OteA4aHiM...',
   about: 'Add a new Operator',
 }, {
-  command: 'thng list',
+  command: 'thngs list',
   about: 'Read a page of Thngs',
 }, {
-  command: 'thng UpUxnWAXeMPNQraRaGmKQdHr read',
+  command: 'thngs UpUxnWAXeMPNQraRaGmKQdHr read',
   about: 'Read a known Thng',
 }, {
-  command: 'product create \'{"name": "My New Product"}\'',
+  command: 'products create \'{"name": "My New Product"}\'',
   about: 'Create a new product',
 }, {
-  command: 'thng list --filter tags=testing --per-page 1',
+  command: 'thngs list --filter tags=testing --per-page 1',
   about: 'Find one tagged Thng',
+}, {
+  command: 'thngs create --build',
+  about: 'Interactively create a Thng',
 }];
+
+const printVersion = () => logger.info(`\n${pkg.name} v${pkg.version}\n${pkg.description}`);
 
 const getPaddingLength = (items) => items.reduce((result, item) => {
   const newLength = item.length;
@@ -46,7 +51,7 @@ const formatList = (list, label, descriptor, sort = true) => {
 };
 
 module.exports = () => {
-  version.operations.default.execute();
+  printVersion();
   logger.info('\nBasic Usage:\n');
   logger.info(indent('$ evrythng <command> <params>... [<payload>] [<switches>...]', 4));
 

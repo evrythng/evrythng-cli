@@ -6,11 +6,11 @@ module.exports = {
   operations: {
     read: {
       execute: async () => http.get('/redirector'),
-      pattern: 'redirector read',
+      pattern: 'read',
     },
     update: {
       execute: async ([, json]) => http.put('/redirector', JSON.parse(json)),
-      pattern: 'redirector update $payload',
+      pattern: 'update $payload',
     },
   },
 };

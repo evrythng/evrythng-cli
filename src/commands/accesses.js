@@ -7,21 +7,21 @@ module.exports = {
   operations: {
     create: {
       execute: async ([, json]) => http.post('/accesses', JSON.parse(json)),
-      pattern: 'accesses create $payload',
+      pattern: 'create $payload',
     },
     list: {
       execute: async () => {
         util.requireKey('Application User');
         return http.get('/accesses');
       },
-      pattern: 'accesses list',
+      pattern: 'list',
     },
     delete: {
       execute: async ([id]) => {
         util.requireKey('Application User');
         return http.delete(`/accesses/${id}`);
       },
-      pattern: 'accesses $id delete',
+      pattern: '$id delete',
     },
   },
 };
