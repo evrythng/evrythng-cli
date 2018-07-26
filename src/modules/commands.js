@@ -58,7 +58,9 @@ const matchArg = (arg, spec) => {
   }
 
   // Must match a map value, or must be the same
-  if (map[spec]) return map[spec]();
+  if (map[spec]) {
+    return map[spec]();
+  }
 
   // Be identical, or identical as a plural
   return arg === spec || arg === `${spec}s`;
