@@ -1,5 +1,7 @@
 # evrythng-cli
 
+> Requires Node.js version 7.6 or greater
+
 CLI for working with the EVRYTHNG API from a terminal or scripts with ease.
 
 
@@ -16,7 +18,7 @@ from the 'Account Settings' page of the
 [EVRYTHNG Dashboard](https://dashboard.evrythng.com):
 
 ```
-$ evrythng operator add $name $region $apiKey
+$ evrythng operators add $name $region $apiKey
 ```
 
 For example:
@@ -24,7 +26,7 @@ For example:
 > Key truncated for brevity.
 
 ```
-$ evrythng operator add prod us AGiWrH5OteA4aHiM...
+$ evrythng operators add prod us AGiWrH5OteA4aHiM...
 ```
 
 
@@ -44,7 +46,7 @@ Run `evrythng` to see all commands, switches, and options.
 
 Authentication is provided in two ways.
 
-1. Using the `operator` command to store Operator API Keys associated with 
+1. Using the `operators` command to store Operator API Keys associated with 
    different accounts and regions in the user's `~/.evrythng-cli-config` file. 
    Any request that can be done as an Operator is done with the currently 
    selected Operator.
@@ -89,11 +91,11 @@ For example:
 ```js
 module.exports = {
   about: 'View rate limit information',
-  firstArg: 'rate-limit',
+  firstArg: 'rate-limits',
   operations: {
     read: {
       execute: async () => http.get('/rateLimits'),
-      pattern: 'rate-limit read',
+      pattern: 'read',
     },
   },
 };
@@ -108,10 +110,10 @@ If no command is matched, the help text is displayed. If a command is not fully
 matched, but the arguments do start with a module's `firstArg`, the syntax
 for the module's `operations` is printed to help guide the user.
 
-So for example, the `thng $id read` command:
+So for example, the `thngs $id read` command:
 
 ```
-$ evrythng thng UnghCKffVg8a9KwRwE5C9qBs read
+$ evrythng thngs UnghCKffVg8a9KwRwE5C9qBs read
 ``` 
 would receive all tokens after its own name as `args` when the operation is 
 called (i.e: all arguments matched its `pattern`):
@@ -125,11 +127,11 @@ and is implemented thus:
 ```js
 module.exports = {
   about: 'Work with Thng resources.',
-  firstArg: 'thng',
+  firstArg: 'thngs',
   operations: {
     readThng: {
       execute: async ([id]) => http.get(`/thngs/${id}`),
-      pattern: 'thng $id read',
+      pattern: '$id read',
     },
   },
 };
@@ -159,7 +161,7 @@ provided by the EVRYTHNG `swagger.json` API description. This is invoked with
 the `--build` switch:
 
 ```
-$ evrythng thng create --build
+$ evrythng thngs create --build
 ```
 
 The CLI then asks for each field in the `definition` (that is not marked as 
@@ -172,7 +174,7 @@ createThng: {
     const payload = await util.buildPayload('ThngDocument', json);
     return http.post('/thngs', payload);
   },
-  pattern: 'thng create $payload',
+  pattern: 'create $payload',
 },
 ```
 
@@ -180,7 +182,7 @@ The user is then asked to input their values, including sub-objects such as
 `customFields`:
 
 ```
-laptop:evrythng-cli chrislewis$ evrythng thng create --build
+laptop:evrythng-cli chrislewis$ evrythng thngs create --build
 
 Provide values for each field (or leave blank to skip):
 
@@ -229,7 +231,7 @@ After `extract()` is called, a switch's state in any given invocation can be
 determined as shown below for an example command:
 
 ```
-$ evrythng thng list --with-scopes
+$ evrythng thngs list --with-scopes
 ```
 
 ```js
@@ -245,7 +247,7 @@ If a switch is configured in `SWITCH_LIST` to be given with a value
 time as follows:
 
 ```
-$ evrythng thng list --filter tags=test
+$ evrythng thngs list --filter tags=test
 ```
 
 The value would be read in code as:
