@@ -37,8 +37,14 @@ const printSimple = (obj, level) => {
   });
 };
 
-const getPayload = async (defName, jsonStr) =>
-  switches.using(switches.BUILD) ? buildPayload(defName) : JSON.parse(jsonStr);
+const getPayload = async (defName, jsonStr) => {
+  try {
+    const parsed = JSON.parse(jsonStr);
+    return switches.using(switches.BUILD) ? buildPayload(defName) : parsed;
+  } catch (e) {
+    throw new Error('Invalid or missing JSON payload');
+  }
+};
 
 const requireKey = (name) => {
   const apiKey = switches.using(switches.API_KEY);
