@@ -17,7 +17,8 @@
     "eslint-config-airbnb-base": "^13.0.0",
     "evrythng-extended": "^4.7.2",
     "evrythng-swagger": "^1.0.0",
-    "json-schema-ref-parser": "^5.0.3"
+    "json-schema-ref-parser": "^5.0.3",
+    "jsonschema": "^1.2.4"
   },
   "devDependencies": {
     "@evrythng/eslint-config-evrythng": "0.0.1",
