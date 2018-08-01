@@ -7,7 +7,7 @@ const MAP = {
   error: 0,
 };
 
-const log = (msg = '', level) => {
+const log = (level, msg = '') => {
   if (MAP[logLevel] < MAP[level]) {
     return;
   }
@@ -16,6 +16,6 @@ const log = (msg = '', level) => {
 };
 
 module.exports = {
-  info: msg => log(msg, 'info'),
-  error: msg => log(msg, 'error'),
+  info: msg => log('info', msg),
+  error: msg => log('error', msg),
 };

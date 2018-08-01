@@ -43,7 +43,7 @@ const addRegion = ([, name, apiUrl]) => {
 const removeRegion = ([name]) => {
   // Do not remove while in use
   const operators = config.get('operators');
-  const inUse = Object.keys(operators).find(item => item.region === name);
+  const inUse = Object.keys(operators).find(item => operators[item].region === name);
   if (inUse) {
     throw new Error('Cannot delete a region while an Operator is using it.');
   }

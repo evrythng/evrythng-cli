@@ -3,7 +3,7 @@ const { OPTION_LIST } = require('../commands/option');
 const { SWITCH_LIST } = require('../modules/switches');
 const indent = require('./indent');
 const logger = require('../modules/logger');
-const pkg = require('../../package.json');
+const { description, name, version } = require('../../package.json');
 
 const EXAMPLES = [{
   command: 'operators list',
@@ -28,7 +28,7 @@ const EXAMPLES = [{
   about: 'Interactively create a Thng',
 }];
 
-const printVersion = () => logger.info(`\n${pkg.name} v${pkg.version}\n${pkg.description}`);
+const printVersion = () => logger.info(`\n${name} v${version}\n${description}`);
 
 const getPaddingLength = (items) => items.reduce((result, item) => {
   const newLength = item.length;

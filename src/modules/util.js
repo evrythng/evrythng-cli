@@ -53,15 +53,6 @@ const requireKey = (name) => {
   }
 };
 
-const getQueryParams = url => url.substring(url.indexOf('?'))
-  .slice(1)
-  .split('&')
-  .reduce((result, item) => {
-    const parts = item.split('=');
-    result[parts[0]] = parts[1];
-    return result;
-  }, {});
-
 module.exports = {
   isId,
   pretty,
@@ -69,5 +60,4 @@ module.exports = {
   printListSummary,
   printSimple,
   requireKey,
-  getQueryParams,
 };
