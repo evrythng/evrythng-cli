@@ -18,7 +18,7 @@ const SWITCH_LIST = [{
   constant: 'SUMMARY',
 }, {
   name: '--api-key',
-  about: 'Use a specific API key instead of the current Operator\'s API Key',
+  about: 'Use a specific API key instead of the current Operator\'s API Key.',
   constant: 'API_KEY',
   hasValue: true,
 }, {
@@ -45,7 +45,7 @@ const SWITCH_LIST = [{
   hasValue: true,
 }, {
   name: '--page',
-  about: 'Go to a specific page of results',
+  about: 'Go to a specific page of results.',
   constant: 'PAGE',
   hasValue: true,
 }];

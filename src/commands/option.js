@@ -4,7 +4,7 @@ const logger = require('../modules/logger');
 const OPTION_LIST = [{
   key: 'logLevel',
   name: 'log-level',
-  about: 'Set level of output to the console (one of \'info\', \'error\')',
+  about: 'Set level of output to the console (one of \'info\', \'error\').',
   values: ['info', 'error'],
 }, {
   key: 'errorDetail',
@@ -19,7 +19,7 @@ const OPTION_LIST = [{
 }, {
   key: 'showHttp',
   name: 'show-http',
-  about: 'Show full details of HTTP requests',
+  about: 'Show full details of HTTP requests.',
   values: ['true', 'false'],
 }];
 

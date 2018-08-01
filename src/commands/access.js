@@ -1,7 +1,7 @@
 const http = require('../modules/http');
 
 module.exports = {
-  about: 'Read actor access information',
+  about: 'Read actor access information.',
   firstArg: 'access',
   operations: {
     read: {
