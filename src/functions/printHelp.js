@@ -55,6 +55,9 @@ module.exports = () => {
   logger.info('\nBasic Usage:\n');
   logger.info(indent('$ evrythng <command> <params>... [<payload>] [<switches>...]', 4));
 
+  logger.info('\nDocumentation:\n');
+  logger.info(indent('https://developers.evrythng.com/docs/evrythng-cli', 4));
+
   logger.info('\nAvailable Commands:\n');
   logger.info(indent('Specify a command name below to see syntax for all its operations.\n', 2));
   formatList(COMMAND_LIST, 'firstArg', 'about');
