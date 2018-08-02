@@ -1,6 +1,6 @@
 {
   "name": "evrythng-cli",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "description": "CLI for the EVRYTHNG API.",
   "main": "./src/main.js",
   "scripts": {
@@ -28,7 +28,8 @@
     "eslint-plugin-jsdoc": "^3.7.1",
     "eslint-plugin-react": "^7.10.0",
     "mocha": "^5.2.0",
-    "nyc": "^12.0.2"
+    "nyc": "^12.0.2",
+    "sinon": "^6.1.4"
   },
   "eslintConfig": {
     "extends": "@evrythng/eslint-config-evrythng",

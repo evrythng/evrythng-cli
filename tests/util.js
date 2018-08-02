@@ -4,10 +4,17 @@
  */
 
 const { expect } = require('chai');
+const sinon = require('sinon');
+const prompt = require('../src/modules/prompt');
 const switches = require('../src/modules/switches');
 const util = require('../src/modules/util');
 
 describe('util', () => {
+  afterEach(() => {
+    switches.unset(switches.BUILD);
+    sinon.resetBehavior();
+  });
+
   it('should know an ID is 24 characters long', () => {
     const id = 'UKAVpbnsVDPa9Kaaam7a5tdp';
 
@@ -49,5 +56,20 @@ describe('util', () => {
 
     const requireKey = () => util.requireKey('Application');
     expect(requireKey).to.not.throw();
+  });
+
+  it('should build a correct thng payload using the user prompts', async () => {
+    switches.set(switches.BUILD, true);
+    sinon.stub(prompt, 'getValue')
+      .onCall(0).returns('TestThng')
+      .returns('');
+
+    const payload = await util.getPayload('ThngDocument');
+    expect(payload).to.have.property('name', 'TestThng');
+  });
+
+  it('should build the correct thng payload using JSON', async () => {
+    const payload = await util.getPayload('ThngDocument', '{"name":"TestThng"}');
+    expect(payload).to.have.property('name', 'TestThng');
   });
 });
