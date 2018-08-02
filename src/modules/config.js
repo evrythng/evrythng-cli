@@ -17,9 +17,6 @@ const DEFAULT_CONFIG = {
     showHttp: false,
     logLevel: 'info',
   },
-  logger: {
-    level: 'info',
-  },
   regions: {
     us: 'https://api.evrythng.com',
     eu: 'https://api-eu.evrythng.com',
