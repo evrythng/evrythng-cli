@@ -43,9 +43,12 @@ const printSimple = (obj, level) => {
 };
 
 const getPayload = async (defName, jsonStr) => {
+  if (switches.using(switches.BUILD)) {
+    return buildPayload(defName);
+  }
+
   try {
-    const parsed = JSON.parse(jsonStr);
-    return switches.using(switches.BUILD) ? buildPayload(defName) : parsed;
+    return JSON.parse(jsonStr);
   } catch (e) {
     throw new Error('Invalid or missing JSON payload');
   }

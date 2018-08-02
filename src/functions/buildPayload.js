@@ -5,7 +5,7 @@
 
 const evrythngSwagger = require('evrythng-swagger');
 const jsonSchemaParser = require('json-schema-ref-parser');
-const { getValue } = require('../modules/prompt');
+const prompt = require('../modules/prompt');
 const indent = require('./indent');
 const logger = require('../modules/logger');
 
@@ -25,14 +25,14 @@ const SPECIAL_BUILDERS = {
 
 let spec;
 
-const getKeyName = async () => getValue(indent('key', 2));
+const getKeyName = async () => prompt.getValue(indent('key', 2));
 
 const buildCustomObject = async () => {
   const result = {};
 
   let key = await getKeyName();
   while (key) {
-    const value = await getValue(indent('value', 2));
+    const value = await prompt.getValue(indent('value', 2));
     result[key] = value;
 
     key = await getKeyName();
@@ -83,7 +83,7 @@ const buildDefProperty = async (opts) => {
   }
 
   // Get a simple value
-  const input = await getValue(`${index + 1}/${total}: ${key} (${typeStr})`);
+  const input = await prompt.getValue(`${index + 1}/${total}: ${key} (${typeStr})`);
   if (!input) {
     return;
   }
