@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const { execSync } = require('child_process');
 const fs = require('fs');
 const http = require('../modules/http');
@@ -16,10 +21,10 @@ const checkFileExists = async (fullPath) => {
 const checkMetaDataMatches = (existing, filePath, contentType) => {
   const pieces = filePath.split('/');
   const fileName = pieces[pieces.length - 1];
-  
+
   if (existing.name !== fileName || existing.type !== contentType) {
-    const errStr = '\nEither the file name or MIME type do not match the file ID specified.' +
-      `\nFile: ${existing.name} ${existing.type}\nCommand: ${fileName} ${contentType}`;
+    const errStr = '\nEither the file name or MIME type do not match the file ID specified.'
+      + `\nFile: ${existing.name} ${existing.type}\nCommand: ${fileName} ${contentType}`;
 
     throw new Error(errStr);
   }
@@ -27,9 +32,9 @@ const checkMetaDataMatches = (existing, filePath, contentType) => {
 
 const uploadToS3 = (existing, fullPath, contentType) => {
   const accessType = existing.privateAccess ? 'private' : 'public-read';
-  const cmd = `curl -X PUT '${existing.uploadUrl}' -H Content-Type:${contentType} ` +
-    `-H x-amz-acl:${accessType} --data-binary @${fullPath} --silent`;
-  
+  const cmd = `curl -X PUT '${existing.uploadUrl}' -H Content-Type:${contentType} `
+    + `-H x-amz-acl:${accessType} --data-binary @${fullPath} --silent`;
+
   const stdout = execSync(cmd).toString();
   logger.info(stdout);
   if (stdout.length > 5) {

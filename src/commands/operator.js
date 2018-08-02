@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const evrythng = require('evrythng-extended');
 const { getValue } = require('../modules/prompt');
 const config = require('../modules/config');
@@ -96,16 +101,16 @@ const checkFirstRun = async () => {
     return;
   }
 
-  logger.info('\nWelcome to the EVRYTHNG CLI!\n\nTo get started, please provide the following ' +
-    'to set up your first account Operator:\n');
+  logger.info('\nWelcome to the EVRYTHNG CLI!\n\nTo get started, please provide the following '
+    + 'to set up your first account Operator:\n');
 
   const name = await getValue('Short Operator name (e.g: \'personal\')');
   const region = await getValue('Account region (\'us\' or \'eu\')');
   const apiKey = await getValue('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
   addOperator([null, name, region, apiKey]);
 
-  logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. ' +
-    'Some examples to get you started:\n');
+  logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. '
+    + 'Some examples to get you started:\n');
   logger.info('  evrythng thng list');
   logger.info('  evrythng thng UnQ8nqfQeD8aQpwRanrXaaPt read');
   logger.info('  evrythng product create \'{"name": "My New Product"}\'\n');

@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const evrythng = require('evrythng-extended');
 const operator = require('../commands/operator');
 

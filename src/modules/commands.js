@@ -1,4 +1,8 @@
-const config = require('./config');
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const logger = require('./logger');
 const switches = require('./switches');
 

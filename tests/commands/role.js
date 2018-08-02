@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const { expect } = require('chai');
 const { ctx } = require('../modules/util');
 const cli = require('../../src/functions/cli');
@@ -5,8 +10,8 @@ const cli = require('../../src/functions/cli');
 describe('roles', () => {
   // Role CRUD
   it('should return 201 for \'roles create $payload\'', async () => {
-    const payload = JSON.stringify({ 
-      name: 'Test role', 
+    const payload = JSON.stringify({
+      name: 'Test role',
       version: 2,
       type: 'userInApp',
     });

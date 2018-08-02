@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const { COMMAND_LIST } = require('../modules/commands');
 const { OPTION_LIST } = require('../commands/option');
 const { SWITCH_LIST } = require('../modules/switches');
@@ -30,7 +35,7 @@ const EXAMPLES = [{
 
 const printVersion = () => logger.info(`\n${name} v${version}\n${description}`);
 
-const getPaddingLength = (items) => items.reduce((result, item) => {
+const getPaddingLength = items => items.reduce((result, item) => {
   const newLength = item.length;
   return (newLength > result) ? newLength : result;
 }, 0);

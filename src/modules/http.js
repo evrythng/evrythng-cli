@@ -1,5 +1,10 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const evrythng = require('evrythng-extended');
-const { getValue, getConfirmation } = require('./prompt');
+const { getConfirmation } = require('./prompt');
 const config = require('./config');
 const expand = require('../functions/expand');
 const logger = require('./logger');
@@ -73,7 +78,7 @@ const goToPage = async (res, endPage) => {
 
 const printResponse = async (res) => {
   if (!res) {
-    return;
+    return null;
   }
   if (!res.data) {
     return res;
@@ -161,7 +166,13 @@ const post = async (url, data) => apiRequest({
 const get = async (url, silent = false) => apiRequest({
   url: `${url}${buildParams()}`,
   authorization: operator.getKey(),
-}).then(res => silent ? res : printResponse(res));
+}).then((res) => {
+  if (silent) {
+    return res;
+  }
+
+  return printResponse(res);
+});
 
 const put = async (url, data) => apiRequest({
   url,

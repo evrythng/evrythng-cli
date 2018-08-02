@@ -1,12 +1,17 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const { expect } = require('chai');
 const { ctx } = require('../modules/util');
 const cli = require('../../src/functions/cli');
 
 describe('files', () => {
   it('should return 201 for \'files create $payload\'', async () => {
-    const payload = JSON.stringify({ 
-      name: 'test.txt', 
-      type: 'text/plain', 
+    const payload = JSON.stringify({
+      name: 'test.txt',
+      type: 'text/plain',
       privateAccess: false,
     });
     const res = await cli(`files create ${payload}`);
@@ -33,7 +38,7 @@ describe('files', () => {
 
   it('should not throw error for \'files $id upload $file-path $mime-type\'', async () => {
     const uploadTestFile = async () => cli(`files ${ctx.fileId} upload ./tests/modules/test.txt text/plain`);
-   
+
     expect(uploadTestFile).to.not.throw();
   });
 

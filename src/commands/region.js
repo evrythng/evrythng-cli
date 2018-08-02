@@ -1,4 +1,8 @@
-const evrythng = require('evrythng-extended');
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const config = require('../modules/config');
 const logger = require('../modules/logger');
 
@@ -41,6 +45,8 @@ const addRegion = ([, name, apiUrl]) => {
 };
 
 const removeRegion = ([name]) => {
+  checkRegionExists(name);
+
   // Do not remove while in use
   const operators = config.get('operators');
   const inUse = Object.keys(operators).find(item => operators[item].region === name);

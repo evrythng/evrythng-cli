@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const { ctx } = require('../modules/util');

@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const { validate } = require('jsonschema');
 const fs = require('fs');
 
@@ -65,8 +70,8 @@ const CONFIG_SCHEMA = {
 
 let data;
 
-const validateConfig = (data) => {
-  let results = validate(data, CONFIG_SCHEMA);
+const validateConfig = (input) => {
+  let results = validate(input, CONFIG_SCHEMA);
   if (results.errors && results.errors.length) {
     results = results.errors.map(item => item.stack);
 

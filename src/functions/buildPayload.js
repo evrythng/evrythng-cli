@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const evrythngSwagger = require('evrythng-swagger');
 const jsonSchemaParser = require('json-schema-ref-parser');
 const { getValue } = require('../modules/prompt');
@@ -53,7 +58,7 @@ const buildDefObject = async (opts) => {
 
 const buildDefProperty = async (opts) => {
   const { index, total, target, key, propertyDef } = opts;
-  
+
   // Fields with only one allowed value
   if (HARDCODE_MAP[key]) {
     target[key] = HARDCODE_MAP[key];
@@ -114,10 +119,10 @@ const buildObject = async (properties, name) => {
   for (let index = 0; index < propertyKeys.length; index += 1) {
     const key = propertyKeys[index];
     await buildDefProperty({
-      key, 
-      index, 
-      total: propertyKeys.length, 
-      target: payload, 
+      key,
+      index,
+      total: propertyKeys.length,
+      target: payload,
       propertyDef: properties[key],
     });
   }

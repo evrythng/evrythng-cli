@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const readline = require('readline');
 const logger = require('./logger');
 
@@ -15,7 +20,7 @@ const getChoice = (label, choices) => new Promise(async (resolve) => {
     logger.error('Invalid choice');
     input = await getValue(label);
   }
-  
+
   resolve(input);
 });
 
@@ -25,7 +30,7 @@ const getInteger = label => new Promise(async (resolve) => {
     logger.error('Invalid input');
     input = await getValue(label);
   }
-  
+
   resolve(input);
 });
 
@@ -37,18 +42,18 @@ const getBoolean = label => new Promise(async (resolve) => {
     logger.error('Invalid input');
     input = await getValue(label);
   }
-  
+
   resolve(input === 'true');
 });
 
 const isJSONString = (val) => {
-  try { 
-    JSON.parse(val); 
+  try {
+    JSON.parse(val);
     return true;
-  } catch (e) { 
+  } catch (e) {
     return false;
   }
-}
+};
 
 const getJSON = label => new Promise(async (resolve) => {
   let input = await getValue(`${label} - (JSON)`);
@@ -56,7 +61,7 @@ const getJSON = label => new Promise(async (resolve) => {
     logger.error('Invalid input');
     input = await getValue(label);
   }
-  
+
   resolve(JSON.parse(input));
 });
 

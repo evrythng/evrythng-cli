@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const evrythng = require('evrythng-extended');
 const config = require('../modules/config');
 const logger = require('../modules/logger');
@@ -38,7 +43,7 @@ const buildFixedAmount = async (task) => {
   task.inputParameters.type = 'FIXED_AMOUNT';
   task.inputParameters.quantity = await prompt.getInteger('Quantity');
   task.inputParameters.thngTemplate = await prompt.getJSON('Thng template');
-  
+
   task.inputParameters.generateRedirections = await prompt.getBoolean('Generate redirections');
   if (task.inputParameters.generateRedirections) {
     task.inputParameters.defaultRedirectUrl = await prompt.getValue('Default redirect URL');
@@ -58,19 +63,19 @@ const buildFileBased = async (task) => {
   task.inputParameters.location = await prompt.getValue('File URL');
   task.inputParameters.format = await prompt.getChoice('File format', FILE_FORMATS);
   task.inputParameters.defaultRedirectUrl = await prompt.getValue('Default redirect URL');
-  
+
   const shortDomains = await getShortDomains();
   task.inputParameters.shortDomain = await prompt.getChoice('Short domain', shortDomains);
   task.inputParameters.thngTemplate = await prompt.getJSON('Thng template');
   return task;
-}; 
+};
 
 const buildListBased = async (task) => {
   task.inputParameters.type = 'LIST_BASED';
   task.inputParameters.generateRedirections = true;
   task.inputParameters.shortIdTemplate = SHORT_ID_TEMPLATE;
   task.inputParameters.defaultRedirectUrl = await prompt.getValue('Default redirect URL');
-  
+
   const shortDomains = await getShortDomains();
   task.inputParameters.shortDomain = await prompt.getChoice('Short domain', shortDomains);
   task.inputParameters.thngTemplate = await prompt.getJSON('Thng template');
@@ -110,7 +115,7 @@ const buildPopulatingTask = async () => {
 
 // ---------------------------- Short ID Generation ----------------------------
 
-const buildShortIdTemplate = async (task) => {
+const buildShortIdTemplate = async () => {
   const template = {};
 
   template.type = await prompt.getChoice('Template type', SHORT_ID_TEMPLATE_TYPES);
@@ -148,7 +153,7 @@ module.exports = async () => {
     SHORT_ID_GENERATION: buildShortIdGenerationTask,
   };
   const task = await builders[taskType]();
-  logger.info(`\Task:\n${JSON.stringify(task, null, 2)}\n`);
+  logger.info(`\nTask:\n${JSON.stringify(task, null, 2)}\n`);
 
   const confirmation = await prompt.getConfirmation();
   if (!confirmation) {

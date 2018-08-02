@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const commands = require('../modules/commands');
 const switches = require('../modules/switches');
 
@@ -5,10 +10,10 @@ const extractJsonRange = (argStr) => {
   if (argStr.includes('[') && argStr.indexOf('[') < argStr.indexOf('{')) {
     // JSON is an object array
     return [argStr.indexOf('['), argStr.lastIndexOf(']') + 1];
-  } else {
-    // JSON is an object
-    return [argStr.indexOf('{'), argStr.lastIndexOf('}') + 1];
   }
+
+  // JSON is an object
+  return [argStr.indexOf('{'), argStr.lastIndexOf('}') + 1];
 };
 
 const argsWithJson = (argStr) => {

@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const cli = require('../../src/functions/cli');
 const switches = require('../../src/modules/switches');
 
@@ -8,7 +13,7 @@ const waitAsync = async ms => new Promise(resolve => setTimeout(resolve, ms));
 const createProject = async () => {
   const payload = JSON.stringify({ name: 'Test project' });
   const res = await cli(`projects create ${payload}`);
-  
+
   return res.data;
 };
 
@@ -20,10 +25,10 @@ const createApplication = async (projectId) => {
 };
 
 const createAppUser = async (name) => {
-  let payload = JSON.stringify({ 
-    firstName: 'test', 
-    lastName: 'user', 
-    email: `${name}@example.com`, 
+  let payload = JSON.stringify({
+    firstName: 'test',
+    lastName: 'user',
+    email: `${name}@example.com`,
     password: 'password',
   });
   let res = await cli(`app-users create ${payload} --api-key ${ctx.application.appApiKey}`);

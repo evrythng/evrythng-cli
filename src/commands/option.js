@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const config = require('../modules/config');
 const logger = require('../modules/logger');
 
@@ -30,7 +35,7 @@ module.exports = {
     listOptions: {
       execute: () => {
         const options = config.get('options');
-        
+
         logger.info('\nOptions:');
         Object.keys(options).forEach((item) => {
           const found = OPTION_LIST.find(item2 => item2.key === item);

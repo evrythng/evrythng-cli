@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const { expect } = require('chai');
 const switches = require('../src/modules/switches');
 const util = require('../src/modules/util');
@@ -5,7 +10,7 @@ const util = require('../src/modules/util');
 describe('util', () => {
   it('should know an ID is 24 characters long', () => {
     const id = 'UKAVpbnsVDPa9Kaaam7a5tdp';
-    
+
     const isId = () => util.isId(id);
     expect(isId()).to.equal(true);
   });
