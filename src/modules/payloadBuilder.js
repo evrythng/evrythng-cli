@@ -4,10 +4,15 @@
  */
 
 const evrythng = require('evrythng-extended');
-const config = require('../modules/config');
-const logger = require('../modules/logger');
+const evrythngSwagger = require('evrythng-swagger');
+const jsonSchemaParser = require('json-schema-ref-parser');
+const config = require('./config');
+const indent = require('../functions/indent');
+const logger = require('./logger');
 const operator = require('../commands/operator');
-const prompt = require('../modules/prompt');
+const prompt = require('./prompt');
+
+// ----------------------------------- Tasks -----------------------------------
 
 const TASK_TYPES = ['POPULATING', 'SHORT_ID_GENERATION'];
 
@@ -26,8 +31,6 @@ const POPULATING_TASK_BASE = {
   inputParameters: { generateThngs: true },
 };
 const FILE_FORMATS = ['CSV', 'ZIP'];
-
-// --------------------------- Batch Populating Task ---------------------------
 
 const apiRequest = (url) => {
   const apiKey = operator.resolveKey(config.get('using'));
@@ -112,9 +115,6 @@ const buildPopulatingTask = async () => {
   return builders[inputType](task);
 };
 
-
-// ---------------------------- Short ID Generation ----------------------------
-
 const buildShortIdTemplate = async () => {
   const template = {};
 
@@ -144,16 +144,15 @@ const buildShortIdGenerationTask = async () => {
   return task;
 };
 
-// ------------------------------------ API ------------------------------------
-
-module.exports = async () => {
+const task = async () => {
   const taskType = await prompt.getChoice('Task type', TASK_TYPES);
   const builders = {
     POPULATING: buildPopulatingTask,
     SHORT_ID_GENERATION: buildShortIdGenerationTask,
   };
-  const task = await builders[taskType]();
-  logger.info(`\nTask:\n${JSON.stringify(task, null, 2)}\n`);
+
+  const result = await builders[taskType]();
+  logger.info(`\nTask:\n${JSON.stringify(result, null, 2)}\n`);
 
   const confirmation = await prompt.getConfirmation();
   if (!confirmation) {
@@ -161,5 +160,143 @@ module.exports = async () => {
     process.exit();
   }
 
-  return task;
+  return result;
+};
+
+// ------------------------------ Regular Payloads -----------------------------
+
+// Some properties are writable, just not at create time
+const NON_CREATE_PROPERTIES = [
+  'scopes', 'properties', 'fn', 'startsAt', 'endsAt', 'location',
+];
+
+// Values that are always the same value, and are not in the creation spec
+const HARDCODE_MAP = {
+  socialNetworks: {},
+};
+
+const getKeyName = async () => prompt.getValue(indent('key', 2));
+
+const buildCustomObject = async () => {
+  const result = {};
+
+  let key = await getKeyName();
+  while (key) {
+    const value = await prompt.getValue(indent('value', 2));
+    result[key] = value;
+
+    key = await getKeyName();
+  }
+
+  return result;
+};
+
+const buildDefObject = async (opts) => {
+  const { key, target, index, total, propertyDef } = opts;
+
+  // User-definable fields are not documented, present free-form
+  if (['customFields', 'identifiers'].includes(key)) {
+    logger.info(`${index + 1}/${total}: ${key} (object, leave 'key' blank to finish)`);
+    target[key] = await buildCustomObject();
+    return;
+  }
+
+  // Recurse
+  target[key] = {};
+  await buildObject(target[key], propertyDef.properties, key);
+};
+
+const buildDefProperty = async (opts) => {
+  const { index, total, target, key, propertyDef } = opts;
+
+  // Fields with only one allowed value
+  if (HARDCODE_MAP[key]) {
+    target[key] = HARDCODE_MAP[key];
+    logger.info(`${index + 1}/${total}: ${key} is always ${JSON.stringify(HARDCODE_MAP[key])}`);
+    return;
+  }
+
+  // Build sub-object
+  // TODO handle sub-object properties
+  if (propertyDef.type === 'object') {
+    await buildDefObject({ key, target, index, total, propertyDef });
+    return;
+  }
+
+  // Determine type hint string
+  let typeStr = propertyDef.type;
+  if (propertyDef.type === 'array') {
+    typeStr = `comma-separated list of ${propertyDef.items.type}`;
+  }
+  if (propertyDef.enum) {
+    typeStr = `${propertyDef.type}, one of '${propertyDef.enum.join('\', \'')}'`;
+  }
+
+  // Get a simple value
+  const input = await prompt.getValue(`${index + 1}/${total}: ${key} (${typeStr})`);
+  if (!input) {
+    return;
+  }
+
+  // Handle input arrays as comma-separated values
+  // TODO handle arrays of non-strings?
+  if (propertyDef.type === 'array') {
+    if (propertyDef.items.type === 'string') {
+      target[key] = input.split(',');
+      return;
+    }
+
+    if (['integer', 'number'].includes(propertyDef.items.type)) {
+      target[key] = input.split(',').map(parseInt);
+      return;
+    }
+  }
+
+  // Simple value
+  target[key] = input;
+};
+
+const filteredPropertyKeys = properties => Object.keys(properties)
+  .filter(item => !properties[item].readOnly)
+  .filter(item => !NON_CREATE_PROPERTIES.includes(item));
+
+const buildObject = async (properties, name) => {
+  const propertyKeys = filteredPropertyKeys(properties);
+  const context = name ? `of ${name} ` : '';
+  logger.info(`Provide values for each field ${context}(or leave blank to skip):\n`);
+
+  const payload = {};
+  for (let index = 0; index < propertyKeys.length; index += 1) {
+    const key = propertyKeys[index];
+    await buildDefProperty({
+      key,
+      index,
+      total: propertyKeys.length,
+      target: payload,
+      propertyDef: properties[key],
+    });
+  }
+
+  return payload;
+};
+
+const resource = async (defName) => {
+  const { definitions } = await jsonSchemaParser.dereference(evrythngSwagger);
+  if (!definitions[defName]) {
+    throw new Error(`\ndefName ${defName} not found in spec!`);
+  }
+
+  logger.info();
+  const { properties } = definitions[defName];
+  const payload = await buildObject(properties);
+
+  logger.info();
+  return payload;
+};
+
+// ------------------------------------ API ------------------------------------
+
+module.exports = {
+  resource,
+  task,
 };

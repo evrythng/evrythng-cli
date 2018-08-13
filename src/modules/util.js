@@ -3,12 +3,17 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const buildPayload = require('../functions/buildPayload');
 const indent = require('../functions/indent');
 const logger = require('./logger');
+const payloadBuilder = require('./payloadBuilder');
 const switches = require('./switches');
 
 const INDENT_SIZE = 2;
+
+// TODO: Redirector, Reactor schedules, etc...
+const SPECIAL_BUILDERS = {
+  task: payloadBuilder.task,
+};
 
 const isId = input => input.length === 24;
 
@@ -44,7 +49,12 @@ const printSimple = (obj, level) => {
 
 const getPayload = async (defName, jsonStr) => {
   if (switches.using(switches.BUILD)) {
-    return buildPayload(defName);
+    // Special builders, such as tasks
+    if (SPECIAL_BUILDERS[defName]) {
+      return SPECIAL_BUILDERS[defName]();
+    }
+
+    return payloadBuilder.resource(defName);
   }
 
   try {
