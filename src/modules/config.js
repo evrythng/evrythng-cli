@@ -50,7 +50,7 @@ const CONFIG_SCHEMA = {
     options: {
       type: 'object',
       additionalProperties: false,
-      required: ['errorDetail', 'noConfirm', 'showHttp', 'logLevel'],
+      required: ['errorDetail', 'noConfirm', 'showHttp', 'logLevel', 'defaultPerPage'],
       properties: {
         errorDetail: { type: 'boolean' },
         noConfirm: { type: 'boolean' },
@@ -58,6 +58,11 @@ const CONFIG_SCHEMA = {
         logLevel: {
           type: 'string',
           enum: ['info', 'error'],
+        },
+        defaultPerPage: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
         },
       },
     },
@@ -76,6 +81,15 @@ const validateConfig = (input) => {
   }
 };
 
+const migrateConfig = (input) => {
+  // v1.1.0 - new defaultPerPage option
+  if (!input.options.defaultPerPage) {
+    input.options.defaultPerPage = 30;
+  }
+
+  write();
+};
+
 const write = () => fs.writeFileSync(PATH, JSON.stringify(data, null, 2), 'utf8');
 
 const load = () => {
@@ -86,6 +100,7 @@ const load = () => {
   }
 
   data = JSON.parse(fs.readFileSync(PATH, 'utf8'));
+  migrateConfig(data);
   validateConfig(data);
 };
 

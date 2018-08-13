@@ -3,6 +3,8 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const config = require('./config');
+
 const SWITCH_LIST = [{
   name: '--filter',
   about: 'Specify a Platform filter, such as \'tags=test\'.',
@@ -89,16 +91,22 @@ const unset = (name) => {
 };
 
 const buildParams = () => {
-  const result = {};
+  const { defaultPerPage } = config.get('options');
   const filter = using(module.exports.FILTER);
   const perPage = using(module.exports.PER_PAGE);
   const project = using(module.exports.PROJECT);
+
+  const result = {};
   if (filter) {
     result.filter = filter.value;
   }
+
+  // Use global value, unless it's specified with flag
+  result.perPage = defaultPerPage;
   if (perPage) {
     result.perPage = perPage.value;
   }
+
   if (project) {
     result.project = project.value;
   }
