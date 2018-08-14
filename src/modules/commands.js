@@ -33,35 +33,39 @@ const showSyntax = (command) => {
   const { firstArg, operations } = command;
   const specs = Object.keys(operations).map(item => `evrythng ${firstArg} ${operations[item].pattern}`);
 
-  logger.error(`\nAvailable operations for '${firstArg}':\n${specs.join('\n')}`);
-  process.exit();
+  throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
 };
 
 const matchArg = (arg, spec) => {
   const map = {
     // Value must be an EVRYTHNG ID
-    $id: () => arg.length === 24,
+    $id: val => val.length === 24,
     // Value must be JSON
-    $payload: () => {
+    $payload: (val) => {
       if (switches.using(switches.BUILD)) {
         return true;
       }
 
       try {
-        return (typeof arg === 'object') && JSON.parse(arg);
+        return typeof JSON.parse(val) === 'object';
       } catch (e) {
         return false;
       }
     },
   };
 
+  // Must match a map value, or must be identical
+  if (map[spec]) {
+    return map[spec](arg);
+  }
+
   // A labelled value, such as $type for actions
   if (spec.startsWith('$')) {
     return true;
   }
 
-  // Must match a map value, or must be identical
-  return map[spec] ? map[spec]() : arg === spec;
+  // Must be the same
+  return arg === spec;
 };
 
 const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => matchArg(args[i], item));

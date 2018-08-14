@@ -13,12 +13,14 @@ const operator = require('../src/commands/operator');
 
 describe('CLI', () => {
   before(async () => {
-    ctx.savedOpts = JSON.parse(JSON.stringify(config.get('options')));
+    const options = config.get('options');
+    ctx.savedOpts = JSON.parse(JSON.stringify(options));
 
-    await cli('options error-detail true');
-    await cli('options no-confirm true');
-    await cli('options show-http false');
-    await cli('options log-level error');
+    options.errorDetail = true;
+    options.noConfirm = true;
+    options.showHttp = false;
+    options.logLevel = 'error';
+    config.set('options', options);
 
     operator.applyRegion();
   });

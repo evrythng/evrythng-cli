@@ -5,14 +5,13 @@
 
 const config = require('./config');
 
-const { logLevel } = config.get('options');
-
 const MAP = {
   info: 1,
   error: 0,
 };
 
 const log = (level, msg = '') => {
+  const { logLevel } = config.get('options');
   if (MAP[logLevel] < MAP[level]) {
     return;
   }

@@ -46,4 +46,18 @@ describe('commands', () => {
     const res = commands.identify(args);
     expect(res).to.deep.equal(expected);
   });
+
+  it('should throw to identify a partial match', () => {
+    const args = ['thngs'];
+    const match = () => commands.identify(args);
+    
+    expect(match).to.throw();
+  });
+
+  it('should throw to print command syntax', () => {
+    const command = commands.COMMAND_LIST.find(item => item.firstArg === 'thngs');
+    const showSyntax = () => commands.showSyntax(command);
+
+    expect(showSyntax).to.throw();
+  });
 });

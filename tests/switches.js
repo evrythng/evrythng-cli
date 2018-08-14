@@ -26,12 +26,13 @@ describe('switches', () => {
     expect(res.data).to.be.an('array');
   });
 
-  it('should accept the --perpage switch', async () => {
-    const res = await cli('thngs list --perpage 1');
+  it('should accept the --per-page switch', async () => {
+    const res = await cli('thngs list --per-page 1');
     switches.unset(switches.PER_PAGE);
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
+    expect(res.data).to.have.length(1);
   });
 
   it('should accept the --summary switch', async () => {

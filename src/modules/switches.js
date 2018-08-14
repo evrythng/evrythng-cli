@@ -90,7 +90,7 @@ const unset = (name) => {
   active.splice(active.indexOf(found), 1);
 };
 
-const buildParams = () => {
+const buildParams = (method) => {
   const { defaultPerPage } = config.get('options');
   const filter = using(module.exports.FILTER);
   const perPage = using(module.exports.PER_PAGE);
@@ -102,7 +102,9 @@ const buildParams = () => {
   }
 
   // Use global value, unless it's specified with flag
-  result.perPage = defaultPerPage;
+  if (method === 'get') {
+    result.perPage = defaultPerPage;
+  }
   if (perPage) {
     result.perPage = perPage.value;
   }

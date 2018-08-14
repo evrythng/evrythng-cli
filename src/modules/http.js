@@ -27,8 +27,8 @@ const statusLabels = {
   504: 'Gateway Timeout',
 };
 
-const buildParams = () => {
-  const params = switches.buildParams();
+const buildParamString = (method) => {
+  const params = switches.buildParams(method);
   const keys = Object.keys(params);
   if (!keys.length) {
     return '';
@@ -157,14 +157,14 @@ const apiRequest = async (options) => {
 };
 
 const post = async (url, data) => apiRequest({
-  url: `${url}${buildParams()}`,
-  method: 'POST',
+  url: `${url}${buildParamString('post')}`,
+  method: 'post',
   authorization: operator.getKey(),
   data,
 }).then(printResponse);
 
 const get = async (url, silent = false) => apiRequest({
-  url: `${url}${buildParams()}`,
+  url: `${url}${buildParamString('get')}`,
   authorization: operator.getKey(),
 }).then((res) => {
   if (silent) {

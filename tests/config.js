@@ -37,6 +37,7 @@ describe('config', () => {
         noConfirm: false,
         showHttp: false,
         logLevel: 'info',
+        defaultPerPage: 30,
       },
       regions: {
         us: 'https://api.evrythng.com',
