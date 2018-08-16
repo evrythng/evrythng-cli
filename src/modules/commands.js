@@ -31,12 +31,17 @@ const COMMAND_LIST = [
 
 const showSyntax = (command) => {
   const { firstArg, operations } = command;
-  const specs = Object.keys(operations).map(item => `evrythng ${firstArg} ${operations[item].pattern}`);
+  const specs = Object.keys(operations).map((item) => {
+    const operation = operations[item];
+    return `evrythng ${firstArg} ${operation.pattern} ${operation.buildable ? '(or --build)' : ''}`;
+  });
 
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
 };
 
 const matchArg = (arg, spec) => {
+  if (!arg) return;
+
   const map = {
     // Value must be an EVRYTHNG ID
     $id: val => val.length === 24,

@@ -52,7 +52,7 @@ describe('switches', () => {
   });
 
   it('should accept the --expand switch', async () => {
-    const res = await cli('thngs list --expand');
+    const res = await cli('products list --expand');
     switches.unset(switches.EXPAND);
 
     expect(res.status).to.equal(200);

@@ -17,6 +17,7 @@ module.exports = {
         return http.post('/thngs', payload);
       },
       pattern: 'create $payload',
+      buildable: true,
     },
     readThng: {
       execute: async ([id]) => http.get(`/thngs/${id}`),

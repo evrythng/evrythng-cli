@@ -16,6 +16,7 @@ module.exports = {
         return http.post('/batches', payload);
       },
       pattern: 'create $payload',
+      buildable: true,
     },
     readBatch: {
       execute: async ([id]) => http.get(`/batches/${id}`),
@@ -39,6 +40,7 @@ module.exports = {
         return http.post(`/batches/${id}/tasks`, payload);
       },
       pattern: '$id tasks create $payload',
+      buildable: true,
     },
     listTasks: {
       execute: async ([id]) => http.get(`/batches/${id}/tasks`),
