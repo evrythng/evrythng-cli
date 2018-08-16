@@ -39,15 +39,13 @@ const showSyntax = (command) => {
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
 };
 
-const matchArg = (arg, spec) => {
-  if (!arg) return;
-
+const matchArg = (arg = '', spec) => {
   const map = {
     // Value must be an EVRYTHNG ID
     $id: val => val.length === 24,
     // Value must be JSON
     $payload: (val) => {
-      if (switches.using(switches.BUILD)) {
+      if (switches.BUILD) {
         return true;
       }
 

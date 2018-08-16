@@ -11,7 +11,7 @@ const util = require('../src/modules/util');
 
 describe('util', () => {
   afterEach(() => {
-    switches.unset(switches.BUILD);
+    switches.BUILD = false;
     sinon.resetBehavior();
   });
 
@@ -52,14 +52,14 @@ describe('util', () => {
 
   it('should not throw and error for requireKey', () => {
     const key = '12345687123456812345678123456781234567812345678123456871234568712345678123465781';
-    switches.set(switches.API_KEY, key);
+    switches.API_KEY = key;
 
     const requireKey = () => util.requireKey('Application');
     expect(requireKey).to.not.throw();
   });
 
   it('should build a correct thng payload using the user prompts', async () => {
-    switches.set(switches.BUILD, true);
+    switches.BUILD = true;
     sinon.stub(prompt, 'getValue')
       .onCall(0).returns('TestThng')
       .returns('');

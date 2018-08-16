@@ -48,7 +48,7 @@ const printSimple = (obj, level) => {
 };
 
 const getPayload = async (defName, jsonStr) => {
-  if (switches.using(switches.BUILD)) {
+  if (switches.BUILD) {
     // Special builders, such as tasks
     if (SPECIAL_BUILDERS[defName]) {
       return SPECIAL_BUILDERS[defName]();
@@ -65,8 +65,7 @@ const getPayload = async (defName, jsonStr) => {
 };
 
 const requireKey = (name) => {
-  const apiKey = switches.using(switches.API_KEY);
-  if (!apiKey) {
+  if (!switches.API_KEY) {
     throw new Error(`Requires --api-key switch specifying the ${name} API Key.`);
   }
 };

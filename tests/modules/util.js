@@ -32,13 +32,13 @@ const createAppUser = async (name) => {
     password: 'password',
   });
   let res = await cli(`app-users create ${payload} --api-key ${ctx.application.appApiKey}`);
-  switches.unset(switches.API_KEY);
+  switches.API_KEY = false;
 
   // Validate Application User
   payload = JSON.stringify({ activationCode: res.data.activationCode });
   const argStr = `app-users ${res.data.evrythngUser} validate ${payload} --api-key ${ctx.application.appApiKey}`;
   res = await cli(argStr);
-  switches.unset(switches.API_KEY);
+  switches.API_KEY = false;
   return res.data;
 };
 

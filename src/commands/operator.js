@@ -124,17 +124,14 @@ const getCurrent = () => config.get('operators')[config.get('using')];
 // ------------------------------------ API ------------------------------------
 
 const getKey = () => {
-  const key = switches.using(switches.API_KEY);
-  if (key) {
-    return key.value;
-  }
+  const override = switches.API_KEY;
 
   const operator = config.get('using');
   if (!operator) {
     throw new Error('No Operator has been selected yet. Use \'operator add\' to add one.');
   }
 
-  return resolveKey(operator);
+  return override || resolveKey(operator);
 };
 
 module.exports = {

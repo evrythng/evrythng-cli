@@ -57,77 +57,25 @@ const SWITCH_LIST = [{
   hasValue: true,
 }];
 
-const active = [];
-
 const apply = (args) => {
-  SWITCH_LIST.forEach((item) => {
-    const found = args.find(item1 => item1 === item.name);
-    if (!found) {
-      return;
-    }
+  args
+    .filter(item => item.includes('--'))
+    .forEach((arg) => {
+      const valid = SWITCH_LIST.find(item => item.name === arg);
+      if (!valid) {
+        throw new Error(`Invalid switch: ${arg}`);
+      }
 
-    const foundIndex = args.indexOf(found);
-    active.push({
-      name: item.name,
-      value: item.hasValue ? args[foundIndex + 1] : '',
+      const foundIndex = args.indexOf(arg);
+      const rule = SWITCH_LIST.find(item => item.name === arg);
+      module.exports[rule.constant] = rule.hasValue ? args[foundIndex + 1] : true;
+      args.splice(foundIndex, rule.hasValue ? 2 : 1);
     });
-    args.splice(foundIndex, item.hasValue ? 2 : 1);
-  });
 
   return args;
-};
-
-const using = query => active.find(item => item.name === query);
-
-const set = (name, value = '') => active.push({ name, value });
-
-const unset = (name) => {
-  const found = using(name);
-  if (!found) {
-    return;
-  }
-
-  active.splice(active.indexOf(found), 1);
-};
-
-const buildParams = (method) => {
-  const { defaultPerPage } = config.get('options');
-  const filter = using(module.exports.FILTER);
-  const perPage = using(module.exports.PER_PAGE);
-  const project = using(module.exports.PROJECT);
-
-  const result = {};
-  if (filter) {
-    result.filter = filter.value;
-  }
-
-  // Use global value, unless it's specified with flag
-  if (method === 'get') {
-    result.perPage = defaultPerPage;
-  }
-  if (perPage) {
-    result.perPage = perPage.value;
-  }
-
-  if (project) {
-    result.project = project.value;
-  }
-  if (using(module.exports.SCOPES)) {
-    result.withScopes = true;
-  }
-
-  return result;
 };
 
 module.exports = {
   SWITCH_LIST,
   apply,
-  using,
-  buildParams,
-  set,
-  unset,
 };
-
-SWITCH_LIST.forEach((item) => {
-  module.exports[item.constant] = item.name;
-});

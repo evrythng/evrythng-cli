@@ -27,8 +27,33 @@ const statusLabels = {
   504: 'Gateway Timeout',
 };
 
+const buildParams = (method) => {
+  const { defaultPerPage } = config.get('options');
+  const filter = switches.FILTER;
+  const perPage = switches.PER_PAGE;
+  const project = switches.PROJECT;
+
+  const result = {};
+  if (filter) {
+    result.filter = filter;
+  }
+
+  // Use global value, unless it's specified with flag
+  if (method === 'get') {
+    result.perPage = perPage || defaultPerPage;
+  }
+  if (project) {
+    result.project = project;
+  }
+  if (switches.SCOPES) {
+    result.withScopes = true;
+  }
+
+  return result;
+};
+
 const buildParamString = (method) => {
-  const params = switches.buildParams(method);
+  const params = buildParams(method);
   const keys = Object.keys(params);
   if (!keys.length) {
     return '';
@@ -87,14 +112,14 @@ const printResponse = async (res) => {
   const { showHttp } = config.get('options');
 
   // Wait until page reached
-  const page = switches.using(switches.PAGE);
+  const page = switches.PAGE;
   if (page) {
-    res = await goToPage(res, parseInt(page.value, 10));
+    res = await goToPage(res, parseInt(page, 10));
   }
 
   // Expand known fields
   const { data, status } = res;
-  if (switches.using(switches.EXPAND)) {
+  if (switches.EXPAND) {
     await expand(data);
   }
 
@@ -106,22 +131,22 @@ const printResponse = async (res) => {
   }
 
   // Print summary view
-  if (switches.using(switches.SUMMARY)) {
+  if (switches.SUMMARY) {
     util.printListSummary(data);
     return res;
   }
 
   // Print simple view
-  if (switches.using(switches.SIMPLE)) {
+  if (switches.SIMPLE) {
     util.printSimple(data, 1);
     return res;
   }
 
   // Get just one field
-  const field = switches.using(switches.FIELD);
+  const field = switches.FIELD;
   if (field) {
-    logger.info(data[field.value]);
-    return data[field.value];
+    logger.info(data[field]);
+    return data[field];
   }
 
   // Regular pretty JSON output

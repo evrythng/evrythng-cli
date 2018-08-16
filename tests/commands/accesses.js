@@ -32,7 +32,7 @@ describe('accesses', () => {
       role: 'base_app_user',
     });
     const res = await cli(`accesses create ${payload} --api-key ${ctx.appUser1.evrythngApiKey}`);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -42,7 +42,7 @@ describe('accesses', () => {
 
   it('should return 200 for \'accesses list\'', async () => {
     const res = await cli(`accesses list --api-key ${ctx.appUser1.evrythngApiKey}`);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
@@ -51,7 +51,7 @@ describe('accesses', () => {
   it('should return 204 for \'accesses delete\'', async () => {
     const argStr = `accesses ${ctx.accessId} delete --api-key ${ctx.appUser1.evrythngApiKey}`;
     const res = await cli(argStr);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(204);
   });
