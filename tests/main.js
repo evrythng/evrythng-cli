@@ -52,7 +52,9 @@ describe('CLI', () => {
 
   require('./commands');
   require('./config');
+  require('./csv');
   require('./functions');
+  require('./logger');
   require('./prompt');
   require('./switches');
   require('./util');

@@ -64,6 +64,11 @@ const SWITCH_LIST = [{
   name: '--context',
   about: 'Specify the \'context=true\' query parameter.',
   constant: 'CONTEXT',
+}, {
+  name: '--to-page',
+  about: 'Read up to 30 pages before returning results.',
+  constant: 'TO_PAGE',
+  hasValue: true,
 }];
 
 const apply = (args) => {

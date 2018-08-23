@@ -13,7 +13,8 @@ const operator = require('../commands/operator');
 const switches = require('./switches');
 const util = require('./util');
 
-const statusLabels = {
+const TO_PAGE_MAX = 30;
+const STATUS_LABELS = {
   200: 'OK',
   201: 'Created',
   202: 'Accepted',
@@ -105,7 +106,32 @@ const goToPage = async (res, endPage) => {
   return nextRes;
 };
 
-const printResponse = async (res) => {
+const getAllPages = async (res, url, max) => {
+  logger.info('\nReading all pages - this may take a while...');
+
+  let { link } = res.headers;
+  let result = res.data;
+  let pages = 1;
+  while(link && pages < max && pages < TO_PAGE_MAX) {
+    let url = decodeURIComponent(link);
+    url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
+    const nextRes = await evrythng.api({
+      url,
+      authorization: operator.getKey(),
+      fullResponse: true,
+    });
+    ({ link } = nextRes.headers);
+    pages += 1;
+
+    result = result.concat(nextRes.data);
+    logger.info(`So far - ${result.length} items`, true);
+  }
+
+  logger.info(`\nRead ${result.length} items (${pages} pages).`);
+  return result;
+};
+
+const printResponse = async (res, url) => {
   if (!res) {
     return null;
   }
@@ -119,6 +145,12 @@ const printResponse = async (res) => {
     res = await goToPage(res, parseInt(page, 10));
   }
 
+  // Get all pages and update res.data
+  const toPage = switches.TO_PAGE;
+  if (toPage) {
+    res.data = await getAllPages(res, url, toPage);
+  }
+
   // Expand known fields
   const { data, status, headers } = res;
   if (switches.EXPAND) {
@@ -128,7 +160,7 @@ const printResponse = async (res) => {
   // Print HTTP response information
   const { showHttp } = config.get('options');
   if (showHttp) {
-    logger.info(`<< ${status} ${statusLabels[status]}`);
+    logger.info(`<< ${status} ${STATUS_LABELS[status]}`);
     formatHeaders(headers).forEach(item => logger.info(item));
     logger.info();
   }
@@ -206,7 +238,7 @@ const get = async (url, silent = false) => apiRequest({
     return res;
   }
 
-  return printResponse(res);
+  return printResponse(res, url);
 });
 
 const put = async (url, data) => apiRequest({

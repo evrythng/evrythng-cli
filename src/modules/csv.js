@@ -1,3 +1,8 @@
+/**
+ * (c) Copyright Reserved EVRYTHNG Limited 2018.
+ * All rights reserved. Use of this material is subject to license.
+ */
+
 const fs = require('fs');
 
 // Keys that are expanded to individual columns, or do not make sense for CSV file.
@@ -24,10 +29,10 @@ const getAllHeaders = (arr) => {
   return { itemKeys, cfKeys, idKeys };
 };
 
-// Escape commas with ", and " with ""
+// Escape , with ", and " with ""
 const esc = val => `"${String(val).split('"').join('""')}"`;
 
-const addValues = (obj = {}, objKeys) => {
+const createCells = (obj = {}, objKeys) => {
   let result = '';
   objKeys.forEach((key) => {
     result += obj[key] ? `${esc(obj[key])},` : ',';
@@ -39,11 +44,12 @@ const addValues = (obj = {}, objKeys) => {
 const createRows = (arr) => {
   const { itemKeys, cfKeys, idKeys } = getAllHeaders(arr);
   const allHeaders = itemKeys.concat(cfKeys).concat(idKeys);
+  
   const firstRow = `${allHeaders.join(',')},`;
   return [firstRow].concat(arr.map((item) => {
-    return addValues(item, itemKeys) +
-      addValues(item.customFields, cfKeys) +
-      addValues(item.identifiers, idKeys);
+    return createCells(item, itemKeys) +
+      createCells(item.customFields, cfKeys) +
+      createCells(item.identifiers, idKeys);
   })).join('\n');
 };
 

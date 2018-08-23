@@ -98,4 +98,12 @@ describe('switches', () => {
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
+
+  it('should accept the --to-page switch', async () => {
+    const res = await cli('thngs list --to-page 5');
+    switches.TO_PAGE = false;
+
+    expect(res.status).to.equal(200);
+    expect(res.data).to.be.an('array');
+  });
 });
