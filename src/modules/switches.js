@@ -55,6 +55,15 @@ const SWITCH_LIST = [{
   about: 'Go to a specific page of results.',
   constant: 'PAGE',
   hasValue: true,
+}, {
+  name: '--to-csv',
+  about: 'Output array response to a CSV file.',
+  constant: 'TO_CSV',
+  hasValue: true,
+}, {
+  name: '--context',
+  about: 'Specify the \'context=true\' query parameter.',
+  constant: 'CONTEXT',
 }];
 
 const apply = (args) => {

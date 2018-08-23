@@ -90,4 +90,12 @@ describe('switches', () => {
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
+
+  it('should accept the --context switch', async () => {
+    const res = await cli('actions scans list --context');
+    switches.CONTEXT = false;
+
+    expect(res.status).to.equal(200);
+    expect(res.data).to.be.an('array');
+  });
 });

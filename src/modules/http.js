@@ -6,6 +6,7 @@
 const evrythng = require('evrythng-extended');
 const { getConfirmation } = require('./prompt');
 const config = require('./config');
+const csv = require('./csv');
 const expand = require('../functions/expand');
 const logger = require('./logger');
 const operator = require('../commands/operator');
@@ -47,6 +48,9 @@ const buildParams = (method) => {
   }
   if (switches.SCOPES) {
     result.withScopes = true;
+  }
+  if (switches.CONTEXT) {
+    result.context = true;
   }
 
   return result;
@@ -109,8 +113,6 @@ const printResponse = async (res) => {
     return res;
   }
 
-  const { showHttp } = config.get('options');
-
   // Wait until page reached
   const page = switches.PAGE;
   if (page) {
@@ -118,15 +120,16 @@ const printResponse = async (res) => {
   }
 
   // Expand known fields
-  const { data, status } = res;
+  const { data, status, headers } = res;
   if (switches.EXPAND) {
     await expand(data);
   }
 
   // Print HTTP response information
+  const { showHttp } = config.get('options');
   if (showHttp) {
     logger.info(`<< ${status} ${statusLabels[status]}`);
-    formatHeaders(res.headers).forEach(item => logger.info(item));
+    formatHeaders(headers).forEach(item => logger.info(item));
     logger.info();
   }
 
@@ -147,6 +150,13 @@ const printResponse = async (res) => {
   if (field) {
     logger.info(data[field]);
     return data[field];
+  }
+
+  // Print to file?
+  const csvFileName = switches.TO_CSV;
+  if (csvFileName) {
+    csv.toFile(Array.isArray(data) ? data : [data], csvFileName);
+    return res;
   }
 
   // Regular pretty JSON output
