@@ -5,7 +5,7 @@
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
-const { ctx } = require('../modules/util');
+const { ctx } = require('../util');
 const cli = require('../../src/functions/cli');
 const config = require('../../src/modules/config');
 

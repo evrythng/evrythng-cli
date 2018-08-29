@@ -4,10 +4,10 @@
  */
 
 const { expect } = require('chai');
-const { ctx } = require('./modules/util');
-const cli = require('../src/functions/cli');
-const operator = require('../src/commands/operator');
-const switches = require('../src/modules/switches');
+const { ctx } = require('../util');
+const cli = require('../../src/functions/cli');
+const operator = require('../../src/commands/operator');
+const switches = require('../../src/modules/switches');
 
 describe('switches', () => {
   it('should accept the --filter switch', async () => {

@@ -4,8 +4,8 @@
  */
 
 const { expect } = require('chai');
-const expand = require('../src/functions/expand');
-const indent = require('../src/functions/indent');
+const expand = require('../../src/functions/expand');
+const indent = require('../../src/functions/indent');
 
 describe('functions', () => {
   it('should expand an example object payload', async () => {

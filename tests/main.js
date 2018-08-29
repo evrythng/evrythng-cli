@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const { ctx } = require('./modules/util');
+const { ctx } = require('./util');
 const cli = require('../src/functions/cli');
 const config = require('../src/modules/config');
 const expand = require('../src/functions/expand');
@@ -50,12 +50,13 @@ describe('CLI', () => {
   require('./commands/thng');
   require('./commands/url');
 
-  require('./commands');
-  require('./config');
-  require('./csv');
-  require('./functions');
-  require('./logger');
-  require('./prompt');
-  require('./switches');
-  require('./util');
+  require('./modules/api');
+  require('./modules/commands');
+  require('./modules/config');
+  require('./modules/csv');
+  require('./modules/functions');
+  require('./modules/logger');
+  require('./modules/prompt');
+  require('./modules/switches');
+  require('./modules/util');
 });

@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const { ctx, createProject, createApplication } = require('../modules/util');
+const { ctx, createProject, createApplication } = require('../util');
 const cli = require('../../src/functions/cli');
 const switches = require('../../src/modules/switches');
 

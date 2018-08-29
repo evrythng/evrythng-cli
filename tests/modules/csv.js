@@ -5,8 +5,8 @@
 
 const { expect } = require('chai');
 const fs = require('fs');
-const config = require('../src/modules/config');
-const csv = require('../src/modules/csv');
+const config = require('../../src/modules/config');
+const csv = require('../../src/modules/csv');
 
 const CSV_PATH = `${__dirname}/output.csv`;
 

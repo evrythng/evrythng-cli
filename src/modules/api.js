@@ -51,18 +51,21 @@ const API = {
   getSwitches: () => switches.exported,
 };
 
+const loadPlugin = (name) => {
+  try {
+    require(`${NODE_MODULES_PATH}/${name}`)(API);
+  } catch (e) {
+    throw new Error(`Failed to load plugin: ${name}`);
+  }
+};
+
 const loadPlugins = () => {
   fs.readdirSync(NODE_MODULES_PATH)
     .filter(item => item.startsWith(PREFIX))
-    .forEach((item) => {
-      try {
-        require(`${NODE_MODULES_PATH}/${item}`)(API);
-      } catch (e) {
-        throw new Error(`Failed to load plugin: ${item}`);
-      }
-    });
+    .forEach(loadPlugin);
 };
 
 module.exports = {
   loadPlugins,
+  API,
 };

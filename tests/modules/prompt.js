@@ -5,7 +5,7 @@
 
 const { expect } = require('chai');
 const sinon = require('sinon');
-const prompt = require('../src/modules/prompt');
+const prompt = require('../../src/modules/prompt');
 
 describe('prompt', () => {
   afterEach(() => {

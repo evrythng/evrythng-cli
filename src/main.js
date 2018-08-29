@@ -19,7 +19,7 @@ const main = async () => {
     try {
       api.loadPlugins();
     } catch (e) {
-      console.log(e);
+      logger.error(e);
     }
 
     const args = switches.apply(process.argv.slice(2));

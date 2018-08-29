@@ -4,8 +4,8 @@
  */
 
 const { expect } = require('chai');
-const cli = require('../src/functions/cli');
-const commands = require('../src/modules/commands');
+const cli = require('../../src/functions/cli');
+const commands = require('../../src/modules/commands');
 
 describe('commands', () => {
   it('should match a given argument and spec item', () => {

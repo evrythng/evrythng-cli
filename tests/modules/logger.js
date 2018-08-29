@@ -4,9 +4,9 @@
  */
 
 const { expect } = require('chai');
-const cli = require('../src/functions/cli');
-const config = require('../src/modules/config');
-const logger = require('../src/modules/logger');
+const cli = require('../../src/functions/cli');
+const config = require('../../src/modules/config');
+const logger = require('../../src/modules/logger');
 
 describe('logger', () => {
   before(async () => {
