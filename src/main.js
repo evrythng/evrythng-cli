@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const api = require('./modules/api');
 const commands = require('./modules/commands');
 const config = require('./modules/config');
 const operator = require('./commands/operator');
@@ -13,6 +14,13 @@ const switches = require('./modules/switches');
 const main = async () => {
   try {
     await operator.checkFirstRun();
+
+    // Don't let bad plugins prevent launch
+    try {
+      api.loadPlugins();
+    } catch (e) {
+      console.log(e);
+    }
 
     const args = switches.apply(process.argv.slice(2));
     const command = commands.identify(args);

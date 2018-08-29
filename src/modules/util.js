@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const jsonschema = require('jsonschema');
 const indent = require('../functions/indent');
 const logger = require('./logger');
 const payloadBuilder = require('./payloadBuilder');
@@ -70,6 +71,15 @@ const requireKey = (name) => {
   }
 };
 
+const validate = (instance, schema) => {
+  const results = jsonschema.validate(instance, schema);
+  if (!results.errors || results.errors.length === 0) {
+    return [];
+  }
+
+  return results.errors.map(item => item.stack);
+};
+
 module.exports = {
   isId,
   pretty,
@@ -77,4 +87,5 @@ module.exports = {
   printListSummary,
   printSimple,
   requireKey,
+  validate,
 };

@@ -82,7 +82,13 @@ const apply = (args) => {
 
       const foundIndex = args.indexOf(arg);
       const rule = SWITCH_LIST.find(item => item.name === arg);
+      
+      // For CLI
       module.exports[rule.constant] = rule.hasValue ? args[foundIndex + 1] : true;
+
+      // For API
+      module.exports.exported[rule.constant] = rule.hasValue ? args[foundIndex + 1] : true;
+
       args.splice(foundIndex, rule.hasValue ? 2 : 1);
     });
 
@@ -92,4 +98,5 @@ const apply = (args) => {
 module.exports = {
   SWITCH_LIST,
   apply,
+  exported: {},
 };

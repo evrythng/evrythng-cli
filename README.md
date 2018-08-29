@@ -30,7 +30,7 @@ $ evrythng operators add prod us AGiWrH5OteA4aHiM...
 ```
 
 
-## Usage
+## Usage and Help
 
 After installation, the global `npm` module can be used directly. In general, 
 the argument structure is:
@@ -58,11 +58,51 @@ Authentication is provided in two ways.
 > You must add at least one Operator before you can begin using the CLI.
 
 
-## Running Tests
+## Plugins
 
-Run `npm test` to run the Mocha tests in the `tests` directory.
+Modules installed in the same directory as the CLI (as will be the case when 
+installed globally with `-g` or as a project dependency) with the prefix 
+`evrythng-cli-plugin-` will be loaded via `require` upon launch. These plugins
+are provided with an `api` parameter that contains methods and data they can 
+use to implement additional functionality, such as adding new commands.
 
-Afterwards, see `reports/index.html` for code coverage results.
+An example of such a plugin is shown below. The basic directory structure is:
+
+```
+- evrythng-cli-plugin-greet
+  - package.json
+  - ...
+  - index.js
+```
+
+`index.js` should export a single function that will be run when it is loaded:
+
+```js
+const command = {
+  about: 'Greet someone',
+  firstArg: 'greet',
+  operations: {
+    greetSomeoneByName: {
+      execute: ([name]) => console.log(`Hello ${name}!`),
+      pattern: '$name',
+    },
+  },
+};
+
+module.exports = (api) => {
+  api.addCommand(command);
+};
+```
+
+In the example above, a new command `greet` is added with one operation that 
+defines the argument it uses, in the same way as regular built-in commands. This
+is valided against a schema before being loaded. It is then available as a 
+command as usual:
+
+```
+$ evrythng greet Charles
+Hello Charles!
+```
 
 
 ## Architecture
@@ -261,3 +301,12 @@ if (filter) console.log(`Filter value was ${filter.value}`);
 ```
 Filter value was tags=test
 ```
+
+
+## Development
+
+### Running Tests
+
+Run `npm test` to run the Mocha tests in the `tests` directory.
+
+Afterwards, see `reports/index.html` for code coverage results.
