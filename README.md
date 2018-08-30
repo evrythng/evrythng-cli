@@ -60,25 +60,36 @@ Authentication is provided in two ways.
 
 ## Plugins
 
-Modules installed in the same directory as the CLI (as will be the case when 
-installed globally with `-g` or as a project dependency) with the prefix 
-`evrythng-cli-plugin-` will be loaded via `require` upon launch. These plugins
+The EVRYTHNG CLI allows additional plugins to be created and installed in order
+to add/extend custom functionality as the user requires. These plugins
 are provided with an `api` parameter that contains methods and data they can 
 use to implement additional functionality, such as adding new commands.
+
+
+## Plugin Requirements
+
+In order to be considered a plugin, the `npm` module must meet the following:
+
+* Installed in the same directory as the CLI, as will be the case when 
+  installed globally with `-g` or as a project dependency.
+* Be named including the prefix `evrythng-cli-plugin-`.
+* Have a single source file identifyable when it is `require`d, such as setting
+  `main` in its `package.json`.
+* That file must export a single function, which is provided the `api` parameter
+  (see below).
 
 An example of such a plugin is shown below. The basic directory structure is:
 
 ```
-- evrythng-cli-plugin-greet
-  - package.json
-  - ...
+- evrythng-cli-plugin-greeter
+  - package.json (with main: index.js)
   - index.js
 ```
 
-`index.js` should export a single function that will be run when it is loaded:
+`index.js` exports a single function that will be run when it is loaded:
 
 ```js
-const command = {
+const newCommand = {
   about: 'Greet someone',
   firstArg: 'greet',
   operations: {
@@ -90,19 +101,32 @@ const command = {
 };
 
 module.exports = (api) => {
-  api.addCommand(command);
+  api.addCommand(newCommand);
 };
 ```
 
 In the example above, a new command `greet` is added with one operation that 
-defines the argument it uses, in the same way as regular built-in commands. This
-is valided against a schema before being loaded. It is then available as a 
-command as usual:
+is provided subsequent arguments, in the same way as regular built-in commands. 
+This is validated against a schema before being loaded - it must match the 
+structure of the above example.
+
+The example command added in the example is then available as usual:
 
 ```
 $ evrythng greet Charles
 Hello Charles!
 ```
+
+
+## Plugin API
+
+The `api` parameter provided to a plugin's exported function contains the 
+following usable methods and data:
+
+* `addCommand()` - Register a new command.
+* `getOptions()` - Retrieve an object describing the user's `options` from the 
+  CLI configuration file, which defines persistent preferences.
+* `getSwitches()` - Retrieve an object describing the currently active switches.
 
 
 ## Architecture

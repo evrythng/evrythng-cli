@@ -3,8 +3,6 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const config = require('./config');
-
 const SWITCH_LIST = [{
   name: '--filter',
   about: 'Specify a Platform filter, such as \'tags=test\'.',
@@ -82,7 +80,7 @@ const apply = (args) => {
 
       const foundIndex = args.indexOf(arg);
       const rule = SWITCH_LIST.find(item => item.name === arg);
-      
+
       // For CLI
       module.exports[rule.constant] = rule.hasValue ? args[foundIndex + 1] : true;
 

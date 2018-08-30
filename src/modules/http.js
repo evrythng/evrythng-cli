@@ -106,13 +106,11 @@ const goToPage = async (res, endPage) => {
   return nextRes;
 };
 
-const getAllPages = async (res, url, max) => {
-  logger.info('\nReading all pages - this may take a while...');
-
+const getAllPages = async (res, max) => {
   let { link } = res.headers;
   let result = res.data;
   let pages = 1;
-  while(link && pages < max && pages < TO_PAGE_MAX) {
+  while (link && pages < max && pages < TO_PAGE_MAX) {
     let url = decodeURIComponent(link);
     url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
     const nextRes = await evrythng.api({
@@ -124,14 +122,14 @@ const getAllPages = async (res, url, max) => {
     pages += 1;
 
     result = result.concat(nextRes.data);
-    logger.info(`So far - ${result.length} items`, true);
+    logger.info(`Reading - ${result.length} items`, true);
   }
 
   logger.info(`\nRead ${result.length} items (${pages} pages).`);
   return result;
 };
 
-const printResponse = async (res, url) => {
+const printResponse = async (res) => {
   if (!res) {
     return null;
   }
@@ -148,7 +146,7 @@ const printResponse = async (res, url) => {
   // Get all pages and update res.data
   const toPage = switches.TO_PAGE;
   if (toPage) {
-    res.data = await getAllPages(res, url, toPage);
+    res.data = await getAllPages(res, toPage);
   }
 
   // Expand known fields
@@ -238,7 +236,7 @@ const get = async (url, silent = false) => apiRequest({
     return res;
   }
 
-  return printResponse(res, url);
+  return printResponse(res);
 });
 
 const put = async (url, data) => apiRequest({

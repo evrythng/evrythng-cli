@@ -62,26 +62,26 @@ const checkAndSetOptionValue = ([name, state]) => {
     boolean: () => {
       const allowed = ['true', 'false'];
       if (!allowed.includes(state)) {
-        throw new Error(`Value must be one of ${allowed.join(', ')}`);  
+        throw new Error(`Value must be one of ${allowed.join(', ')}`);
       }
 
-      options[key] = (state === 'true');  
+      options[key] = (state === 'true');
     },
     integer: () => {
       try {
-        const intValue = parseInt(state);
+        const intValue = parseInt(state, 10);
         if (intValue < range[0] || intValue > range[1]) {
           throw new Error(`Value must be between ${range[0]} and ${range[1]}`);
         }
 
         options[key] = intValue;
       } catch (e) {
-        throw new Error(`Value must be an integer`);
-      }  
+        throw new Error('Value must be an integer');
+      }
     },
     string: () => {
       if (!values.includes(state)) {
-        throw new Error(`Value must be one of ${values.join(', ')}`);  
+        throw new Error(`Value must be one of ${values.join(', ')}`);
       }
 
       options[key] = state;

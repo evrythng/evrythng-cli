@@ -44,13 +44,12 @@ const createCells = (obj = {}, objKeys) => {
 const createRows = (arr) => {
   const { itemKeys, cfKeys, idKeys } = getAllHeaders(arr);
   const allHeaders = itemKeys.concat(cfKeys).concat(idKeys);
-  
+
   const firstRow = `${allHeaders.join(',')},`;
-  return [firstRow].concat(arr.map((item) => {
-    return createCells(item, itemKeys) +
-      createCells(item.customFields, cfKeys) +
-      createCells(item.identifiers, idKeys);
-  })).join('\n');
+  const rows = arr.map(item => createCells(item, itemKeys)
+    + createCells(item.customFields, cfKeys)
+    + createCells(item.identifiers, idKeys));
+  return [firstRow].concat(rows).join('\n');
 };
 
 const toFile = (data, fileName) => fs.writeFileSync(fileName, createRows(data), 'utf8');

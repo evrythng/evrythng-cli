@@ -81,6 +81,8 @@ const validateConfig = (input) => {
   }
 };
 
+const write = () => fs.writeFileSync(PATH, JSON.stringify(data, null, 2), 'utf8');
+
 const migrateConfig = (input) => {
   // v1.1.0 - new defaultPerPage option
   if (!input.options.defaultPerPage) {
@@ -89,8 +91,6 @@ const migrateConfig = (input) => {
 
   write();
 };
-
-const write = () => fs.writeFileSync(PATH, JSON.stringify(data, null, 2), 'utf8');
 
 const load = () => {
   if (!fs.existsSync(PATH)) {
