@@ -205,7 +205,8 @@ const apiRequest = async (options) => {
   }
 
   const { showHttp, noConfirm } = config.get('options');
-  if (options.method === 'DELETE' && !noConfirm) {
+  const methods = ['POST', 'PUT', 'DELETE'];
+  if (methods.includes(options.method.toUpperCase()) && !noConfirm) {
     const confirmation = await getConfirmation();
     if (!confirmation) {
       logger.info('Cancelled');
