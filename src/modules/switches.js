@@ -8,6 +8,7 @@ const SWITCH_LIST = [{
   about: 'Specify a Platform filter, such as \'tags=test\'.',
   constant: 'FILTER',
   hasValue: true,
+  valueLabel: '<query>',
 }, {
   name: '--with-scopes',
   about: 'Include resource scopes in the response.',
@@ -17,6 +18,7 @@ const SWITCH_LIST = [{
   about: 'Specify number of resources per page.',
   constant: 'PER_PAGE',
   hasValue: true,
+  valueLabel: '<count>',
 }, {
   name: '--summary',
   about: 'Show a list of resources as a summarised single-line format',
@@ -26,6 +28,7 @@ const SWITCH_LIST = [{
   about: 'Use a specific API key instead of the current Operator\'s API Key.',
   constant: 'API_KEY',
   hasValue: true,
+  valueLabel: '<API key>',
 }, {
   name: '--expand',
   about: 'Expand some ID fields, timestamps to date, etc.',
@@ -35,6 +38,7 @@ const SWITCH_LIST = [{
   about: 'Print only a certain field from the response.',
   constant: 'FIELD',
   hasValue: true,
+  valueLabel: '<key>',
 }, {
   name: '--simple',
   about: 'Print response in non-JSON friendly format.',
@@ -48,25 +52,29 @@ const SWITCH_LIST = [{
   about: 'Specify the \'project\' query parameter.',
   constant: 'PROJECT',
   hasValue: true,
+  valueLabel: '<project ID>',
 }, {
   name: '--page',
   about: 'Go to a specific page of results.',
   constant: 'PAGE',
   hasValue: true,
+  valueLabel: '<page>',
 }, {
   name: '--to-csv',
-  about: 'Output array response to a CSV file.',
+  about: 'Output array response to a CSV file, such as \'./data.csv\'.',
   constant: 'TO_CSV',
   hasValue: true,
+  valueLabel: '<output file>',
 }, {
   name: '--context',
   about: 'Specify the \'context=true\' query parameter.',
   constant: 'CONTEXT',
 }, {
   name: '--to-page',
-  about: 'Read up to 30 pages before returning results.',
+  about: 'Read up to 30 pages before returning results (only with --to-csv).',
   constant: 'TO_PAGE',
   hasValue: true,
+  valueLabel: '<page>',
 }];
 
 const apply = (args) => {

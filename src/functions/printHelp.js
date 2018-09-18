@@ -69,7 +69,7 @@ module.exports = () => {
 
   logger.info('\nAvailable Switches:\n');
   const switchList = SWITCH_LIST.map((item) => {
-    item.name = `${item.name}${item.hasValue ? ' <value>' : ''}`;
+    item.name = `${item.name}${item.hasValue ? ` ${item.valueLabel}` : ''}`;
     return item;
   });
   formatList(switchList, 'name', 'about');

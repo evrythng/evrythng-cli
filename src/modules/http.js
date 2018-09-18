@@ -144,8 +144,13 @@ const printResponse = async (res) => {
   }
 
   // Get all pages and update res.data
+  const csvFileName = switches.TO_CSV;
   const toPage = switches.TO_PAGE;
   if (toPage) {
+    if (!csvFileName) {
+      throw new Error('--to-page is only available when using --to-csv.');
+    }
+
     res.data = await getAllPages(res, toPage);
   }
 
@@ -183,7 +188,6 @@ const printResponse = async (res) => {
   }
 
   // Print to file?
-  const csvFileName = switches.TO_CSV;
   if (csvFileName) {
     csv.toFile(Array.isArray(data) ? data : [data], csvFileName);
     return res;
