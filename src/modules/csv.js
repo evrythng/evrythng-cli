@@ -11,7 +11,7 @@ const IGNORE = [
 ];
 
 const getAllKeys = (arr, prefix) => {
-  let result = [];
+  const result = [];
   arr.forEach((arrItem) => {
     Object.keys(arrItem)
       .filter(itemKey => !result.includes(itemKey))
@@ -19,8 +19,13 @@ const getAllKeys = (arr, prefix) => {
       .forEach(newItem => result.push(newItem));
   });
 
-  result = result.map(item => prefix ? `${prefix}.${item}` : item)
-  return result;
+  return result.map((item) => {
+    if (prefix) {
+      return `${prefix}.${item}`;
+    }
+
+    return item;
+  });
 };
 
 const getAllHeaders = (arr) => {

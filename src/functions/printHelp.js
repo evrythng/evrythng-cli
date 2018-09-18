@@ -72,7 +72,7 @@ module.exports = () => {
   const thirdPartyCommands = COMMAND_LIST.filter(item => item.fromPlugin);
   if (thirdPartyCommands.length) {
     logger.info('\nAvailable Plugin Commands:\n');
-    formatList(thirdPartyCommands, 'firstArg', 'about');    
+    formatList(thirdPartyCommands, 'firstArg', 'about');
   }
 
   logger.info('\nAvailable Switches:\n');
