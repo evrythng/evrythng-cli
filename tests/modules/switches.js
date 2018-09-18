@@ -3,13 +3,24 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
+const fs = require('fs');
 const { ctx } = require('../util');
 const cli = require('../../src/functions/cli');
 const operator = require('../../src/commands/operator');
 const switches = require('../../src/modules/switches');
 
+const { expect } = chai;
+chai.use(chaiAsPromised);
+
+const CSV_PATH = './test.csv';
+
 describe('switches', () => {
+  after(async () => {
+    fs.unlinkSync(CSV_PATH);
+  });
+
   it('should accept the --filter switch', async () => {
     const res = await cli('thngs list --filter tags=test');
     switches.FILTER = false;
@@ -99,9 +110,16 @@ describe('switches', () => {
     expect(res.data).to.be.an('array');
   });
 
-  it('should accept the --to-page switch', async () => {
-    const res = await cli('thngs list --to-page 5');
+  it('should reject if --to-page is used without --to-csv', async () => {
+    const list = cli('thngs list --to-page 5');
+
+    return expect(list).to.be.rejectedWith(Error);  
+  });
+
+  it('should accept the --to-page switch with --to-csv', async () => {
+    const res = await cli(`thngs list --to-page 5 --to-csv ${CSV_PATH}`);
     switches.TO_PAGE = false;
+    switches.TO_CSV = false;
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');

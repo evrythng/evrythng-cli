@@ -8,6 +8,7 @@ const chaiAsPromised = require('chai-as-promised');
 const { ctx } = require('../util');
 const cli = require('../../src/functions/cli');
 const config = require('../../src/modules/config');
+const region = require('../../src/commands/region');
 
 chai.should();
 chai.use(chaiAsPromised);
@@ -34,5 +35,17 @@ describe('regions', () => {
 
   it('should not throw error for \'regions $name remove\'', async () => {
     return cli(`regions ${ctx.regionName} remove`).should.be.fulfilled;
+  });
+
+  it('should throw if a region name does not exist', () => {
+    const check = () => region.checkRegionExists('foo');
+
+    expect(check).to.throw();
+  });
+
+  it('should throw if a region name is more than one word', () => {
+    const add = () => region.addRegion([, 'two words', 'https://api.evrythng.com']);
+
+    expect(add).to.throw();
   });
 });

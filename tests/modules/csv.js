@@ -16,17 +16,24 @@ describe('csv', () => {
   });
 
   it('should not throw writing a CSV file', async () => {
-    const data = [
-      { name: 'Thng1', customFields: { foo: 'bar' }, tags: ['some', 'tags'] },
-      { name: 'Thng2', customFields: { baz: 123 }, identifiers: { 'gs1:21': 4837289 } },
-      { name: 'Thng3' },
-    ];
+    const data = [{ 
+      name: 'Thng1', 
+      customFields: { foo: 'bar' }, 
+      tags: ['some', 'tags'],
+    }, { 
+      name: 'Thng2', 
+      customFields: { baz: 123 }, 
+      identifiers: { 'gs1:21': 4837289 },
+    }, { 
+      name: 'Thng3',
+    }];
+    
     const writeCsvFile = () => csv.toFile(data, CSV_PATH);
     expect(writeCsvFile).to.not.throw();
 
     const rows = fs.readFileSync(CSV_PATH, 'utf8').toString().split('\n');
     expect(rows).to.have.length(4);
-    expect(rows[0]).to.equal('name,foo,baz,gs1:21,');
+    expect(rows[0]).to.equal('name,customFields.foo,customFields.baz,identifiers.gs1:21,');
     expect(rows[1]).to.include(data[0].name);
     expect(rows[2]).to.include(data[1].customFields.baz);
   });

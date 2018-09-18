@@ -55,6 +55,7 @@ describe('CLI', () => {
   require('./modules/config');
   require('./modules/csv');
   require('./modules/functions');
+  require('./modules/http');
   require('./modules/logger');
   require('./modules/prompt');
   require('./modules/switches');
