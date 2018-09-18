@@ -55,7 +55,7 @@ const loadPlugin = (name) => {
   try {
     require(`${NODE_MODULES_PATH}/${name}`)(API);
   } catch (e) {
-    throw new Error(`Failed to load plugin: ${name}`);
+    throw new Error(`Failed to load plugin: ${name} (${e.message})`);
   }
 };
 

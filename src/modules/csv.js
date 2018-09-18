@@ -10,21 +10,23 @@ const IGNORE = [
   'resource', 'properties', 'tags', 'collections', 'location', 'customFields', 'identifiers',
 ];
 
-const getAllKeys = (arr) => {
-  const result = [];
+const getAllKeys = (arr, prefix) => {
+  let result = [];
   arr.forEach((arrItem) => {
-    const newItems = Object.keys(arrItem)
+    Object.keys(arrItem)
       .filter(itemKey => !result.includes(itemKey))
-      .filter(itemKey => !IGNORE.includes(itemKey));
-    newItems.forEach(newItem => result.push(newItem));
+      .filter(itemKey => !IGNORE.includes(itemKey))
+      .forEach(newItem => result.push(newItem));
   });
+
+  result = result.map(item => prefix ? `${prefix}.${item}` : item)
   return result;
 };
 
 const getAllHeaders = (arr) => {
   const itemKeys = getAllKeys(arr);
-  const cfKeys = getAllKeys(arr.map(item => item.customFields || {}));
-  const idKeys = getAllKeys(arr.map(item => item.identifiers || {}));
+  const cfKeys = getAllKeys(arr.map(item => item.customFields || {}), 'customFields');
+  const idKeys = getAllKeys(arr.map(item => item.identifiers || {}), 'identifiers');
 
   return { itemKeys, cfKeys, idKeys };
 };
@@ -34,7 +36,9 @@ const esc = val => `"${String(val).split('"').join('""')}"`;
 
 const createCells = (obj = {}, objKeys) => {
   let result = '';
-  objKeys.forEach((key) => {
+  objKeys.forEach((item) => {
+    // Handle a prefix, if any
+    const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
     result += obj[key] ? `${esc(obj[key])},` : ',';
   });
 
