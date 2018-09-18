@@ -16,7 +16,7 @@ const main = async () => {
     await operator.checkFirstRun();
 
     const args = switches.apply(process.argv.slice(2));
-    api.API.getArgs = () => args;
+    api.setArgs(args);
 
     // Don't let bad plugins prevent launch
     try {

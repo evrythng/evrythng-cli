@@ -38,6 +38,8 @@ const COMMAND_SCHEMA = {
   },
 };
 
+let args;
+
 const API = {
   addCommand: (command) => {
     const errors = validate(command, COMMAND_SCHEMA);
@@ -45,11 +47,12 @@ const API = {
       throw new Error(`Invalid command object: ${JSON.stringify(errors)}`);
     }
 
+    command.fromPlugin = true;
     commands.COMMAND_LIST.push(command);
   },
   getOptions: () => config.get('options'),
   getSwitches: () => switches.exported,
-  getArgs: () => { /* Implemented in main.js */ },
+  getArgs: () => args,
 };
 
 const loadPlugin = (name) => {
@@ -66,7 +69,12 @@ const loadPlugins = () => {
     .forEach(loadPlugin);
 };
 
+const setArgs = (items) => {
+  args = [].concat(items);
+};
+
 module.exports = {
   loadPlugins,
   API,
+  setArgs,
 };
