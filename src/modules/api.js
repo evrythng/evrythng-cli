@@ -49,6 +49,7 @@ const API = {
   },
   getOptions: () => config.get('options'),
   getSwitches: () => switches.exported,
+  getArgs: () => { /* Implemented in main.js */ },
 };
 
 const loadPlugin = (name) => {
