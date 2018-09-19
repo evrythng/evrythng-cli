@@ -10,6 +10,7 @@ const IGNORE = [
   'resource', 'properties', 'tags', 'collections', 'location', 'customFields', 'identifiers',
 ];
 
+// Get de-deuplicated list of object keys, with optional prefix
 const getAllKeys = (arr, prefix) => {
   const result = [];
   arr.forEach((arrItem) => {
@@ -28,21 +29,23 @@ const getAllKeys = (arr, prefix) => {
   });
 };
 
-const getAllHeaders = (arr) => {
-  const itemKeys = getAllKeys(arr);
+// Object, 'customFields', and 'identifiers' are supported
+const getColumnHeaders = (arr) => {
+  const objKeys = getAllKeys(arr);
   const cfKeys = getAllKeys(arr.map(item => item.customFields || {}), 'customFields');
   const idKeys = getAllKeys(arr.map(item => item.identifiers || {}), 'identifiers');
 
-  return { itemKeys, cfKeys, idKeys };
+  return { objKeys, cfKeys, idKeys };
 };
 
 // Escape , with ", and " with ""
 const esc = val => `"${String(val).split('"').join('""')}"`;
 
-const createCells = (obj = {}, objKeys) => {
+// Add cells to row with value of each applicable key, else add empty cell (,)
+const addCells = (obj = {}, objKeys) => {
   let result = '';
   objKeys.forEach((item) => {
-    // Handle a prefix, if any
+    // Handle any  prefix
     const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
     result += obj[key] ? `${esc(obj[key])},` : ',';
   });
@@ -50,18 +53,18 @@ const createCells = (obj = {}, objKeys) => {
   return result;
 };
 
-const createRows = (arr) => {
-  const { itemKeys, cfKeys, idKeys } = getAllHeaders(arr);
-  const allHeaders = itemKeys.concat(cfKeys).concat(idKeys);
+const createCsvData = (arr) => {
+  const { objKeys, cfKeys, idKeys } = getColumnHeaders(arr);
+  const columnHeaders = objKeys.concat(cfKeys).concat(idKeys);
 
-  const firstRow = `${allHeaders.join(',')},`;
-  const rows = arr.map(item => createCells(item, itemKeys)
-    + createCells(item.customFields, cfKeys)
-    + createCells(item.identifiers, idKeys));
-  return [firstRow].concat(rows).join('\n');
+  const firstRow = `${columnHeaders.join(',')},`;
+  const otherRows = arr.map(item => addCells(item, objKeys)
+    + addCells(item.customFields, cfKeys)
+    + addCells(item.identifiers, idKeys));
+  return [firstRow].concat(otherRows);
 };
 
-const toFile = (data, fileName) => fs.writeFileSync(fileName, createRows(data), 'utf8');
+const toFile = (arr, fileName) => fs.writeFileSync(fileName, createCsvData(arr).join('\n'), 'utf8');
 
 module.exports = {
   toFile,

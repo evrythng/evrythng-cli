@@ -29,7 +29,7 @@ const STATUS_LABELS = {
   504: 'Gateway Timeout',
 };
 
-const buildParams = (method) => {
+const buildQueryParams = (method) => {
   const { defaultPerPage } = config.get('options');
   const filter = switches.FILTER;
   const perPage = switches.PER_PAGE;
@@ -40,7 +40,7 @@ const buildParams = (method) => {
     result.filter = filter;
   }
 
-  // Use global value, unless it's specified with flag
+  // Use options value, unless it's specified with the --per-page flag
   if (method === 'get') {
     result.perPage = perPage || defaultPerPage;
   }
@@ -58,7 +58,7 @@ const buildParams = (method) => {
 };
 
 const buildParamString = (method) => {
-  const params = buildParams(method);
+  const params = buildQueryParams(method);
   const keys = Object.keys(params);
   if (!keys.length) {
     return '';
@@ -84,10 +84,11 @@ const printRequest = (options) => {
 
 const goToPage = async (res, endPage) => {
   let currentPage = 1;
-  let linkStr = res.headers.link;
+  let { link } = res.headers;
   let nextRes = res;
+
   while (currentPage !== endPage) {
-    let url = decodeURIComponent(linkStr);
+    let url = decodeURIComponent(link);
     url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
     nextRes = await evrythng.api({
       url,
@@ -95,8 +96,8 @@ const goToPage = async (res, endPage) => {
       fullResponse: true,
     });
 
-    linkStr = nextRes.headers.link;
-    if (!linkStr) {
+    ({ link } = nextRes.headers);
+    if (!link) {
       throw new Error(`Ran out of pages at page ${currentPage}`);
     }
 
@@ -106,10 +107,11 @@ const goToPage = async (res, endPage) => {
   return nextRes;
 };
 
-const getAllPages = async (res, max) => {
+const getMorePages = async (res, max) => {
   let { link } = res.headers;
   let result = res.data;
   let pages = 1;
+
   while (link && pages < max && pages < TO_PAGE_MAX) {
     let url = decodeURIComponent(link);
     url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
@@ -151,11 +153,12 @@ const printResponse = async (res) => {
       throw new Error('--to-page is only available when using --to-csv.');
     }
 
-    res.data = await getAllPages(res, toPage);
+    res.data = await getMorePages(res, toPage);
   }
 
-  // Expand known fields
   const { data, status, headers } = res;
+
+  // Expand known fields
   if (switches.EXPAND) {
     await expand(data);
   }
@@ -263,4 +266,5 @@ module.exports = {
   put,
   delete: deleteMethod,
   formatHeaders,
+  printRequest,
 };

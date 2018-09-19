@@ -73,11 +73,9 @@ const CONFIG_SCHEMA = {
 let data;
 
 const validateConfig = (input) => {
-  let results = validate(input, CONFIG_SCHEMA);
+  const results = validate(input, CONFIG_SCHEMA);
   if (results.errors && results.errors.length) {
-    results = results.errors.map(item => item.stack);
-
-    throw new Error(`\nConfiguration is invalid:\n- ${results.join('\n- ')}`);
+    throw new Error(`\nConfiguration is invalid:\n- ${results.errors.map(item => item.stack).join('\n- ')}`);
   }
 };
 

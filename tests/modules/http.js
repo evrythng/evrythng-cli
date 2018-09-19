@@ -20,4 +20,21 @@ describe('http', () => {
     const format = () => http.formatHeaders(headers);
     expect(format).to.not.throw();
   });
+
+  it('should not throw when printing a request object', () => {
+    const req = {
+      method: 'post',
+      url: 'https://api.evrythng.com/thngs',
+      displayHeaders: {
+        'content-type': 'application/json',
+        connection: 'close',
+      },
+      data: {
+        name: 'Test Thng'
+      }
+    };
+
+    const print = () => http.printRequest(req);
+    expect(print).to.not.throw();
+  });
 });

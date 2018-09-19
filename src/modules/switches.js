@@ -7,7 +7,6 @@ const SWITCH_LIST = [{
   name: '--filter',
   about: 'Specify a Platform filter, such as \'tags=test\'.',
   constant: 'FILTER',
-  hasValue: true,
   valueLabel: '<query>',
 }, {
   name: '--with-scopes',
@@ -17,7 +16,6 @@ const SWITCH_LIST = [{
   name: '--per-page',
   about: 'Specify number of resources per page.',
   constant: 'PER_PAGE',
-  hasValue: true,
   valueLabel: '<count>',
 }, {
   name: '--summary',
@@ -27,7 +25,6 @@ const SWITCH_LIST = [{
   name: '--api-key',
   about: 'Use a specific API key instead of the current Operator\'s API Key.',
   constant: 'API_KEY',
-  hasValue: true,
   valueLabel: '<API key>',
 }, {
   name: '--expand',
@@ -37,7 +34,6 @@ const SWITCH_LIST = [{
   name: '--field',
   about: 'Print only a certain field from the response.',
   constant: 'FIELD',
-  hasValue: true,
   valueLabel: '<key>',
 }, {
   name: '--simple',
@@ -51,19 +47,16 @@ const SWITCH_LIST = [{
   name: '--project',
   about: 'Specify the \'project\' query parameter.',
   constant: 'PROJECT',
-  hasValue: true,
   valueLabel: '<project ID>',
 }, {
   name: '--page',
   about: 'Go to a specific page of results.',
   constant: 'PAGE',
-  hasValue: true,
   valueLabel: '<page>',
 }, {
   name: '--to-csv',
   about: 'Output array response to a CSV file, such as \'./data.csv\'.',
   constant: 'TO_CSV',
-  hasValue: true,
   valueLabel: '<output file>',
 }, {
   name: '--context',
@@ -73,7 +66,6 @@ const SWITCH_LIST = [{
   name: '--to-page',
   about: 'Read up to 30 pages before returning results (only with --to-csv).',
   constant: 'TO_PAGE',
-  hasValue: true,
   valueLabel: '<page>',
 }];
 
@@ -88,14 +80,15 @@ const apply = (args) => {
 
       const foundIndex = args.indexOf(arg);
       const rule = SWITCH_LIST.find(item => item.name === arg);
+      const { constant, valueLabel } = rule;
 
       // For CLI
-      module.exports[rule.constant] = rule.hasValue ? args[foundIndex + 1] : true;
+      module.exports[constant] = valueLabel ? args[foundIndex + 1] : true;
 
       // For API
-      module.exports.exported[rule.constant] = rule.hasValue ? args[foundIndex + 1] : true;
+      module.exports.active[constant] = valueLabel ? args[foundIndex + 1] : true;
 
-      args.splice(foundIndex, rule.hasValue ? 2 : 1);
+      args.splice(foundIndex, valueLabel ? 2 : 1);
     });
 
   return args;
@@ -104,5 +97,5 @@ const apply = (args) => {
 module.exports = {
   SWITCH_LIST,
   apply,
-  exported: {},
+  active: {},
 };

@@ -51,15 +51,15 @@ const API = {
     commands.COMMAND_LIST.push(command);
   },
   getOptions: () => config.get('options'),
-  getSwitches: () => switches.exported,
+  getSwitches: () => switches.active,
   getArgs: () => args,
 };
 
-const loadPlugin = (name) => {
+const loadPlugin = (moduleName) => {
   try {
-    require(`${NODE_MODULES_PATH}/${name}`)(API);
+    require(`${NODE_MODULES_PATH}/${moduleName}`)(API);
   } catch (e) {
-    throw new Error(`Failed to load plugin: ${name} (${e.message})`);
+    throw new Error(`Failed to load plugin: ${moduleName} (${e.message})`);
   }
 };
 

@@ -2,7 +2,9 @@
 
 > Requires Node.js version 7.6 or greater
 
-Command Line Interface (CLI) for working with the [EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with ease.
+Command Line Interface (CLI) for working with the 
+[EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with 
+ease.
 
 
 ## Installation
@@ -60,23 +62,24 @@ Authentication is provided in two ways.
 
 ## Plugins
 
-The EVRYTHNG CLI allows additional plugins to be created and installed in order
-to add/extend custom functionality as the user requires. These plugins
-are provided with an `api` parameter that contains methods and data they can 
-use to implement additional functionality, such as adding new commands.
+The EVRYTHNG CLI allows plugins to be created and installed in order to 
+add/extend custom functionality as the user requires. These plugins are provided 
+with an `api` parameter that contains methods and data they can use to implement 
+additional functionality, such as adding new commands.
 
 
-## Plugin Requirements
+### Plugin Requirements
 
-In order to be considered a plugin, the `npm` module must meet the following:
+In order to be considered a plugin, its `npm` module must meet the following:
 
-* Installed in the same directory as the CLI, as will be the case when 
-  installed globally with `-g` or as a project dependency.
-* Be named including the prefix `evrythng-cli-plugin-`.
+* Be installed in the same directory as the CLI, as will be the case when 
+  installed globally with `-g` or as a project dependency (i.e: in 
+  `node_modules`).
+* Have a package name beginning the prefix `evrythng-cli-plugin-`.
 * Have a single source file identifyable when it is `require`d, such as setting
   `main` in its `package.json`.
 * That file must export a single function, which is provided the `api` parameter
-  (see below).
+  (see below). Asynchronous functions are not currently supported.
 
 An example of such a plugin is shown below. The basic directory structure is:
 
@@ -94,39 +97,43 @@ const newCommand = {
   firstArg: 'greet',
   operations: {
     greetSomeoneByName: {
-      execute: ([name]) => console.log(`Hello ${name}!`),
+      execute: ([name]) => console.log(`Hello there, ${name}!`),
       pattern: '$name',
     },
   },
 };
 
 module.exports = (api) => {
+  // Register a new command
   api.addCommand(newCommand);
 };
 ```
 
 In the example above, a new command `greet` is added with one operation that 
-is provided subsequent arguments, in the same way as regular built-in commands. 
-This is validated against a schema before being loaded - it must match the 
-structure of the above example.
+is provided the remaining arguments, in the same way as regular built-in 
+commands. This is validated against a schema before being loaded - it must match 
+the structure of the above example.
 
-The example command added in the example is then available as usual:
+The example command added in the example is then available as usual when using 
+the CLI:
 
 ```
 $ evrythng greet Charles
-Hello Charles!
+Hello there, Charles!
 ```
 
 
-## Plugin API
+### Plugin API
 
 The `api` parameter provided to a plugin's exported function contains the 
 following usable methods and data:
 
 * `addCommand()` - Register a new command.
 * `getOptions()` - Retrieve an object describing the user's `options` from the 
-  CLI configuration file, which defines persistent preferences.
+  CLI configuration file, which defines the persistent `options` preferences.
 * `getSwitches()` - Retrieve an object describing the currently active switches.
+* `getArgs()` - Retrieve a list of arguments after `evrythng` in the command
+  executed by the user.
 
 
 ## Architecture
@@ -301,7 +308,7 @@ $ evrythng thngs list --with-scopes
 ```js
 const switches = require('../modules/switches');
 
-if (switches.using(switches.SCOPES)) {
+if (switches.SCOPES) {
   // --with-scopes was specified
 }
 ```
@@ -317,9 +324,11 @@ $ evrythng thngs list --filter tags=test
 The value would be read in code as:
 
 ```js
-const filter = switches.using(switches.FILTER);
+const filter = switches.FILTER;
 
-if (filter) console.log(`Filter value was ${filter.value}`);
+if (filter) {
+  console.log(`Filter value was ${filter}`);
+}
 ```
 
 ```
@@ -331,6 +340,7 @@ Filter value was tags=test
 
 ### Running Tests
 
-Run `npm test` to run the Mocha tests in the `tests` directory.
+Run `npm test` to run the Mocha tests in the `tests` directory. Ensure `use` an 
+appropriate Operator first!
 
 Afterwards, see `reports/index.html` for code coverage results.

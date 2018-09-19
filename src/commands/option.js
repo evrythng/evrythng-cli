@@ -38,10 +38,10 @@ const OPTION_LIST = [{
 const listAllOptions = () => {
   const options = config.get('options');
 
-  logger.info('\nOptions:');
-  Object.keys(options).forEach((item) => {
-    const found = OPTION_LIST.find(item2 => item2.key === item);
-    logger.info(`- ${found.name}: ${options[item]}`);
+  logger.info('\nCurrent option settings:');
+  Object.keys(options).forEach((optionKey) => {
+    const found = OPTION_LIST.find(listOption => listOption.key === optionKey);
+    logger.info(`- ${found.name}: ${options[optionKey]}`);
   });
 };
 
@@ -68,16 +68,20 @@ const checkAndSetOptionValue = ([name, state]) => {
       options[key] = (state === 'true');
     },
     integer: () => {
-      try {
-        const intValue = parseInt(state, 10);
-        if (intValue < range[0] || intValue > range[1]) {
-          throw new Error(`Value must be between ${range[0]} and ${range[1]}`);
-        }
+      const [min, max] = range;
 
-        options[key] = intValue;
+      let intValue;
+      try {
+        intValue = parseInt(state, 10);
       } catch (e) {
         throw new Error('Value must be an integer');
       }
+
+      if (intValue < min || intValue > max) {
+        throw new Error(`Value must be between ${min} and ${max}`);
+      }
+
+      options[key] = intValue;
     },
     string: () => {
       if (!values.includes(state)) {

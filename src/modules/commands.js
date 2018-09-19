@@ -31,8 +31,8 @@ const COMMAND_LIST = [
 const showSyntax = (command) => {
   const { firstArg, operations } = command;
   const specs = Object.keys(operations).map((item) => {
-    const operation = operations[item];
-    return `evrythng ${firstArg} ${operation.pattern} ${operation.buildable ? '(or --build)' : ''}`;
+    const { pattern, buildable } = operations[item];
+    return `evrythng ${firstArg} ${pattern} ${buildable ? '(or --build)' : ''}`;
   });
 
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
@@ -56,17 +56,17 @@ const matchArg = (arg = '', spec) => {
     },
   };
 
-  // Must match a map value, or must be identical
+  // Must match a map value
   if (map[spec]) {
     return map[spec](arg);
   }
 
-  // A labelled value, such as $type for actions
+  // or be a labelled value, such as $type for actions
   if (spec.startsWith('$')) {
     return true;
   }
 
-  // Must be the same
+  // else must be the same as the pattern spec
   return arg === spec;
 };
 

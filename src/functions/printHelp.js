@@ -63,12 +63,10 @@ module.exports = () => {
   logger.info('\nDocumentation:\n');
   logger.info(indent('https://developers.evrythng.com/docs/evrythng-cli', 4));
 
-  // Built-in commands
   logger.info('\nAvailable Commands:\n');
   logger.info(indent('Specify a command name below to see syntax for all its operations.\n', 4));
   formatList(COMMAND_LIST.filter(item => !item.fromPlugin), 'firstArg', 'about');
 
-  // Third party commands
   const thirdPartyCommands = COMMAND_LIST.filter(item => item.fromPlugin);
   if (thirdPartyCommands.length) {
     logger.info('\nAvailable Plugin Commands:\n');
@@ -77,7 +75,7 @@ module.exports = () => {
 
   logger.info('\nAvailable Switches:\n');
   const switchList = SWITCH_LIST.map((item) => {
-    item.name = `${item.name}${item.hasValue ? ` ${item.valueLabel}` : ''}`;
+    item.name = `${item.name}${item.valueLabel ? ` ${item.valueLabel}` : ''}`;
     return item;
   });
   formatList(switchList, 'name', 'about');

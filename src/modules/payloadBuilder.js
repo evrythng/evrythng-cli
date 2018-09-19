@@ -12,6 +12,7 @@ const logger = require('./logger');
 const operator = require('../commands/operator');
 const prompt = require('./prompt');
 
+
 // ----------------------------------- Tasks -----------------------------------
 
 const TASK_TYPES = ['POPULATING', 'SHORT_ID_GENERATION'];
@@ -163,7 +164,8 @@ const task = async () => {
   return result;
 };
 
-// ------------------------------ Regular Payloads -----------------------------
+
+// ------------------------------ Regular Resources ----------------------------
 
 // Some properties are writable, just not at create time
 const NON_CREATE_PROPERTIES = [
@@ -195,7 +197,8 @@ const buildDefObject = async (opts) => {
   const { key, target, index, total, propertyDef } = opts;
 
   // User-definable fields are not documented, present free-form
-  if (['customFields', 'identifiers'].includes(key)) {
+  const freeformObjects = ['customFields', 'identifiers'];
+  if (freeformObjects.includes(key)) {
     logger.info(`${index + 1}/${total}: ${key} (object, leave 'key' blank to finish)`);
     target[key] = await buildCustomObject();
     return;
@@ -263,7 +266,7 @@ const filteredPropertyKeys = properties => Object.keys(properties)
 const buildObject = async (properties, name) => {
   const propertyKeys = filteredPropertyKeys(properties);
   const context = name ? `of ${name} ` : '';
-  logger.info(`Provide values for each field ${context}(or leave blank to skip):\n`);
+  logger.info(`\nProvide values for each field ${context}(or leave blank to skip):\n`);
 
   const payload = {};
   for (let index = 0; index < propertyKeys.length; index += 1) {
@@ -277,6 +280,7 @@ const buildObject = async (properties, name) => {
     });
   }
 
+  logger.info();
   return payload;
 };
 
@@ -286,13 +290,10 @@ const resource = async (defName) => {
     throw new Error(`\ndefName ${defName} not found in spec!`);
   }
 
-  logger.info();
-  const { properties } = definitions[defName];
-  const payload = await buildObject(properties);
-
-  logger.info();
+  const payload = await buildObject(definitions[defName].properties);
   return payload;
 };
+
 
 // ------------------------------------ API ------------------------------------
 
