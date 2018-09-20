@@ -26,7 +26,7 @@ describe('api', () => {
   });
 
   it('should not throw when adding a valid command', () => {
-    const addCommand = () => api.API.addCommand(GREET_COMMAND);
+    const addCommand = () => api.API.registerCommand(GREET_COMMAND);
     expect(addCommand).to.not.throw();
   });
 
@@ -41,7 +41,7 @@ describe('api', () => {
       },
     };
 
-    const addCommand = () => api.API.addCommand(invalidCommand);
+    const addCommand = () => api.API.registerCommand(invalidCommand);
     expect(addCommand).to.throw();
   });
 

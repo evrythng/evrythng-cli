@@ -38,10 +38,9 @@ const COMMAND_SCHEMA = {
   },
 };
 
-let args;
 
 const API = {
-  addCommand: (command) => {
+  registerCommand: (command) => {
     const errors = validate(command, COMMAND_SCHEMA);
     if (errors.length) {
       throw new Error(`Invalid command object: ${JSON.stringify(errors)}`);
@@ -52,7 +51,6 @@ const API = {
   },
   getOptions: () => config.get('options'),
   getSwitches: () => switches.active,
-  getArgs: () => args,
 };
 
 const loadPlugin = (moduleName) => {
@@ -69,12 +67,7 @@ const loadPlugins = () => {
     .forEach(loadPlugin);
 };
 
-const setArgs = (items) => {
-  args = [].concat(items);
-};
-
 module.exports = {
   loadPlugins,
   API,
-  setArgs,
 };

@@ -92,20 +92,20 @@ An example of such a plugin is shown below. The basic directory structure is:
 `index.js` exports a single function that will be run when it is loaded:
 
 ```js
-const newCommand = {
-  about: 'Greet someone',
-  firstArg: 'greet',
-  operations: {
-    greetSomeoneByName: {
-      execute: ([name]) => console.log(`Hello there, ${name}!`),
-      pattern: '$name',
-    },
-  },
-};
-
 module.exports = (api) => {
+  const newCommand = {
+    about: 'Greet someone',
+    firstArg: 'greet',
+    operations: {
+      greetSomeoneByName: {
+        execute: ([name]) => console.log(`Hello there, ${name}!`),
+        pattern: '$name',
+      },
+    },
+  };
+
   // Register a new command
-  api.addCommand(newCommand);
+  api.registerCommand(newCommand);
 };
 ```
 
@@ -128,12 +128,10 @@ Hello there, Charles!
 The `api` parameter provided to a plugin's exported function contains the 
 following usable methods and data:
 
-* `addCommand()` - Register a new command.
+* `registerCommand()` - Register a new command.
 * `getOptions()` - Retrieve an object describing the user's `options` from the 
   CLI configuration file, which defines the persistent `options` preferences.
 * `getSwitches()` - Retrieve an object describing the currently active switches.
-* `getArgs()` - Retrieve a list of arguments after `evrythng` in the command
-  executed by the user.
 
 
 ## Architecture

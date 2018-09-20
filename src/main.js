@@ -15,9 +15,6 @@ const main = async () => {
   try {
     await operator.checkFirstRun();
 
-    const args = switches.apply(process.argv.slice(2));
-    api.setArgs(args);
-
     // Don't let bad plugins prevent launch
     try {
       api.loadPlugins();
@@ -25,6 +22,7 @@ const main = async () => {
       logger.error(e);
     }
 
+    const args = switches.apply(process.argv.slice(2));
     const command = commands.identify(args);
     if (!command) {
       printHelp();
