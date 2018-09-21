@@ -7,7 +7,13 @@ const fs = require('fs');
 
 // Keys that are expanded to individual columns, or do not make sense for CSV file.
 const IGNORE = [
-  'resource', 'properties', 'tags', 'collections', 'location', 'customFields', 'identifiers',
+  'resource',
+  'properties',
+  'tags',
+  'collections',
+  'location',
+  'customFields',
+  'identifiers',
 ];
 
 // Get de-deuplicated list of object keys, with optional prefix
@@ -20,13 +26,8 @@ const getAllKeys = (arr, prefix) => {
       .forEach(newItem => result.push(newItem));
   });
 
-  return result.map((item) => {
-    if (prefix) {
-      return `${prefix}.${item}`;
-    }
-
-    return item;
-  });
+  const buildKey = item => prefix ? `${prefix}.${item}` : item;
+  return result.map(buildKey);
 };
 
 // Object, 'customFields', and 'identifiers' are supported
@@ -42,15 +43,12 @@ const getColumnHeaders = (arr) => {
 const esc = val => `"${String(val).split('"').join('""')}"`;
 
 // Add cells to row with value of each applicable key, else add empty cell (,)
-const addCells = (obj = {}, objKeys) => {
-  let result = '';
+const addCells = (rowArr, obj = {}, objKeys) => {
   objKeys.forEach((item) => {
     // Handle any  prefix
     const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
-    result += obj[key] ? `${esc(obj[key])},` : ',';
+    rowArr.push(obj[key] ? esc(obj[key]) : '');
   });
-
-  return result;
 };
 
 const createCsvData = (arr) => {
@@ -58,14 +56,14 @@ const createCsvData = (arr) => {
   const columnHeaders = objKeys.concat(cfKeys).concat(idKeys);
 
   const firstRow = `${columnHeaders.join(',')},`;
-  const otherRows = arr.map(item => addCells(item, objKeys)
-    + addCells(item.customFields, cfKeys)
-    + addCells(item.identifiers, idKeys));
+  const otherRows = arr.map((item) => {
+    const row = [];
+    addCells(row, item, objKeys);
+    addCells(row, item.customFields, cfKeys);
+    addCells(row, item.identifiers, idKeys);
+    return row.join(',');
+  });
   return [firstRow].concat(otherRows);
 };
 
-const toFile = (arr, fileName) => fs.writeFileSync(fileName, createCsvData(arr).join('\n'), 'utf8');
-
-module.exports = {
-  toFile,
-};
+exports.toFile = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');

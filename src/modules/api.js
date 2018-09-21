@@ -9,11 +9,6 @@ const commands = require('./commands');
 const config = require('./config');
 const switches = require('./switches');
 
-const PREFIX = 'evrythng-cli-plugin-';
-
-// Read node_modules alongside CLI
-const NODE_MODULES_PATH = `${__dirname}/../../../`;
-
 const COMMAND_SCHEMA = {
   type: 'object',
   additionalProperties: false,
@@ -38,6 +33,9 @@ const COMMAND_SCHEMA = {
   },
 };
 
+// Read node_modules alongside CLI
+const NODE_MODULES_PATH = `${__dirname}/../../../`;
+const PREFIX = 'evrythng-cli-plugin-';
 
 const API = {
   registerCommand: (command) => {
@@ -68,6 +66,6 @@ const loadPlugins = () => {
 };
 
 module.exports = {
-  loadPlugins,
   API,
+  loadPlugins,
 };

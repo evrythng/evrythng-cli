@@ -11,7 +11,7 @@ const OPTION_LIST = [{
   name: 'log-level',
   about: 'Set level of output to the console (one of \'info\', \'error\').',
   type: 'string',
-  values: ['info', 'error'],
+  allowed: ['info', 'error'],
 }, {
   key: 'errorDetail',
   name: 'error-detail',
@@ -40,59 +40,61 @@ const listAllOptions = () => {
 
   logger.info('\nCurrent option settings:');
   Object.keys(options).forEach((optionKey) => {
-    const found = OPTION_LIST.find(listOption => listOption.key === optionKey);
-    logger.info(`- ${found.name}: ${options[optionKey]}`);
+    const option = OPTION_LIST.find(({ key }) => key === optionKey);
+    logger.info(`- ${option.name}: ${options[optionKey]}`);
   });
 };
 
-const checkAndSetOptionValue = ([name, state]) => {
-  if (!name) {
-    throw new Error('Please specify an option $name');
+const booleanSetter = () => (options, key, newValue) => {
+  const allowed = ['true', 'false'];
+  if (!allowed.includes(newValue)) {
+    throw new Error(`Value must be one of ${allowed.join(', ')}`);
   }
 
-  const found = OPTION_LIST.find(item => item.name === name);
-  if (!found) {
+  options[key] = (newValue === 'true');
+};
+
+const integerSetter = range => (options, key, newValue) => {
+  const [min, max] = range;
+
+  let intValue = 0;
+  try {
+    intValue = parseInt(newValue, 10);
+  } catch (e) {
+    throw new Error('Value must be an integer');
+  }
+
+  if (intValue < min || intValue > max) {
+    throw new Error(`Value must be between ${min} and ${max}`);
+  }
+
+  options[key] = intValue;
+};
+
+const stringSetter = allowed => (options, key, newValue) => {
+  if (!allowed.includes(newValue)) {
+    throw new Error(`Value must be one of ${allowed.join(', ')}`);
+  }
+
+  options[key] = newValue;
+};
+
+const checkAndSetOptionValue = ([name, newValue]) => {
+  const option = OPTION_LIST.find(item => item.name === name);
+  if (!option) {
     throw new Error(`Unknown option name '${name}'`);
   }
 
   const options = config.get('options');
-  const { key, type, range, values } = found;
+  const { key, type, range, allowed } = option;
 
   const typeMap = {
-    boolean: () => {
-      const allowed = ['true', 'false'];
-      if (!allowed.includes(state)) {
-        throw new Error(`Value must be one of ${allowed.join(', ')}`);
-      }
-
-      options[key] = (state === 'true');
-    },
-    integer: () => {
-      const [min, max] = range;
-
-      let intValue;
-      try {
-        intValue = parseInt(state, 10);
-      } catch (e) {
-        throw new Error('Value must be an integer');
-      }
-
-      if (intValue < min || intValue > max) {
-        throw new Error(`Value must be between ${min} and ${max}`);
-      }
-
-      options[key] = intValue;
-    },
-    string: () => {
-      if (!values.includes(state)) {
-        throw new Error(`Value must be one of ${values.join(', ')}`);
-      }
-
-      options[key] = state;
-    },
+    boolean: booleanSetter(),
+    integer: integerSetter(range),
+    string: stringSetter(allowed),
   };
 
-  typeMap[type]();
+  typeMap[type](options, key, newValue);
   config.set('options', options);
 };
 
@@ -106,7 +108,7 @@ module.exports = {
     },
     setOption: {
       execute: checkAndSetOptionValue,
-      pattern: '$name $state',
+      pattern: '$name $newValue',
     },
   },
   OPTION_LIST,

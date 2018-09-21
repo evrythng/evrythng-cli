@@ -169,7 +169,12 @@ const task = async () => {
 
 // Some properties are writable, just not at create time
 const NON_CREATE_PROPERTIES = [
-  'scopes', 'properties', 'fn', 'startsAt', 'endsAt', 'location',
+  'scopes',
+  'properties',
+  'fn',
+  'startsAt',
+  'endsAt',
+  'location',
 ];
 
 // Values that are always the same value, and are not in the creation spec
@@ -184,9 +189,7 @@ const buildCustomObject = async () => {
 
   let key = await getKeyName();
   while (key) {
-    const value = await prompt.getValue(indent('value', 2));
-    result[key] = value;
-
+    result[key] = await prompt.getValue(indent('value', 2));
     key = await getKeyName();
   }
 

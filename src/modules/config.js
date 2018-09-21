@@ -6,8 +6,6 @@
 const { validate } = require('jsonschema');
 const fs = require('fs');
 
-const PATH = `${require('os').homedir()}/.evrythng-cli-config`;
-
 const DEFAULT_CONFIG = {
   using: '',
   operators: {},
@@ -70,6 +68,10 @@ const CONFIG_SCHEMA = {
   },
 };
 
+const DEFAULT_DEFAULT_PER_PAGE = 30;
+
+const PATH = `${require('os').homedir()}/.evrythng-cli-config`;
+
 let data;
 
 const validateConfig = (input) => {
@@ -84,7 +86,7 @@ const write = () => fs.writeFileSync(PATH, JSON.stringify(data, null, 2), 'utf8'
 const migrateConfig = (input) => {
   // v1.1.0 - new defaultPerPage option
   if (!input.options.defaultPerPage) {
-    input.options.defaultPerPage = 30;
+    input.options.defaultPerPage = DEFAULT_DEFAULT_PER_PAGE;
   }
 
   write();
