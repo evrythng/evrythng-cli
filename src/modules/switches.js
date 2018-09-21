@@ -73,13 +73,13 @@ const apply = (args) => {
   args
     .filter(item => item.includes('--'))
     .forEach((arg) => {
-      const valid = SWITCH_LIST.find(item => item.name === arg);
+      const valid = SWITCH_LIST.find(({ name }) => name === arg);
       if (!valid) {
         throw new Error(`Invalid switch: ${arg}`);
       }
 
       const foundIndex = args.indexOf(arg);
-      const rule = SWITCH_LIST.find(item => item.name === arg);
+      const rule = SWITCH_LIST.find(({ name }) => name === arg);
       const { constant, valueLabel } = rule;
 
       // For CLI

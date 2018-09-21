@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const { parse } = require('url');
 const evrythng = require('evrythng-extended');
 const { getConfirmation } = require('./prompt');
 const config = require('./config');
@@ -28,6 +29,9 @@ const STATUS_LABELS = {
   503: 'Service Unavailable',
   504: 'Gateway Timeout',
 };
+
+const authorization = operator.getKey();
+const fullResponse = true;
 
 const buildQueryParams = (method) => {
   const { defaultPerPage } = config.get('options');
@@ -82,53 +86,43 @@ const printRequest = (options) => {
   }
 };
 
+const extractUrlFromLink = (link) => {
+  const encodedUrl = link.slice(1, link.indexOf('>') - link.length);
+  return parse(decodeURIComponent(encodedUrl)).path;
+};
+
 const goToPage = async (res, endPage) => {
-  let currentPage = 1;
-  let { link } = res.headers;
-  let nextRes = res;
-
-  while (currentPage !== endPage) {
-    let url = decodeURIComponent(link);
-    url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
-    nextRes = await evrythng.api({
-      url,
-      authorization: operator.getKey(),
-      fullResponse: true,
-    });
-
-    ({ link } = nextRes.headers);
-    if (!link) {
-      throw new Error(`Ran out of pages at page ${currentPage}`);
+  for (let page = 0; page <= endPage; page += 1) {
+    const url = extractUrlFromLink(res.headers.link)
+    res = await evrythng.api({ authorization, fullResponse, url });
+    if (page === endPage - 1) {
+      return res;
     }
 
-    currentPage += 1;
+    if (!res.headers.link) {
+      throw new Error(`Ran out of pages at page ${page}`);
+    }
   }
 
-  return nextRes;
+  return res;
 };
 
 const getMorePages = async (res, max) => {
-  let { link } = res.headers;
-  let result = res.data;
-  let pages = 1;
+  max = max > TO_PAGE_MAX ? TO_PAGE_MAX : max;
+  const items = [...res.data];
 
-  while (link && pages < max && pages < TO_PAGE_MAX) {
-    let url = decodeURIComponent(link);
-    url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
-    const nextRes = await evrythng.api({
-      url,
-      authorization: operator.getKey(),
-      fullResponse: true,
-    });
-    ({ link } = nextRes.headers);
-    pages += 1;
-
-    result = result.concat(nextRes.data);
-    logger.info(`Reading - ${result.length} items`, true);
+  for (let page = 1; page < max; page += 1) {
+    const url = extractUrlFromLink(res.headers.link);
+    res = await evrythng.api({ authorization, fullResponse, url });
+    items.push(...res.data);
+    logger.info(`Reading - ${items.length} items`, true);
+    if (!res.headers.link) {
+      break;
+    }
   }
 
-  logger.info(`\nRead ${result.length} items (${pages} pages).`);
-  return result;
+  logger.info(`\nRead ${items.length} items.`);
+  return items;
 };
 
 const printResponse = async (res) => {

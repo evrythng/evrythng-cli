@@ -43,27 +43,30 @@ const getColumnHeaders = (arr) => {
 const esc = val => `"${String(val).split('"').join('""')}"`;
 
 // Add cells to row with value of each applicable key, else add empty cell (,)
-const addCells = (rowArr, obj = {}, objKeys) => {
+const addCells = (obj = {}, objKeys) => {
+  const result = [];
   objKeys.forEach((item) => {
     // Handle any  prefix
     const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
-    rowArr.push(obj[key] ? esc(obj[key]) : '');
+    result.push(obj[key] ? esc(obj[key]) : '');
   });
+
+  return result;
 };
 
 const createCsvData = (arr) => {
   const { objKeys, cfKeys, idKeys } = getColumnHeaders(arr);
-  const columnHeaders = objKeys.concat(cfKeys).concat(idKeys);
+  const columnHeaders = [...objKeys, ...cfKeys, ...idKeys, ''].join(',');
 
-  const firstRow = `${columnHeaders.join(',')},`;
-  const otherRows = arr.map((item) => {
-    const row = [];
-    addCells(row, item, objKeys);
-    addCells(row, item.customFields, cfKeys);
-    addCells(row, item.identifiers, idKeys);
-    return row.join(',');
+  const rows = arr.map((item) => {
+    const { customFields, identifiers } = item;
+    return [
+      addCells(item, objKeys),
+      addCells(customFields, cfKeys),
+      addCells(identifiers, idKeys)
+    ].join(',');
   });
-  return [firstRow].concat(otherRows);
+  return [columnHeaders, ...rows];
 };
 
 exports.toFile = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');

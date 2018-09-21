@@ -72,12 +72,12 @@ const requireKey = (name) => {
 };
 
 const validate = (instance, schema) => {
-  const results = jsonschema.validate(instance, schema);
-  if (!results.errors || results.errors.length === 0) {
+  const { errors } = jsonschema.validate(instance, schema);
+  if (!errors || errors.length === 0) {
     return [];
   }
 
-  return results.errors.map(item => item.stack);
+  return errors.map(item => item.stack);
 };
 
 module.exports = {
