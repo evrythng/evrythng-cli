@@ -111,9 +111,9 @@ const checkFirstRun = async () => {
 
   logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. '
     + 'Some examples to get you started:\n');
-  logger.info('  evrythng thng list');
-  logger.info('  evrythng thng UnQ8nqfQeD8aQpwRanrXaaPt read');
-  logger.info('  evrythng product create \'{"name": "My New Product"}\'\n');
+  logger.info('  evrythng thngs list');
+  logger.info('  evrythng thngs UnQ8nqfQeD8aQpwRanrXaaPt read');
+  logger.info('  evrythng products create \'{"name": "My New Product"}\'\n');
   logger.info('Type \'evrythng\' to see all available commands and options.\n');
   process.exit();
 };
@@ -124,17 +124,14 @@ const getCurrent = () => config.get('operators')[config.get('using')];
 // ------------------------------------ API ------------------------------------
 
 const getKey = () => {
-  const key = switches.using(switches.API_KEY);
-  if (key) {
-    return key.value;
-  }
+  const override = switches.API_KEY;
 
   const operator = config.get('using');
   if (!operator) {
     throw new Error('No Operator has been selected yet. Use \'operator add\' to add one.');
   }
 
-  return resolveKey(operator);
+  return override || resolveKey(operator);
 };
 
 module.exports = {

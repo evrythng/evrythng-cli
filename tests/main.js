@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const { ctx } = require('./modules/util');
+const { ctx } = require('./util');
 const cli = require('../src/functions/cli');
 const config = require('../src/modules/config');
 const expand = require('../src/functions/expand');
@@ -13,12 +13,14 @@ const operator = require('../src/commands/operator');
 
 describe('CLI', () => {
   before(async () => {
-    ctx.savedOpts = JSON.parse(JSON.stringify(config.get('options')));
+    const options = config.get('options');
+    ctx.savedOpts = JSON.parse(JSON.stringify(options));
 
-    await cli('options error-detail true');
-    await cli('options no-confirm true');
-    await cli('options show-http false');
-    await cli('options log-level error');
+    options.errorDetail = true;
+    options.noConfirm = true;
+    options.showHttp = false;
+    options.logLevel = 'error';
+    config.set('options', options);
 
     operator.applyRegion();
   });
@@ -48,10 +50,14 @@ describe('CLI', () => {
   require('./commands/thng');
   require('./commands/url');
 
-  require('./commands');
-  require('./config');
-  require('./functions');
-  require('./prompt');
-  require('./switches');
-  require('./util');
+  require('./modules/api');
+  require('./modules/commands');
+  require('./modules/config');
+  require('./modules/csv');
+  require('./modules/functions');
+  require('./modules/http');
+  require('./modules/logger');
+  require('./modules/prompt');
+  require('./modules/switches');
+  require('./modules/util');
 });

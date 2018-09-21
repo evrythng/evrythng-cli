@@ -2,7 +2,9 @@
 
 > Requires Node.js version 7.6 or greater
 
-Command Line Interface (CLI) for working with the [EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with ease.
+Command Line Interface (CLI) for working with the 
+[EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with 
+ease.
 
 
 ## Installation
@@ -30,7 +32,7 @@ $ evrythng operators add prod us AGiWrH5OteA4aHiM...
 ```
 
 
-## Usage
+## Usage and Help
 
 After installation, the global `npm` module can be used directly. In general, 
 the argument structure is:
@@ -58,11 +60,78 @@ Authentication is provided in two ways.
 > You must add at least one Operator before you can begin using the CLI.
 
 
-## Running Tests
+## Plugins
 
-Run `npm test` to run the Mocha tests in the `tests` directory.
+The EVRYTHNG CLI allows plugins to be created and installed in order to 
+add/extend custom functionality as the user requires. These plugins are provided 
+with an `api` parameter that contains methods and data they can use to implement 
+additional functionality, such as adding new commands.
 
-Afterwards, see `reports/index.html` for code coverage results.
+
+### Plugin Requirements
+
+In order to be considered a plugin, its `npm` module must meet the following:
+
+* Be installed in the same directory as the CLI, as will be the case when 
+  installed globally with `-g` or as a project dependency (i.e: in 
+  `node_modules`).
+* Have a package name beginning the prefix `evrythng-cli-plugin-`.
+* Have a single source file identifyable when it is `require`d, such as setting
+  `main` in its `package.json`.
+* That file must export a single function, which is provided the `api` parameter
+  (see below). Asynchronous functions are not currently supported.
+
+An example of such a plugin is shown below. The basic directory structure is:
+
+```
+- evrythng-cli-plugin-greeter
+  - package.json (with main: index.js)
+  - index.js
+```
+
+`index.js` exports a single function that will be run when it is loaded:
+
+```js
+module.exports = (api) => {
+  const newCommand = {
+    about: 'Greet someone',
+    firstArg: 'greet',
+    operations: {
+      greetSomeoneByName: {
+        execute: ([name]) => console.log(`Hello there, ${name}!`),
+        pattern: '$name',
+      },
+    },
+  };
+
+  // Register a new command
+  api.registerCommand(newCommand);
+};
+```
+
+In the example above, a new command `greet` is added with one operation that 
+is provided the remaining arguments, in the same way as regular built-in 
+commands. This is validated against a schema before being loaded - it must match 
+the structure of the above example.
+
+The example command added in the example is then available as usual when using 
+the CLI:
+
+```
+$ evrythng greet Charles
+Hello there, Charles!
+```
+
+
+### Plugin API
+
+The `api` parameter provided to a plugin's exported function contains the 
+following usable methods and data:
+
+* `registerCommand()` - Register a new command.
+* `getOptions()` - Retrieve an object describing the user's `options` from the 
+  CLI configuration file, which defines the persistent `options` preferences.
+* `getSwitches()` - Retrieve an object describing the currently active switches.
 
 
 ## Architecture
@@ -237,7 +306,7 @@ $ evrythng thngs list --with-scopes
 ```js
 const switches = require('../modules/switches');
 
-if (switches.using(switches.SCOPES)) {
+if (switches.SCOPES) {
   // --with-scopes was specified
 }
 ```
@@ -253,11 +322,23 @@ $ evrythng thngs list --filter tags=test
 The value would be read in code as:
 
 ```js
-const filter = switches.using(switches.FILTER);
+const filter = switches.FILTER;
 
-if (filter) console.log(`Filter value was ${filter.value}`);
+if (filter) {
+  console.log(`Filter value was ${filter}`);
+}
 ```
 
 ```
 Filter value was tags=test
 ```
+
+
+## Development
+
+### Running Tests
+
+Run `npm test` to run the Mocha tests in the `tests` directory. Ensure `use` an 
+appropriate Operator first!
+
+Afterwards, see `reports/index.html` for code coverage results.

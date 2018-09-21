@@ -65,6 +65,7 @@ module.exports = {
         return http.post('/files', payload);
       },
       pattern: 'create $payload',
+      buildable: true,
     },
     read: {
       execute: async ([id]) => http.get(`/files/${id}`),

@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const { ctx } = require('../modules/util');
+const { ctx } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('files', () => {
@@ -37,7 +37,7 @@ describe('files', () => {
   });
 
   it('should not throw error for \'files $id upload $file-path $mime-type\'', async () => {
-    const uploadTestFile = async () => cli(`files ${ctx.fileId} upload ./tests/modules/test.txt text/plain`);
+    const uploadTestFile = async () => cli(`files ${ctx.fileId} upload ./tests/test.txt text/plain`);
 
     expect(uploadTestFile).to.not.throw();
   });

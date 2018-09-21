@@ -17,6 +17,7 @@ module.exports = {
         return http.post('/products', payload);
       },
       pattern: 'create $payload',
+      buildable: true,
     },
     readProduct: {
       execute: async ([id]) => http.get(`/products/${id}`),

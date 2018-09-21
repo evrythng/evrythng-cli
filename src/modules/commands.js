@@ -3,7 +3,6 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const logger = require('./logger');
 const switches = require('./switches');
 
 const COMMAND_LIST = [
@@ -31,37 +30,44 @@ const COMMAND_LIST = [
 
 const showSyntax = (command) => {
   const { firstArg, operations } = command;
-  const specs = Object.keys(operations).map(item => `evrythng ${firstArg} ${operations[item].pattern}`);
+  const specs = Object.keys(operations).map((item) => {
+    const { pattern, buildable } = operations[item];
+    return `evrythng ${firstArg} ${pattern} ${buildable ? '(or --build)' : ''}`;
+  });
 
-  logger.error(`\nAvailable operations for '${firstArg}':\n${specs.join('\n')}`);
-  process.exit();
+  throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
 };
 
-const matchArg = (arg, spec) => {
+const matchArg = (arg = '', spec) => {
   const map = {
     // Value must be an EVRYTHNG ID
-    $id: () => arg.length === 24,
+    $id: val => val.length === 24,
     // Value must be JSON
-    $payload: () => {
-      if (switches.using(switches.BUILD)) {
+    $payload: (val) => {
+      if (switches.BUILD) {
         return true;
       }
 
       try {
-        return (typeof arg === 'object') && JSON.parse(arg);
+        return typeof JSON.parse(val) === 'object';
       } catch (e) {
         return false;
       }
     },
   };
 
-  // A labelled value, such as $type for actions
+  // Must match a map value
+  if (map[spec]) {
+    return map[spec](arg);
+  }
+
+  // or be a labelled value, such as $type for actions
   if (spec.startsWith('$')) {
     return true;
   }
 
-  // Must match a map value, or must be identical
-  return map[spec] ? map[spec]() : arg === spec;
+  // else must be the same as the pattern spec
+  return arg === spec;
 };
 
 const matchArgs = (args, pattern) => pattern.split(' ').every((item, i) => matchArg(args[i], item));

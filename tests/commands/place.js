@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const { ctx } = require('../modules/util');
+const { ctx } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('places', () => {

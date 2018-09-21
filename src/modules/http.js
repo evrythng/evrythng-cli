@@ -3,16 +3,19 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const { parse } = require('url');
 const evrythng = require('evrythng-extended');
 const { getConfirmation } = require('./prompt');
 const config = require('./config');
+const csv = require('./csv');
 const expand = require('../functions/expand');
 const logger = require('./logger');
 const operator = require('../commands/operator');
 const switches = require('./switches');
 const util = require('./util');
 
-const statusLabels = {
+const TO_PAGE_MAX = 30;
+const STATUS_LABELS = {
   200: 'OK',
   201: 'Created',
   202: 'Accepted',
@@ -27,8 +30,39 @@ const statusLabels = {
   504: 'Gateway Timeout',
 };
 
-const buildParams = () => {
-  const params = switches.buildParams();
+const authorization = operator.getKey();
+const fullResponse = true;
+
+const buildQueryParams = (method) => {
+  const { defaultPerPage } = config.get('options');
+  const filter = switches.FILTER;
+  const perPage = switches.PER_PAGE;
+  const project = switches.PROJECT;
+
+  const result = {};
+  if (filter) {
+    result.filter = filter;
+  }
+
+  // Use options value, unless it's specified with the --per-page flag
+  if (method === 'get') {
+    result.perPage = perPage || defaultPerPage;
+  }
+  if (project) {
+    result.project = project;
+  }
+  if (switches.SCOPES) {
+    result.withScopes = true;
+  }
+  if (switches.CONTEXT) {
+    result.context = true;
+  }
+
+  return result;
+};
+
+const buildParamString = (method) => {
+  const params = buildQueryParams(method);
   const keys = Object.keys(params);
   if (!keys.length) {
     return '';
@@ -52,28 +86,43 @@ const printRequest = (options) => {
   }
 };
 
-const goToPage = async (res, endPage) => {
-  let currentPage = 1;
-  let linkStr = res.headers.link;
-  let nextRes = res;
-  while (currentPage !== endPage) {
-    let url = decodeURIComponent(linkStr);
-    url = url.substring(url.indexOf('.com') + '.com'.length, url.indexOf('>'));
-    nextRes = await evrythng.api({
-      url,
-      authorization: operator.getKey(),
-      fullResponse: true,
-    });
+const extractUrlFromLink = (link) => {
+  const encodedUrl = link.slice(1, link.indexOf('>') - link.length);
+  return parse(decodeURIComponent(encodedUrl)).path;
+};
 
-    linkStr = nextRes.headers.link;
-    if (!linkStr) {
-      throw new Error(`Ran out of pages at page ${currentPage}`);
+const goToPage = async (res, endPage) => {
+  for (let page = 0; page <= endPage; page += 1) {
+    const url = extractUrlFromLink(res.headers.link)
+    res = await evrythng.api({ authorization, fullResponse, url });
+    if (page === endPage - 1) {
+      return res;
     }
 
-    currentPage += 1;
+    if (!res.headers.link) {
+      throw new Error(`Ran out of pages at page ${page}`);
+    }
   }
 
-  return nextRes;
+  return res;
+};
+
+const getMorePages = async (res, max) => {
+  max = max > TO_PAGE_MAX ? TO_PAGE_MAX : max;
+  const items = [...res.data];
+
+  for (let page = 1; page < max; page += 1) {
+    const url = extractUrlFromLink(res.headers.link);
+    res = await evrythng.api({ authorization, fullResponse, url });
+    items.push(...res.data);
+    logger.info(`Reading - ${items.length} items`, true);
+    if (!res.headers.link) {
+      break;
+    }
+  }
+
+  logger.info(`\nRead ${items.length} items.`);
+  return items;
 };
 
 const printResponse = async (res) => {
@@ -84,44 +133,61 @@ const printResponse = async (res) => {
     return res;
   }
 
-  const { showHttp } = config.get('options');
-
   // Wait until page reached
-  const page = switches.using(switches.PAGE);
+  const page = switches.PAGE;
   if (page) {
-    res = await goToPage(res, parseInt(page.value, 10));
+    res = await goToPage(res, parseInt(page, 10));
   }
 
+  // Get all pages and update res.data
+  const csvFileName = switches.TO_CSV;
+  const toPage = switches.TO_PAGE;
+  if (toPage) {
+    if (!csvFileName) {
+      throw new Error('--to-page is only available when using --to-csv.');
+    }
+
+    res.data = await getMorePages(res, toPage);
+  }
+
+  const { data, status, headers } = res;
+
   // Expand known fields
-  const { data, status } = res;
-  if (switches.using(switches.EXPAND)) {
+  if (switches.EXPAND) {
     await expand(data);
   }
 
   // Print HTTP response information
+  const { showHttp } = config.get('options');
   if (showHttp) {
-    logger.info(`<< ${status} ${statusLabels[status]}`);
-    formatHeaders(res.headers).forEach(item => logger.info(item));
+    logger.info(`<< ${status} ${STATUS_LABELS[status]}`);
+    formatHeaders(headers).forEach(item => logger.info(item));
     logger.info();
   }
 
   // Print summary view
-  if (switches.using(switches.SUMMARY)) {
+  if (switches.SUMMARY) {
     util.printListSummary(data);
     return res;
   }
 
   // Print simple view
-  if (switches.using(switches.SIMPLE)) {
+  if (switches.SIMPLE) {
     util.printSimple(data, 1);
     return res;
   }
 
   // Get just one field
-  const field = switches.using(switches.FIELD);
+  const field = switches.FIELD;
   if (field) {
-    logger.info(data[field.value]);
-    return data[field.value];
+    logger.info(data[field]);
+    return data[field];
+  }
+
+  // Print to file?
+  if (csvFileName) {
+    csv.toFile(Array.isArray(data) ? data : [data], csvFileName);
+    return res;
   }
 
   // Regular pretty JSON output
@@ -140,7 +206,8 @@ const apiRequest = async (options) => {
   }
 
   const { showHttp, noConfirm } = config.get('options');
-  if (options.method === 'DELETE' && !noConfirm) {
+  const methods = ['POST', 'PUT', 'DELETE'];
+  if (methods.includes(options.method.toUpperCase()) && !noConfirm) {
     const confirmation = await getConfirmation();
     if (!confirmation) {
       logger.info('Cancelled');
@@ -157,14 +224,14 @@ const apiRequest = async (options) => {
 };
 
 const post = async (url, data) => apiRequest({
-  url: `${url}${buildParams()}`,
-  method: 'POST',
+  url: `${url}${buildParamString('post')}`,
+  method: 'post',
   authorization: operator.getKey(),
   data,
 }).then(printResponse);
 
 const get = async (url, silent = false) => apiRequest({
-  url: `${url}${buildParams()}`,
+  url: `${url}${buildParamString('get')}`,
   authorization: operator.getKey(),
 }).then((res) => {
   if (silent) {
@@ -192,4 +259,6 @@ module.exports = {
   get,
   put,
   delete: deleteMethod,
+  formatHeaders,
+  printRequest,
 };

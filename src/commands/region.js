@@ -79,4 +79,6 @@ module.exports = {
       pattern: '$name remove',
     },
   },
+  checkRegionExists,
+  addRegion,
 };

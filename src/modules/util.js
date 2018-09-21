@@ -3,12 +3,18 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const buildPayload = require('../functions/buildPayload');
+const jsonschema = require('jsonschema');
 const indent = require('../functions/indent');
 const logger = require('./logger');
+const payloadBuilder = require('./payloadBuilder');
 const switches = require('./switches');
 
 const INDENT_SIZE = 2;
+
+// TODO: Redirector, Reactor schedules, etc...
+const SPECIAL_BUILDERS = {
+  task: payloadBuilder.task,
+};
 
 const isId = input => input.length === 24;
 
@@ -43,8 +49,13 @@ const printSimple = (obj, level) => {
 };
 
 const getPayload = async (defName, jsonStr) => {
-  if (switches.using(switches.BUILD)) {
-    return buildPayload(defName);
+  if (switches.BUILD) {
+    // Special builders, such as tasks
+    if (SPECIAL_BUILDERS[defName]) {
+      return SPECIAL_BUILDERS[defName]();
+    }
+
+    return payloadBuilder.resource(defName);
   }
 
   try {
@@ -55,10 +66,18 @@ const getPayload = async (defName, jsonStr) => {
 };
 
 const requireKey = (name) => {
-  const apiKey = switches.using(switches.API_KEY);
-  if (!apiKey) {
+  if (!switches.API_KEY) {
     throw new Error(`Requires --api-key switch specifying the ${name} API Key.`);
   }
+};
+
+const validate = (instance, schema) => {
+  const { errors } = jsonschema.validate(instance, schema);
+  if (!errors || errors.length === 0) {
+    return [];
+  }
+
+  return errors.map(item => item.stack);
 };
 
 module.exports = {
@@ -68,4 +87,5 @@ module.exports = {
   printListSummary,
   printSimple,
   requireKey,
+  validate,
 };

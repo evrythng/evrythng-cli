@@ -4,14 +4,14 @@
  */
 
 const { expect } = require('chai');
-const cli = require('../src/functions/cli');
+const cli = require('../../src/functions/cli');
 
 let config;
 
 describe('config', () => {
   it('should not throw when loading config', () => {
     const loadConfig = () => {
-      config = require('../src/modules/config');
+      config = require('../../src/modules/config');
     };
 
     expect(loadConfig).to.not.throw();
@@ -37,6 +37,7 @@ describe('config', () => {
         noConfirm: false,
         showHttp: false,
         logLevel: 'info',
+        defaultPerPage: 30,
       },
       regions: {
         us: 'https://api.evrythng.com',

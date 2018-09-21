@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const { ctx, createProject, createApplication } = require('../modules/util');
+const { ctx, createProject, createApplication } = require('../util');
 const cli = require('../../src/functions/cli');
 const switches = require('../../src/modules/switches');
 
@@ -28,7 +28,7 @@ describe('app-users', () => {
   it('should return 201 for \'app-users create $payload\'', async () => {
     const payload = JSON.stringify(APP_USER);
     const res = await cli(`app-users create ${payload} --api-key ${ctx.application.appApiKey}`);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -41,7 +41,7 @@ describe('app-users', () => {
     const payload = JSON.stringify({ activationCode: ctx.activationCode });
     const argStr = `app-users ${ctx.evrythngUser} validate ${payload} --api-key ${ctx.application.appApiKey}`;
     const res = await cli(argStr);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -51,7 +51,7 @@ describe('app-users', () => {
 
   it('should return 201 for \'app-users anonymous create\'', async () => {
     const res = await cli(`app-users anonymous create --api-key ${ctx.application.appApiKey}`);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');
@@ -85,7 +85,7 @@ describe('app-users', () => {
       password: APP_USER.password,
     });
     const res = await cli(`app-users login ${payload} --api-key ${ctx.application.appApiKey}`);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('object');
@@ -93,7 +93,7 @@ describe('app-users', () => {
 
   it('should return 201 for \'app-users logout\'', async () => {
     const res = await cli(`app-users logout --api-key ${ctx.evrythngApiKey}`);
-    switches.unset(switches.API_KEY);
+    switches.API_KEY = false;
 
     expect(res.status).to.equal(201);
     expect(res.data).to.be.an('object');

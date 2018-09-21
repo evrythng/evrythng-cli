@@ -5,15 +5,21 @@
 
 const config = require('./config');
 
-const { logLevel } = config.get('options');
-
 const MAP = {
   info: 1,
   error: 0,
 };
 
-const log = (level, msg = '') => {
+const log = (level, msg = '', update = false) => {
+  const { logLevel } = config.get('options');
   if (MAP[logLevel] < MAP[level]) {
+    return;
+  }
+
+  if (update) {
+    process.stdout.clearLine();
+    process.stdout.cursorTo(0);
+    process.stdout.write(msg);
     return;
   }
 
@@ -21,6 +27,6 @@ const log = (level, msg = '') => {
 };
 
 module.exports = {
-  info: msg => log('info', msg),
+  info: (msg, update) => log('info', msg, update),
   error: msg => log('error', msg),
 };

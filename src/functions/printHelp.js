@@ -64,18 +64,24 @@ module.exports = () => {
   logger.info(indent('https://developers.evrythng.com/docs/evrythng-cli', 4));
 
   logger.info('\nAvailable Commands:\n');
-  logger.info(indent('Specify a command name below to see syntax for all its operations.\n', 2));
-  formatList(COMMAND_LIST, 'firstArg', 'about');
+  logger.info(indent('Specify a command name below to see syntax for all its operations.\n', 4));
+  formatList(COMMAND_LIST.filter(item => !item.fromPlugin), 'firstArg', 'about');
+
+  const thirdPartyCommands = COMMAND_LIST.filter(item => item.fromPlugin);
+  if (thirdPartyCommands.length) {
+    logger.info('\nAvailable Plugin Commands:\n');
+    formatList(thirdPartyCommands, 'firstArg', 'about');
+  }
 
   logger.info('\nAvailable Switches:\n');
   const switchList = SWITCH_LIST.map((item) => {
-    item.name = `${item.name}${item.hasValue ? ' <value>' : ''}`;
+    item.name = `${item.name}${item.valueLabel ? ` ${item.valueLabel}` : ''}`;
     return item;
   });
   formatList(switchList, 'name', 'about');
 
   logger.info('\nAvailable Options:\n');
-  logger.info(indent('Use \'option list\' to see option states.\n', 2));
+  logger.info(indent('Use \'option list\' to see option states.\n', 4));
   formatList(OPTION_LIST, 'name', 'about');
 
   logger.info('\nUsage Examples:\n');

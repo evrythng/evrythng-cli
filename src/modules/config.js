@@ -6,8 +6,6 @@
 const { validate } = require('jsonschema');
 const fs = require('fs');
 
-const PATH = `${require('os').homedir()}/.evrythng-cli-config`;
-
 const DEFAULT_CONFIG = {
   using: '',
   operators: {},
@@ -50,7 +48,7 @@ const CONFIG_SCHEMA = {
     options: {
       type: 'object',
       additionalProperties: false,
-      required: ['errorDetail', 'noConfirm', 'showHttp', 'logLevel'],
+      required: ['errorDetail', 'noConfirm', 'showHttp', 'logLevel', 'defaultPerPage'],
       properties: {
         errorDetail: { type: 'boolean' },
         noConfirm: { type: 'boolean' },
@@ -59,24 +57,40 @@ const CONFIG_SCHEMA = {
           type: 'string',
           enum: ['info', 'error'],
         },
+        defaultPerPage: {
+          type: 'integer',
+          minimum: 1,
+          maximum: 100,
+        },
       },
     },
     regions: { type: 'object' },
   },
 };
 
+const DEFAULT_DEFAULT_PER_PAGE = 30;
+
+const PATH = `${require('os').homedir()}/.evrythng-cli-config`;
+
 let data;
 
 const validateConfig = (input) => {
-  let results = validate(input, CONFIG_SCHEMA);
+  const results = validate(input, CONFIG_SCHEMA);
   if (results.errors && results.errors.length) {
-    results = results.errors.map(item => item.stack);
-
-    throw new Error(`\nConfiguration is invalid:\n- ${results.join('\n- ')}`);
+    throw new Error(`\nConfiguration is invalid:\n- ${results.errors.map(item => item.stack).join('\n- ')}`);
   }
 };
 
 const write = () => fs.writeFileSync(PATH, JSON.stringify(data, null, 2), 'utf8');
+
+const migrateConfig = (input) => {
+  // v1.1.0 - new defaultPerPage option
+  if (!input.options.defaultPerPage) {
+    input.options.defaultPerPage = DEFAULT_DEFAULT_PER_PAGE;
+  }
+
+  write();
+};
 
 const load = () => {
   if (!fs.existsSync(PATH)) {
@@ -86,6 +100,7 @@ const load = () => {
   }
 
   data = JSON.parse(fs.readFileSync(PATH, 'utf8'));
+  migrateConfig(data);
   validateConfig(data);
 };
 
