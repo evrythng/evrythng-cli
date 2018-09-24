@@ -128,7 +128,7 @@ const getKey = () => {
 
   const operator = config.get('using');
   if (!operator) {
-    throw new Error('No Operator has been selected yet. Use \'operator add\' to add one.');
+    throw new Error('No Operator has been selected yet. Use \'operators add\' to add one.');
   }
 
   return override || resolveKey(operator);
