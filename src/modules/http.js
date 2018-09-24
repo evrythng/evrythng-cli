@@ -30,7 +30,6 @@ const STATUS_LABELS = {
   504: 'Gateway Timeout',
 };
 
-const authorization = operator.getKey();
 const fullResponse = true;
 
 const buildQueryParams = (method) => {
@@ -94,7 +93,11 @@ const extractUrlFromLink = (link) => {
 const goToPage = async (res, endPage) => {
   for (let page = 0; page <= endPage; page += 1) {
     const url = extractUrlFromLink(res.headers.link)
-    res = await evrythng.api({ authorization, fullResponse, url });
+    res = await evrythng.api({
+      authorization: operator.getKey(),
+      fullResponse,
+      url,
+    });
     if (page === endPage - 1) {
       return res;
     }
@@ -113,7 +116,11 @@ const getMorePages = async (res, max) => {
 
   for (let page = 1; page < max; page += 1) {
     const url = extractUrlFromLink(res.headers.link);
-    res = await evrythng.api({ authorization, fullResponse, url });
+    res = await evrythng.api({
+      authorization: operator.getKey(),
+      fullResponse,
+      url,
+    });
     items.push(...res.data);
     logger.info(`Reading - ${items.length} items`, true);
     if (!res.headers.link) {
