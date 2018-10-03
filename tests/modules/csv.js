@@ -28,7 +28,7 @@ describe('csv', () => {
       name: 'Thng3',
     }];
     
-    const writeCsvFile = () => csv.toFile(data, CSV_PATH);
+    const writeCsvFile = () => csv.write(data, CSV_PATH);
     expect(writeCsvFile).to.not.throw();
 
     const rows = fs.readFileSync(CSV_PATH, 'utf8').toString().split('\n');

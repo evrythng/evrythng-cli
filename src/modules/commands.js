@@ -31,8 +31,8 @@ const COMMAND_LIST = [
 const showSyntax = (command) => {
   const { firstArg, operations } = command;
   const specs = Object.keys(operations).map((item) => {
-    const { pattern, buildable } = operations[item];
-    return `evrythng ${firstArg} ${pattern} ${buildable ? '(or --build)' : ''}`;
+    const { pattern, buildable, importable } = operations[item];
+    return `evrythng ${firstArg} ${pattern} ${buildable ? '(or --build)' : ''} ${importable ? '(or --from-csv)' : ''}`;
   });
 
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
@@ -44,7 +44,8 @@ const matchArg = (arg = '', spec) => {
     $id: val => val.length === 24,
     // Value must be JSON
     $payload: (val) => {
-      if (switches.BUILD) {
+      // Some switches work instead of a payload
+      if (switches.BUILD || switches.FROM_CSV) {
         return true;
       }
 

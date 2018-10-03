@@ -3,7 +3,12 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const evrythng = require('evrythng-extended');
 const fs = require('fs');
+const logger = require('./logger');
+const operator = require('../commands/operator');
+const switches = require('./switches');
+const util = require('./util');
 
 // Keys that are expanded to individual columns, or do not make sense for CSV file.
 const IGNORE = [
@@ -15,6 +20,25 @@ const IGNORE = [
   'customFields',
   'identifiers',
 ];
+
+// Keys that are read-only
+const READ_ONLY = [
+  'id',
+  'createdAt',
+  'updatedAt',
+  'activatedAt',
+  'batch',
+  'createdByTask',
+  'fn',
+  'scopes',
+  'properties',
+];
+
+// Keys that are not currently supported
+const UNSUPPORTED = [
+  'photos',
+];
+
 
 // Get de-deuplicated list of object keys, with optional prefix
 const getAllKeys = (arr, prefix) => {
@@ -69,4 +93,110 @@ const createCsvData = (arr) => {
   return [columnHeaders, ...rows];
 };
 
-exports.toFile = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');
+/**
+ * Write some array of EVRYTHNG objects to a CSV file.
+ * @param {Object[]} arr - Array of objects to write to file.
+ * @param {String} path - Path of the file to write.
+ */
+const write = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');
+
+/**
+ * Create a single resource from a data object.
+ * @async
+ * @param {Object} scope - evrythng.js Operator scope.
+ * @param {Object} resource - The object to create as a resource.
+ * @param {String} type - The resource type, as evrythng.js Operator member name.
+ */
+const createResource = async (scope, resource, type) => {
+  try {
+    const params = {};
+    const projectId = switches.PROJECT;
+    if (projectId) {
+      params.project = projectId;
+    }
+
+    const res = await scope[type]().create(resource, { params });
+    logger.info(`Created ${type} ${res.id}`);
+  } catch (e) {
+    logger.error(`Failed to create ${JSON.stringify(resource)} as a ${type}!`);
+    logger.error(e.message || e.errors(0));
+  }
+};
+
+/**
+ * Convert a CSV row to an EVRYTHNG resource, using the CSV headers
+ * @param {String} row - The row to convert.
+ * @param {String[]} headers - The CSV headers.
+ */
+const rowToObject = (row, headers) => {
+  const cells = row.split(',');
+  return headers.reduce((res, key, i) => {
+    // Skip read-only keys, or empty cells
+    if (READ_ONLY.includes(key) || !cells[i]) {
+      return res;
+    }
+
+    if (UNSUPPORTED.includes(key)) {
+      logger.info(`Skipping unsupported key: ${key}`);
+      return res;
+    }
+
+    // Decode CSV comma escaping
+    const value = cells[i].split('"').join('');
+
+    // Custom fields
+    if (key.includes('customFields')) {
+      if (!res.customFields) {
+        res.customFields = {};
+      }
+
+      key = key.split('.')[1];
+      res.customFields[key] = value;
+      return res;
+    }
+
+    // Identifiers
+    if (key.includes('identifiers')) {
+      if (!res.identifiers) {
+        res.identifiers = {};
+      }
+
+      key = key.split('.')[1];
+      res.identifiers[key] = value;
+      return res;
+    }
+
+    // Simple value
+    res[key] = value;
+    return res;
+  }, {});
+};
+
+/**
+ * Read a CSV file and upload the contents to the account.
+ * @async
+ * @param {String} type - Type of EVRYTHNG resource the items in the file should be treated as.
+ * @returns {Promise} A Promise that resolves when all items have been created.
+ */
+const read = async (type) => {
+  const path = switches.FROM_CSV;
+  if (!fs.existsSync(path)) {
+    throw new Error('File was not found!');
+  }
+
+  // Get headers
+  const rows = fs.readFileSync(path, 'utf8').toString().split('\n');
+  const headers = rows[0].split(',').filter(item => item.length);
+  
+  const scope = new evrythng.Operator(operator.getKey());
+  const resourceRows = rows.slice(1);
+  await util.nextTask(resourceRows.map((item) => () => {
+    const resource = rowToObject(item, headers);
+    return createResource(scope, resource, type);
+  }));
+};
+
+module.exports = {
+  write,
+  read,
+};

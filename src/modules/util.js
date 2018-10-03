@@ -80,6 +80,20 @@ const validate = (instance, schema) => {
   return errors.map(item => item.stack);
 };
 
+/**
+ * Sequentially run a series of functions that return Promises.
+ * @async
+ * @param {Function[]} items - Array of functions that return Promises.
+ * @return {Promise} A Promise that resolves when all items have been processed.
+ */
+const nextTask = async (items) => {
+  if (!items.length) {
+    return;
+  }
+
+  return items.splice(0, 1)[0]().then(() => nextTask(items));
+};
+
 module.exports = {
   isId,
   pretty,
@@ -88,4 +102,5 @@ module.exports = {
   printSimple,
   requireKey,
   validate,
+  nextTask,
 };

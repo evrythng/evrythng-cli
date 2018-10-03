@@ -187,13 +187,13 @@ const printResponse = async (res) => {
   // Get just one field
   const field = switches.FIELD;
   if (field) {
-    logger.info(data[field]);
+    logger.info(JSON.stringify(data[field], null, 2));
     return data[field];
   }
 
   // Print to file?
   if (csvFileName) {
-    csv.toFile(Array.isArray(data) ? data : [data], csvFileName);
+    csv.write(Array.isArray(data) ? data : [data], csvFileName);
     return res;
   }
 

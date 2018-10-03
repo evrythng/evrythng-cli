@@ -67,6 +67,11 @@ const SWITCH_LIST = [{
   about: 'Read up to 30 pages before returning results (only with --to-csv).',
   constant: 'TO_PAGE',
   valueLabel: '<page>',
+}, {
+  name: '--from-csv',
+  about: 'Load resources from a CSV file that was previously exported with --to-csv.',
+  constant: 'FROM_CSV',
+  valueLabel: '<input file>',
 }];
 
 const apply = (args) => {
