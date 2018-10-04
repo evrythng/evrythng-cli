@@ -35,12 +35,12 @@ const READ_ONLY = [
   'createdByTask',
   'fn',
   'scopes',
-  'properties',
 ];
 
-/* Keys that are not currently supported */
-const UNSUPPORTED = [
+/* Keys that are array type */
+const CONVERTED_ARRAYS = [
   'photos',
+  'tags',
 ];
 
 /* Use a character other than ','' to encode lists */
@@ -105,8 +105,8 @@ const addCells = (obj = {}, objKeys) => objKeys.reduce((res, item) => {
     return res;
   }
 
-  // Handle 'tags'
-  if (key === 'tags' && value.length) {
+  // Handle Array types
+  if (CONVERTED_ARRAYS.includes(key) && value.length) {
     value = value.join(LIST_SEPARATOR);
   }
 
@@ -189,11 +189,6 @@ const rowToObject = (row, headers) => {
       return res;
     }
 
-    if (UNSUPPORTED.includes(key)) {
-      logger.info(`Skipping unsupported key: ${key}`);
-      return res;
-    }
-
     // Decode CSV comma escaping
     let value = cells[i].split('"').join('');
     if (value === '[object Object]') {
@@ -201,10 +196,9 @@ const rowToObject = (row, headers) => {
     }
 
     // Tags
-    //  TODO need to handle escaping quotes AND commas...
-    if (key === 'tags') {
-      value = value.split(LIST_SEPARATOR);
+    if (CONVERTED_ARRAYS.includes(key)) {
       if (value.length) {
+        value = value.split(LIST_SEPARATOR);
         res[key] = value;
       }
       return res;
