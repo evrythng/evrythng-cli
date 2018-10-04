@@ -3,7 +3,9 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const csv = require('../modules/csv');
 const http = require('../modules/http');
+const switches = require('../modules/switches');
 const util = require('../modules/util');
 
 module.exports = {
@@ -12,11 +14,16 @@ module.exports = {
   operations: {
     createActionType: {
       execute: async ([, json]) => {
+        if (switches.FROM_CSV) {
+          return csv.read('actionType');
+        }
+
         const payload = await util.getPayload('ActionTypeDocument', json);
         return http.post('/actions', payload);
       },
       pattern: 'create $payload',
       buildable: true,
+      importable: true,
     },
     listActionType: {
       execute: async () => http.get('/actions'),

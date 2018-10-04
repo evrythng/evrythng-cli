@@ -3,7 +3,9 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const csv = require('../modules/csv');
 const http = require('../modules/http');
+const switches = require('../modules/switches');
 const util = require('../modules/util');
 
 module.exports = {
@@ -13,11 +15,16 @@ module.exports = {
     // CRUD
     createCollection: {
       execute: async ([, json]) => {
+        if (switches.FROM_CSV) {
+          return csv.read('collection');
+        }
+
         const payload = await util.getPayload('CollectionDocument', json);
         return http.post('/collections', payload);
       },
       pattern: 'create $payload',
       buildable: true,
+      importable: true,
     },
     readCollection: {
       execute: async ([id]) => http.get(`/collections/${id}`),

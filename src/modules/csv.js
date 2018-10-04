@@ -10,17 +10,22 @@ const operator = require('../commands/operator');
 const switches = require('./switches');
 const util = require('./util');
 
-// Keys that are expanded to individual columns, or do not make sense for CSV file.
+/* Keys that are expanded to individual columns, or do not make sense for CSV file. */
 const IGNORE = [
+  // Do not make sense
   'resource',
-  'properties',
   'collections',
+
+  // Not supported
   'location',
+
+  // Expanded
+  'properties',
   'customFields',
   'identifiers',
 ];
 
-// Keys that are read-only
+/* Keys that are read-only */
 const READ_ONLY = [
   'id',
   'createdAt',
@@ -33,43 +38,59 @@ const READ_ONLY = [
   'properties',
 ];
 
-// Keys that are not currently supported
+/* Keys that are not currently supported */
 const UNSUPPORTED = [
   'photos',
 ];
 
-/**
- * Use a character other than ','' to encode lists
- */
+/* Use a character other than ','' to encode lists */
 const LIST_SEPARATOR = '|';
 
-// Get de-deuplicated list of object keys, with optional prefix
+/** Get de-deuplicated list of object keys of a specific type (denoted by prefix)
+ * @param {Object[]} arr - Array of objects to search for keys.
+ * @param {String} prefix - Optional prefix when searching a sub-object.
+ * @returns {String[]} - Array of keys found in the objects.
+ */
 const getAllKeys = (arr, prefix) => {
-  const result = [];
-  arr.forEach((arrItem) => {
-    Object.keys(arrItem)
-      .filter(itemKey => !result.includes(itemKey))
-      .filter(itemKey => !IGNORE.includes(itemKey))
-      .forEach(newItem => result.push(newItem));
-  });
-
   const buildKey = item => prefix ? `${prefix}.${item}` : item;
-  return result.map(buildKey);
+  
+  return arr.reduce((res, arrItem) => {
+    Object.keys(arrItem)
+      .filter(itemKey => !res.includes(itemKey))
+      .filter(itemKey => !IGNORE.includes(itemKey))
+      .forEach(newItem => res.push(newItem));
+    return res;
+  }, []).map(buildKey);
 };
 
-// Object, 'customFields', and 'identifiers' are supported
+/**
+ * Get all applicable column headers for all objects.
+ * Object, 'customFields', 'identifiers', and 'properties' are supported as types.
+ * @param {Object[]} arr - Array of objects to search for keys.
+ * @returns {Object} Object containing a list of each kind of keys
+ */
 const getColumnHeaders = (arr) => {
   const objKeys = getAllKeys(arr);
   const cfKeys = getAllKeys(arr.map(item => item.customFields || {}), 'customFields');
   const idKeys = getAllKeys(arr.map(item => item.identifiers || {}), 'identifiers');
+  const propKeys = getAllKeys(arr.map(item => item.properties || {}), 'properties');
 
-  return { objKeys, cfKeys, idKeys };
+  return { objKeys, cfKeys, idKeys, propKeys };
 };
 
-// Escape , with ", and " with ""
+/**
+ * Escape , with ", and " with ""
+ * @param {any} val - The value to escape.
+ * @returns {String} - Escaped string of the value.
+ */
 const esc = val => `"${String(val).split('"').join('""')}"`;
 
-// Add cells to row with value of each applicable key, else add empty cell (,)
+/**
+ * Create row of cell values for each applicable key, else add empty cell (,).
+ * @param {Object} obj - The object to convert to a row.
+ * @param {String[]} objKeys - Array of object keys to use.
+ * @returns {String[]} Array of cell values for this row.
+ */
 const addCells = (obj = {}, objKeys) => objKeys.reduce((res, item) => {
   // Handle any prefix
   const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
@@ -93,16 +114,22 @@ const addCells = (obj = {}, objKeys) => objKeys.reduce((res, item) => {
   return res;
 }, []);
 
+/**
+ * Create CSV data from input object array.
+ * @param {Object[]} arr - Array of input objects to convert.
+ * @returns {String[]} Array of CSV rows as strings.
+ */
 const createCsvData = (arr) => {
-  const { objKeys, cfKeys, idKeys } = getColumnHeaders(arr);
-  const columnHeaders = [...objKeys, ...cfKeys, ...idKeys, ''].join(',');
+  const { objKeys, cfKeys, idKeys, propKeys } = getColumnHeaders(arr);
+  const columnHeaders = [...objKeys, ...cfKeys, ...idKeys, ...propKeys, ''].join(',');
 
   const rows = arr.map((item) => {
-    const { customFields, identifiers } = item;
+    const { customFields, identifiers, properties } = item;
     return [
       addCells(item, objKeys),
       addCells(customFields, cfKeys),
-      addCells(identifiers, idKeys)
+      addCells(identifiers, idKeys),
+      addCells(properties, propKeys),
     ].join(',');
   });
   return [columnHeaders, ...rows];
@@ -138,10 +165,21 @@ const createResource = async (scope, resource, type) => {
   }
 };
 
+const addKeyToObject = (obj, objKey, key, value) => {
+  if (!obj[objKey]) {
+    obj[objKey] = {};
+  }
+
+  key = key.split('.')[1];
+  obj[objKey][key] = value;
+  return obj;
+};
+
 /**
  * Convert a CSV row to an EVRYTHNG resource, using the CSV headers
  * @param {String} row - The row to convert.
  * @param {String[]} headers - The CSV headers.
+ * @returns {Object} - An object representation of this CSV row.
  */
 const rowToObject = (row, headers) => {
   const cells = row.split(',');
@@ -165,30 +203,21 @@ const rowToObject = (row, headers) => {
     // Tags
     //  TODO need to handle escaping quotes AND commas...
     if (key === 'tags') {
-      res[key] = value.split(LIST_SEPARATOR);
+      value = value.split(LIST_SEPARATOR);
+      if (value.length) {
+        res[key] = value;
+      }
       return res;
     }
 
-    // Custom fields
     if (key.includes('customFields')) {
-      if (!res.customFields) {
-        res.customFields = {};
-      }
-
-      key = key.split('.')[1];
-      res.customFields[key] = value;
-      return res;
+      return addKeyToObject(res, 'customFields', key, value);
     }
-
-    // Identifiers
     if (key.includes('identifiers')) {
-      if (!res.identifiers) {
-        res.identifiers = {};
-      }
-
-      key = key.split('.')[1];
-      res.identifiers[key] = value;
-      return res;
+      return addKeyToObject(res, 'identifiers', key, value);
+    }
+    if (key.includes('properties')) {
+      return addKeyToObject(res, 'properties', key, value);
     }
 
     // Simple value
