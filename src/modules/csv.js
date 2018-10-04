@@ -14,7 +14,6 @@ const util = require('./util');
 const IGNORE = [
   'resource',
   'properties',
-  'tags',
   'collections',
   'location',
   'customFields',
@@ -39,6 +38,10 @@ const UNSUPPORTED = [
   'photos',
 ];
 
+/**
+ * Use a character other than ','' to encode lists
+ */
+const LIST_SEPARATOR = '|';
 
 // Get de-deuplicated list of object keys, with optional prefix
 const getAllKeys = (arr, prefix) => {
@@ -67,16 +70,28 @@ const getColumnHeaders = (arr) => {
 const esc = val => `"${String(val).split('"').join('""')}"`;
 
 // Add cells to row with value of each applicable key, else add empty cell (,)
-const addCells = (obj = {}, objKeys) => {
-  const result = [];
-  objKeys.forEach((item) => {
-    // Handle any  prefix
-    const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
-    result.push(obj[key] ? esc(obj[key]) : '');
-  });
+const addCells = (obj = {}, objKeys) => objKeys.reduce((res, item) => {
+  // Handle any prefix
+  const key = item.includes('.') ? item.substring(item.indexOf('.') + 1) : item;
+  let value = obj[key];
+  if (value === '[object Object]') {
+    logger.info(`Warning: Object exporting not supported (key: ${item})`);
+  }
 
-  return result;
-};
+  // Empty cell
+  if (!value) {
+    res.push('');
+    return res;
+  }
+
+  // Handle 'tags'
+  if (key === 'tags' && value.length) {
+    value = value.join(LIST_SEPARATOR);
+  }
+
+  res.push(esc(value));
+  return res;
+}, []);
 
 const createCsvData = (arr) => {
   const { objKeys, cfKeys, idKeys } = getColumnHeaders(arr);
@@ -119,7 +134,7 @@ const createResource = async (scope, resource, type) => {
     logger.info(`Created ${type} ${res.id}`);
   } catch (e) {
     logger.error(`Failed to create ${JSON.stringify(resource)} as a ${type}!`);
-    logger.error(e.message || e.errors(0));
+    logger.error(e.message || e.errors[0]);
   }
 };
 
@@ -142,7 +157,17 @@ const rowToObject = (row, headers) => {
     }
 
     // Decode CSV comma escaping
-    const value = cells[i].split('"').join('');
+    let value = cells[i].split('"').join('');
+    if (value === '[object Object]') {
+      logger.info(`Warning: Object importing not supported (key: ${key})`);
+    }
+
+    // Tags
+    //  TODO need to handle escaping quotes AND commas...
+    if (key === 'tags') {
+      res[key] = value.split(LIST_SEPARATOR);
+      return res;
+    }
 
     // Custom fields
     if (key.includes('customFields')) {
