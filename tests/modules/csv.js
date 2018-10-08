@@ -27,13 +27,12 @@ const TEST_OBJECTS = [{
   id: 'UK3x87gBpwAAXtawamsKRtmr',
   name: 'Thng3',
 }];
-const TEST_ROWS = [ 
+const TEST_ROWS = [
   'id,name,tags,product,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
   '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","bar",,"8742278493",,"red"',
   '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,"123",,"4837289",',
   '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,,,,',
 ];
-const TEST_HEADERS = TEST_ROWS[0];
 
 describe('csv', () => {
   after(async () => {
@@ -52,11 +51,10 @@ describe('csv', () => {
 
   it('should have written the correct content to file', () => {
     const rows = fs.readFileSync(CSV_PATH, 'utf8').toString().split('\n');
-    expect(rows).to.have.length(4);
-    expect(rows[0]).to.equal(TEST_HEADERS);
-    expect(rows[1]).to.equal(TEST_ROWS[1]);
-    expect(rows[2]).to.equal(TEST_ROWS[2]);
-    expect(rows[3]).to.equal(TEST_ROWS[3]);
+    expect(rows).to.have.length(TEST_ROWS.length);
+    rows.forEach((item, i) => {
+      expect(rows[i]).to.equal(TEST_ROWS[i]);
+    });
   });
 
   it('should add a key to an object property', () => {
@@ -81,8 +79,8 @@ describe('csv', () => {
   });
 
   it('should convert a row into an object', () => {
-    const object = csv.rowToObject(TEST_ROWS[1], TEST_HEADERS.split(','));
-    const result = { 
+    const object = csv.rowToObject(TEST_ROWS[1], TEST_ROWS[0].split(','));
+    const result = {
       name: 'Thng1',
       tags: [ 'some', 'tags' ],
       customFields: { foo: 'bar' },
