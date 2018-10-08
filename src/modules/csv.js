@@ -12,11 +12,10 @@ const util = require('./util');
 
 /* Keys that are expanded to individual columns, or do not make sense for CSV file. */
 const IGNORE = [
-  // Do not make sense
+  // SDK property
   'resource',
-  'collections',
 
-  // Not supported
+  // Object not currently supported
   'location',
 
   // Expanded
@@ -41,6 +40,7 @@ const READ_ONLY = [
 const CONVERTED_ARRAYS = [
   'photos',
   'tags',
+  'collections',
 ];
 
 /* Use a character other than ','' to encode lists */

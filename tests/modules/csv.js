@@ -18,6 +18,10 @@ const TEST_OBJECTS = [{
   product: 'UKGwQrgHq3shEqRaw2KyTt2n',
   identifiers: { dm: '8742278493' },
   properties: { color: 'red' },
+  collections: [
+    'UH4nVsWVMG8EEqRawkMnybMh',
+    'UHHHeHc5MGsYhqRawF6Hybgg',
+  ],
 }, {
   id: 'UpmSnYxUDDbasCwwRkRNQehq',
   name: 'Thng2',
@@ -28,10 +32,10 @@ const TEST_OBJECTS = [{
   name: 'Thng3',
 }];
 const TEST_ROWS = [
-  'id,name,tags,product,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
-  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","bar",,"8742278493",,"red"',
-  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,"123",,"4837289",',
-  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,,,,',
+  'id,name,tags,product,collections,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
+  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg","bar",,"8742278493",,"red"',
+  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,,"123",,"4837289",',
+  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,,,,,',
 ];
 
 describe('csv', () => {
@@ -87,6 +91,10 @@ describe('csv', () => {
       product: 'UKGwQrgHq3shEqRaw2KyTt2n',
       properties: { color: 'red' },
       identifiers: { dm: '8742278493' },
+      collections: [
+        'UH4nVsWVMG8EEqRawkMnybMh',
+        'UHHHeHc5MGsYhqRawF6Hybgg',
+      ],
     };
 
     expect(_.isEqual(object, result)).to.equal(true);
