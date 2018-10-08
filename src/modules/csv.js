@@ -121,7 +121,7 @@ const addCells = (obj = {}, objKeys) => objKeys.reduce((res, item) => {
  */
 const createCsvData = (arr) => {
   const { objKeys, cfKeys, idKeys, propKeys } = getColumnHeaders(arr);
-  const columnHeaders = [...objKeys, ...cfKeys, ...idKeys, ...propKeys, ''].join(',');
+  const columnHeaders = [...objKeys, ...cfKeys, ...idKeys, ...propKeys].join(',');
 
   const rows = arr.map((item) => {
     const { customFields, identifiers, properties } = item;
@@ -165,7 +165,7 @@ const createResource = async (scope, resource, type) => {
   }
 };
 
-const addKeyToObject = (obj, objKey, key, value) => {
+const addPrefixKeyToObject = (obj, objKey, key, value) => {
   if (!obj[objKey]) {
     obj[objKey] = {};
   }
@@ -205,13 +205,13 @@ const rowToObject = (row, headers) => {
     }
 
     if (key.includes('customFields')) {
-      return addKeyToObject(res, 'customFields', key, value);
+      return addPrefixKeyToObject(res, 'customFields', key, value);
     }
     if (key.includes('identifiers')) {
-      return addKeyToObject(res, 'identifiers', key, value);
+      return addPrefixKeyToObject(res, 'identifiers', key, value);
     }
     if (key.includes('properties')) {
-      return addKeyToObject(res, 'properties', key, value);
+      return addPrefixKeyToObject(res, 'properties', key, value);
     }
 
     // Simple value
@@ -247,4 +247,8 @@ const read = async (type) => {
 module.exports = {
   write,
   read,
+  rowToObject,
+  addPrefixKeyToObject,
+  createCsvData,
+  READ_ONLY,
 };
