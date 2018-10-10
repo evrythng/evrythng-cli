@@ -22,6 +22,10 @@ const TEST_OBJECTS = [{
     'UH4nVsWVMG8EEqRawkMnybMh',
     'UHHHeHc5MGsYhqRawF6Hybgg',
   ],
+  position: {
+    type: 'Point',
+    coordinates: [ -0.119123, 51.519435 ],
+  },
 }, {
   id: 'UpmSnYxUDDbasCwwRkRNQehq',
   name: 'Thng2',
@@ -32,10 +36,10 @@ const TEST_OBJECTS = [{
   name: 'Thng3',
 }];
 const TEST_ROWS = [
-  'id,name,tags,product,collections,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
-  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg","bar",,"8742278493",,"red"',
-  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,,"123",,"4837289",',
-  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,,,,,',
+  'id,name,tags,product,collections,position,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
+  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg","-0.119123|51.519435","bar",,"8742278493",,"red"',
+  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,,,"123",,"4837289"',
+  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,',
 ];
 
 describe('csv', () => {
@@ -84,7 +88,7 @@ describe('csv', () => {
 
   it('should convert a row into an object', () => {
     const object = csv.rowToObject(TEST_ROWS[1], TEST_ROWS[0].split(','));
-    const result = {
+    const expected = {
       name: 'Thng1',
       tags: [ 'some', 'tags' ],
       customFields: { foo: 'bar' },
@@ -95,8 +99,11 @@ describe('csv', () => {
         'UH4nVsWVMG8EEqRawkMnybMh',
         'UHHHeHc5MGsYhqRawF6Hybgg',
       ],
+      position: {
+        type: 'Point',
+        coordinates: [ -0.119123, 51.519435 ],
+      },
     };
-
-    expect(_.isEqual(object, result)).to.equal(true);
+    expect(_.isEqual(object, expected)).to.equal(true);
   });
 });
