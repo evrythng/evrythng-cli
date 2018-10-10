@@ -52,7 +52,13 @@ const showKey = ([name]) => {
   return key;
 };
 
-const addOperator = ([, name, region, apiKey]) => {
+/**
+ * Add an operator record to the configuration, if it is valid.
+ *
+ * @async
+ * @param {String[]} args - The command arguments provided.
+ */ 
+const addOperator = async ([, name, region, apiKey]) => {
   if (!REGIONS[region]) {
     throw new Error(`$region must be one of ${Object.keys(REGIONS).join(', ')}`);
   }
@@ -61,6 +67,17 @@ const addOperator = ([, name, region, apiKey]) => {
   }
   if (apiKey.length !== 80) {
     throw new Error('API key is an invalid length');
+  }
+
+  // Check the key is valid
+  try {
+    evrythng.setup({ apiUrl: REGIONS[region] });
+    const access = await evrythng.api({ url: '/access', authorization: apiKey });
+    if (access.actor.type !== 'operator') {
+      throw new Error('Actor was not operator');
+    }
+  } catch (e) {
+    throw new Error('Failed to add operator - check apiKey and region are correct and compatible.');
   }
 
   const operators = config.get('operators');
