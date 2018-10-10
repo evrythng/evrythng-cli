@@ -77,7 +77,7 @@ const addOperator = async ([, name, region, apiKey]) => {
       throw new Error('Actor was not operator');
     }
   } catch (e) {
-    throw new Error('Failed to add operator - check apiKey and region are correct and compatible.');
+    throw new Error('Failed to add operator - check $apiKey and $region are correct and compatible.');
   }
 
   const operators = config.get('operators');
