@@ -116,4 +116,17 @@ describe('csv', () => {
     };
     expect(_.isEqual(object, expected)).to.equal(true);
   });
+
+  it('should encode a simple JSON object', () => {
+    const obj = { foo: 'bar', 'baz': 'thng' };
+    const expected = '{foo:bar|baz:thng}';
+    expect(csv.encodeObject(obj)).to.equal(expected);    
+  });
+
+  it('should decode a simple JSON object encoded string', () => {
+    const objStr = '{foo:bar|baz:thng}';
+    const expected = { foo: 'bar', 'baz': 'thng' };
+    const result = csv.decodeObject(objStr);
+    expect(_.isEqual(result, expected)).to.equal(true);    
+  });
 });

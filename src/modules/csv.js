@@ -324,5 +324,7 @@ module.exports = {
   rowToObject,
   addPrefixKeyToObject,
   createCsvData,
+  encodeObject,
+  decodeObject,
   READ_ONLY,
 };
