@@ -53,6 +53,21 @@ const showKey = ([name]) => {
 };
 
 /**
+ * Test an operator's credentials work, else throw.
+ *
+ * @async
+ * @param {String} region - User entered region.
+ * @param {String} apiKey - User entered API key.
+ */
+const validateCredentials = async (region, apiKey) => {
+  evrythng.setup({ apiUrl: REGIONS[region] });
+  const access = await evrythng.api({ url: '/access', authorization: apiKey });
+  if (access.actor.type !== 'operator') {
+    throw new Error('Actor was not operator');
+  }
+};
+
+/**
  * Add an operator record to the configuration, if it is valid.
  *
  * @async
@@ -71,11 +86,7 @@ const addOperator = async ([, name, region, apiKey]) => {
 
   // Check the key is valid
   try {
-    evrythng.setup({ apiUrl: REGIONS[region] });
-    const access = await evrythng.api({ url: '/access', authorization: apiKey });
-    if (access.actor.type !== 'operator') {
-      throw new Error('Actor was not operator');
-    }
+    await module.exports.validateCredentials(region, apiKey);
   } catch (e) {
     throw new Error('Failed to add operator - check $apiKey and $region are correct and compatible.');
   }
@@ -181,4 +192,5 @@ module.exports = {
   checkFirstRun,
   resolveKey,
   getCurrent,
+  validateCredentials,
 };

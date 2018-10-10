@@ -73,13 +73,13 @@ const getAllKeys = (arr, prefix) => {
  * @returns {Object} Object containing a list of each kind of keys
  */
 const getColumnHeaders = (arr) => {
-  const objKeys = getAllKeys(arr);
-  const addressKeys = getAllKeys(arr.map(item => item.address || {}), 'address');
-  const cfKeys = getAllKeys(arr.map(item => item.customFields || {}), 'customFields');
-  const idKeys = getAllKeys(arr.map(item => item.identifiers || {}), 'identifiers');
-  const propKeys = getAllKeys(arr.map(item => item.properties || {}), 'properties');
+  const object = getAllKeys(arr);
+  const address = getAllKeys(arr.map(item => item.address || {}), 'address');
+  const customFields = getAllKeys(arr.map(item => item.customFields || {}), 'customFields');
+  const identifiers = getAllKeys(arr.map(item => item.identifiers || {}), 'identifiers');
+  const properties = getAllKeys(arr.map(item => item.properties || {}), 'properties');
 
-  return { objKeys, addressKeys, cfKeys, idKeys, propKeys };
+  return { object, address, customFields, identifiers, properties };
 };
 
 /**
@@ -125,16 +125,14 @@ const decodeObject = objStr => objStr
 const objectToCells = (obj, objKeys) => {
     // If this object doesn't exist, add an empty cell for every key missing
   if (!obj) {
-    const cells = [];
-    objKeys.forEach(item => cells.push(''));
-    return cells;
+    return objKeys.reduce(res => res.concat(''), []);
   }
 
   // For each key, add the value as a cell to the array
   return objKeys.reduce((res, item) => {
     // Handle any prefix
     const key = item.includes('.') ? item.split('.')[1] : item;
-    let value = obj[key];
+    const value = obj[key];
    
     // Empty cell
     if (!value) {
@@ -157,8 +155,8 @@ const objectToCells = (obj, objKeys) => {
 
     // Other objects not supported
     if (String(value).includes('[object Object]')) {
-      logger.info(`Warning: Object exporting not supported (key: ${item})`);
-      res.push(esc(value));
+      logger.info(`Warning: Object exporting not fully supported (key: ${item})`);
+      res.push(encodeObject(value));
       return res;
     }
 
@@ -174,16 +172,17 @@ const objectToCells = (obj, objKeys) => {
  * @returns {String[]} Array of CSV rows as strings.
  */
 const createCsvData = (arr) => {
-  const { objKeys, addressKeys, cfKeys, idKeys, propKeys } = getColumnHeaders(arr);
-  const columnHeaders = [...objKeys, ...addressKeys, ...cfKeys, ...idKeys, ...propKeys].join(',');
+  const { object, address, customFields, identifiers, properties } = getColumnHeaders(arr);
+  const columnHeaders = [
+    ...object, ...address, ...customFields, ...identifiers, ...properties,
+  ].join(',');
 
   const rows = arr.map((item) => {
-    const { customFields, address, identifiers, properties } = item;
-    return objectToCells(item, objKeys)
-      .concat(objectToCells(address, addressKeys))
-      .concat(objectToCells(customFields, cfKeys))
-      .concat(objectToCells(identifiers, idKeys))
-      .concat(objectToCells(properties, propKeys))
+    return objectToCells(item, object)
+      .concat(objectToCells(item.address, address))
+      .concat(objectToCells(item.customFields, customFields))
+      .concat(objectToCells(item.identifiers, identifiers))
+      .concat(objectToCells(item.properties, properties))
       .join(',');
   });
   return [columnHeaders, ...rows];
@@ -221,7 +220,15 @@ const createResource = async (scope, resource, type) => {
   }
 };
 
-const addPrefixKeyToObject = (obj, objKey, key, value) => {
+/**
+ * Assign a prefixed property to an object property
+ *
+ * @param {Object} obj - The object to modify.
+ * @param {String} objKey - The object property to modify.
+ * @param {String} key - The key of the property to assign.
+ * @oaram {String} value - The value to assign.
+ */
+const assignPrefixProperty = (obj, objKey, key, value) => {
   if (!obj[objKey]) {
     obj[objKey] = {};
   }
@@ -265,16 +272,16 @@ const rowToObject = (row, headers) => {
 
     // Sub-objects
     if (key.includes('address')) {
-      return addPrefixKeyToObject(res, 'address', key, value);
+      return assignPrefixProperty(res, 'address', key, value);
     }
     if (key.includes('customFields')) {
-      return addPrefixKeyToObject(res, 'customFields', key, value);
+      return assignPrefixProperty(res, 'customFields', key, value);
     }
     if (key.includes('identifiers')) {
-      return addPrefixKeyToObject(res, 'identifiers', key, value);
+      return assignPrefixProperty(res, 'identifiers', key, value);
     }
     if (key.includes('properties')) {
-      return addPrefixKeyToObject(res, 'properties', key, value);
+      return assignPrefixProperty(res, 'properties', key, value);
     }
 
     // Position - special case, decode with the separator into fixed object
@@ -322,7 +329,7 @@ module.exports = {
   write,
   read,
   rowToObject,
-  addPrefixKeyToObject,
+  assignPrefixProperty,
   createCsvData,
   encodeObject,
   decodeObject,

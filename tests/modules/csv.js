@@ -76,7 +76,7 @@ describe('csv', () => {
     const testValue = 'testValue';
     const simpleObj = { customFields: {} };
 
-    csv.addPrefixKeyToObject(simpleObj, 'customFields', prefixKey, testValue);
+    csv.assignPrefixProperty(simpleObj, 'customFields', prefixKey, testValue);
     expect(simpleObj.customFields[realKey]).to.equal(testValue);
   });
 
@@ -86,7 +86,7 @@ describe('csv', () => {
     const testValue = 'testValue';
     const simpleObj = {};
 
-    csv.addPrefixKeyToObject(simpleObj, 'customFields', prefixKey, testValue);
+    csv.assignPrefixProperty(simpleObj, 'customFields', prefixKey, testValue);
     expect(simpleObj.customFields).to.be.an('object');
     expect(simpleObj.customFields[realKey]).to.equal(testValue);
   });
