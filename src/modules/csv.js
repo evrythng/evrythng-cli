@@ -179,12 +179,12 @@ const createCsvData = (arr) => {
 
   const rows = arr.map((item) => {
     const { customFields, address, identifiers, properties } = item;
-    let cells = objectToCells(item, objKeys);
-    cells = cells.concat(objectToCells(address, addressKeys));
-    cells = cells.concat(objectToCells(customFields, cfKeys));
-    cells = cells.concat(objectToCells(identifiers, idKeys));
-    cells = cells.concat(objectToCells(properties, propKeys));
-    return cells.join(',');
+    return objectToCells(item, objKeys)
+      .concat(objectToCells(address, addressKeys))
+      .concat(objectToCells(customFields, cfKeys))
+      .concat(objectToCells(identifiers, idKeys))
+      .concat(objectToCells(properties, propKeys))
+      .join(',');
   });
   return [columnHeaders, ...rows];
 };

@@ -26,6 +26,11 @@ const TEST_OBJECTS = [{
     type: 'Point',
     coordinates: [ -0.119123, 51.519435 ],
   },
+  address: {
+    street: 'East Road',
+    city: 'London',
+    countryCode: 'GB',
+  },
 }, {
   id: 'UpmSnYxUDDbasCwwRkRNQehq',
   name: 'Thng2',
@@ -36,10 +41,10 @@ const TEST_OBJECTS = [{
   name: 'Thng3',
 }];
 const TEST_ROWS = [
-  'id,name,tags,product,collections,position,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
-  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg","-0.119123|51.519435","bar",,"8742278493",,"red"',
-  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,,,"123",,"4837289"',
-  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,',
+  'id,name,tags,product,collections,position,address.street,address.city,address.countryCode,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
+  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg","-0.119123|51.519435","East Road","London","GB","bar",,"8742278493",,"red"',
+  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,,,,,,"123",,"4837289",',
+  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,,,,,,,,,',
 ];
 
 describe('csv', () => {
@@ -102,6 +107,11 @@ describe('csv', () => {
       position: {
         type: 'Point',
         coordinates: [ -0.119123, 51.519435 ],
+      },
+      address: {
+        street: 'East Road',
+        city: 'London',
+        countryCode: 'GB',
       },
     };
     expect(_.isEqual(object, expected)).to.equal(true);
