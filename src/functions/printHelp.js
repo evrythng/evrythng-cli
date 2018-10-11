@@ -21,7 +21,7 @@ const EXAMPLES = [{
   about: 'Read a page of Thngs',
 }, {
   command: 'thngs UpUxnWAXeMPNQraRaGmKQdHr read',
-  about: 'Read a known Thng',
+  about: 'Read a single Thng',
 }, {
   command: 'products create \'{"name": "My New Product"}\'',
   about: 'Create a new product',
@@ -31,6 +31,12 @@ const EXAMPLES = [{
 }, {
   command: 'thngs create --build',
   about: 'Interactively create a Thng',
+}, {
+  command: 'products list --per-page 100 --to-csv ./products.csv',
+  about: 'Save products to a CSV file',
+}, {
+  command: 'products create --from-csv ./products.csv --project UnghCKffVg8a9KwRwE5C9qBs',
+  about: 'Create products from a CSV file',
 }];
 
 const printVersion = () => logger.info(`\n${name} v${version}\n${description}`);

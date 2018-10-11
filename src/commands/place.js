@@ -23,6 +23,7 @@ module.exports = {
       },
       pattern: 'create $payload',
       buildable: true,
+      importable: true,
     },
     read: {
       execute: async ([placeId]) => http.get(`/places/${placeId}`),
