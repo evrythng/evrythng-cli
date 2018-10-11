@@ -15,6 +15,7 @@ const COMMAND_LIST = [
   require('../commands/batch'),
   require('../commands/collection'),
   require('../commands/file'),
+  require('../commands/help'),
   require('../commands/operator'),
   require('../commands/option'),
   require('../commands/place'),

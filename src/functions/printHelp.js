@@ -87,7 +87,7 @@ module.exports = () => {
   formatList(switchList, 'name', 'about');
 
   logger.info('\nAvailable Options:\n');
-  logger.info(indent('Use \'option list\' to see option states.\n', 4));
+  logger.info(indent('Use \'options list\' to see current option states.\n', 4));
   formatList(OPTION_LIST, 'name', 'about');
 
   logger.info('\nUsage Examples:\n');
