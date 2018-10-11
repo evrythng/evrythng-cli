@@ -34,6 +34,11 @@ const READ_ONLY = [
   'scopes',
 ];
 
+/* Keys that are complex object that aren't supported or cannot be specified for import */
+const IMPORT_UNSUPPORTED = [
+  'location',
+];
+
 /* Keys that are array type */
 const CONVERTED_ARRAYS = [
   'photos',
@@ -156,7 +161,7 @@ const objectToCells = (obj, objKeys) => {
     // Other objects not supported
     if (String(value).includes('[object Object]')) {
       logger.info(`Warning: Object exporting not fully supported (key: ${item})`);
-      res.push(encodeObject(value));
+      res.push(`"${encodeObject(value)}"`);
       return res;
     }
 
@@ -239,6 +244,34 @@ const assignPrefixProperty = (obj, objKey, key, value) => {
 };
 
 /**
+ * Consume CSV row cell by cell, since splitting on ',' doesn't work for cells that contain ','.
+ *
+ * @param {String} row - The row to consume.
+ * @returns [String[]] Array of cell contents.
+ */
+const readCells = (row) => {
+  const result = [];
+  while(row) {
+    switch (row.charAt(0)) {
+      case '"':
+        // Value between (" to ",)
+        result.push(row.substring(1, row.indexOf('"', 1)));
+        row = row.substring(row.indexOf('"', 1) + 2);
+        break;
+      case ',':
+        // Empty cell (,)
+        result.push('');
+        row = row.substring(1);
+        break;
+      default:
+        throw new Error(`Unexpected row substring: ${row}`);
+        break;
+    }
+  }
+  return result;
+};
+
+/**
  * Convert a CSV row to an EVRYTHNG resource, using the CSV headers.
  *
  * @param {String} row - The row to convert.
@@ -246,7 +279,7 @@ const assignPrefixProperty = (obj, objKey, key, value) => {
  * @returns {Object} - An object representation of this CSV row.
  */
 const rowToObject = (row, headers) => {
-  const cells = row.split(',');
+  const cells = readCells(row);
   return headers.reduce((res, key, i) => {
     // Skip read-only keys, or empty cells
     if (READ_ONLY.includes(key) || !cells[i]) {
@@ -259,6 +292,12 @@ const rowToObject = (row, headers) => {
     // Sub-objects are not supported
     if (value === '[object Object]') {
       logger.info(`Warning: Object importing not supported (key: ${key})`);
+      return res;
+    }
+
+    // Other unsupported object
+    if (IMPORT_UNSUPPORTED.includes(key)) {
+      logger.info(`Warning: Importing not supported (key: ${key})`);
       return res;
     }
 
