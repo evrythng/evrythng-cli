@@ -135,7 +135,7 @@ const checkFirstRun = async () => {
   const name = await getValue('Short Operator name (e.g: \'personal\')');
   const region = await getValue('Account region (\'us\' or \'eu\')');
   const apiKey = await getValue('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
-  addOperator([null, name, region, apiKey]);
+  await addOperator([null, name, region, apiKey]);
 
   logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. '
     + 'Some examples to get you started:\n');
