@@ -55,9 +55,8 @@ const showKey = ([name]) => {
 /**
  * Test an operator's credentials work, else throw.
  *
- * @async
- * @param {String} region - User entered region.
- * @param {String} apiKey - User entered API key.
+ * @param {string} region - User entered region.
+ * @param {string} apiKey - User entered API key.
  */
 const validateCredentials = async (region, apiKey) => {
   evrythng.setup({ apiUrl: REGIONS[region] });
@@ -70,10 +69,10 @@ const validateCredentials = async (region, apiKey) => {
 /**
  * Add an operator record to the configuration, if it is valid.
  *
- * @async
- * @param {String[]} args - The command arguments provided.
- */ 
-const addOperator = async ([, name, region, apiKey]) => {
+ * @param {string[]} args - The command arguments provided.
+ */
+const addOperator = async (args) => {
+  const [, name, region, apiKey] = args;
   if (!REGIONS[region]) {
     throw new Error(`$region must be one of ${Object.keys(REGIONS).join(', ')}`);
   }

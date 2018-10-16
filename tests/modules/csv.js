@@ -12,7 +12,7 @@ const csv = require('../../src/modules/csv');
 const CSV_PATH = `${__dirname}/output.csv`;
 const TEST_OBJECTS = [{
   id: 'U5GSbgP7KwddXtRRwkwxYgPq',
-  name: 'Thng1',
+  name: 'Name, with commas',
   customFields: { foo: 'bar' },
   tags: ['some', 'tags'],
   product: 'UKGwQrgHq3shEqRaw2KyTt2n',
@@ -42,9 +42,9 @@ const TEST_OBJECTS = [{
 }];
 const TEST_ROWS = [
   'id,name,tags,product,collections,position,address.street,address.city,address.countryCode,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
-  '"U5GSbgP7KwddXtRRwkwxYgPq","Thng1","some|tags","UKGwQrgHq3shEqRaw2KyTt2n","UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg","-0.119123|51.519435","East Road","London","GB","bar",,"8742278493",,"red"',
-  '"UpmSnYxUDDbasCwwRkRNQehq","Thng2",,,,,,,,,"123",,"4837289",',
-  '"UK3x87gBpwAAXtawamsKRtmr","Thng3",,,,,,,,,,,,',
+  'U5GSbgP7KwddXtRRwkwxYgPq,"Name, with commas",some|tags,UKGwQrgHq3shEqRaw2KyTt2n,UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg,-0.119123|51.519435,East Road,London,GB,bar,,8742278493,,red',
+  'UpmSnYxUDDbasCwwRkRNQehq,Thng2,,,,,,,,,123,,4837289,',
+  'UK3x87gBpwAAXtawamsKRtmr,Thng3,,,,,,,,,,,,',
 ];
 
 describe('csv', () => {
@@ -94,7 +94,7 @@ describe('csv', () => {
   it('should convert a row into an object', () => {
     const object = csv.rowToObject(TEST_ROWS[1], TEST_ROWS[0].split(','));
     const expected = {
-      name: 'Thng1',
+      name: 'Name, with commas',
       tags: [ 'some', 'tags' ],
       customFields: { foo: 'bar' },
       product: 'UKGwQrgHq3shEqRaw2KyTt2n',

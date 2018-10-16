@@ -52,15 +52,16 @@ const LIST_SEPARATOR = '|';
 /* Separates object key-value pairs */
 const PAIR_SEPARATOR = ':';
 
-/** Get de-duplicated list of object keys of a specific type (denoted by prefix)
+/**
+ * Get de-duplicated list of object keys of a specific type (denoted by prefix)
  *
  * @param {Object[]} arr - Array of objects to search for keys.
- * @param {String} prefix - Optional prefix when searching a sub-object.
- * @returns {String[]} - Array of keys found in the objects.
+ * @param {string} prefix - Optional prefix when searching a sub-object.
+ * @returns {string[]} Array of keys found in the objects.
  */
 const getAllKeys = (arr, prefix) => {
-  const buildKey = item => prefix ? `${prefix}.${item}` : item;
-  
+  const buildKey = item => { return prefix ? `${prefix}.${item}` : item; };
+
   return arr.reduce((res, arrItem) => {
     Object.keys(arrItem)
       .filter(itemKey => !res.includes(itemKey))
@@ -89,16 +90,27 @@ const getColumnHeaders = (arr) => {
 
 /**
  * Escape , with ", and " with ""
- * @param {any} val - The value to escape.
- * @returns {String} - Escaped string of the value.
+ *
+ * @param {any} value - The value to escape.
+ * @returns {string} - Escaped string of the value.
  */
-const esc = val => `"${String(val).split('"').join('""')}"`;
+const escapeCommas = (value) => {
+  let output = String(value);
+  if (output.includes('"')) {
+    output = output.split('"').join('""');
+  }
+  if (output.includes(',')) {
+    output = `"${output}"`;
+  }
+
+  return output;
+};
 
 /**
  * Encode a single level object into a CSV compatible format.
  *
  * @param {Object} obj - The object to encode.
- * @returns {String} The encoded form.
+ * @returns {string} The encoded form.
  */
 const encodeObject = obj => {
   const pairs = Object.keys(obj).map(key => `${key}:${obj[key]}`);
@@ -108,7 +120,7 @@ const encodeObject = obj => {
 /**
  * Decode a single level object string from a CSV compatible format.
  *
- * @param {String} objStr - The object string to decode.
+ * @param {string} objStr - The object string to decode.
  * @returns {Object} The decoded object.
  */
 const decodeObject = objStr => objStr
@@ -124,11 +136,11 @@ const decodeObject = objStr => objStr
  * Create row of cell values for each applicable key, else add empty cell (,).
  *
  * @param {Object} obj - The object to convert to a row.
- * @param {String[]} objKeys - Array of object keys to use.
- * @returns {String[]} Array of cell values for this row.
+ * @param {string[]} objKeys - Array of object keys to use.
+ * @returns {string[]} Array of cell values for this row.
  */
 const objectToCells = (obj, objKeys) => {
-    // If this object doesn't exist, add an empty cell for every key missing
+  // If this object doesn't exist, add an empty cell for every key missing
   if (!obj) {
     return objKeys.reduce(res => res.concat(''), []);
   }
@@ -138,7 +150,7 @@ const objectToCells = (obj, objKeys) => {
     // Handle any prefix
     const key = item.includes('.') ? item.split('.')[1] : item;
     const value = obj[key];
-   
+
     // Empty cell
     if (!value) {
       res.push('');
@@ -147,25 +159,25 @@ const objectToCells = (obj, objKeys) => {
 
     // Handle Array types
     if (CONVERTED_ARRAYS.includes(key) && value.length) {
-      res.push(`"${value.join(LIST_SEPARATOR)}"`);
+      res.push(escapeCommas(value.join(LIST_SEPARATOR)));
       return res;
     }
 
     // Position - special case, encode with the separator
     if (key === 'position') {
       const [lon, lat] = obj.position.coordinates;
-      res.push(`"${lon}|${lat}"`);
+      res.push(`${lon}|${lat}`);
       return res;
     }
 
     // Other objects not supported
     if (String(value).includes('[object Object]')) {
       logger.info(`Warning: Object exporting not fully supported (key: ${item})`);
-      res.push(`"${encodeObject(value)}"`);
+      res.push(escapeCommas(encodeObject(value)));
       return res;
     }
 
-    res.push(esc(value));
+    res.push(escapeCommas(value));
     return res;
   }, []);
 };
@@ -174,7 +186,7 @@ const objectToCells = (obj, objKeys) => {
  * Create CSV data from input object array.
  *
  * @param {Object[]} arr - Array of input objects to convert.
- * @returns {String[]} Array of CSV rows as strings.
+ * @returns {string[]} Array of CSV rows as strings.
  */
 const createCsvData = (arr) => {
   const { object, address, customFields, identifiers, properties } = getColumnHeaders(arr);
@@ -197,17 +209,16 @@ const createCsvData = (arr) => {
  * Write some array of EVRYTHNG objects to a CSV file.
  *
  * @param {Object[]} arr - Array of objects to write to file.
- * @param {String} path - Path of the file to write.
+ * @param {string} path - Path of the file to write.
  */
 const write = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');
 
 /**
  * Create a single resource from a data object.
  *
- * @async
  * @param {Object} scope - evrythng.js Operator scope.
  * @param {Object} resource - The object to create as a resource.
- * @param {String} type - The resource type, as evrythng.js Operator member name.
+ * @param {string} type - The resource type, as evrythng.js Operator member name.
  */
 const createResource = async (scope, resource, type) => {
   try {
@@ -229,16 +240,16 @@ const createResource = async (scope, resource, type) => {
  * Assign a prefixed property to an object property
  *
  * @param {Object} obj - The object to modify.
- * @param {String} objKey - The object property to modify.
- * @param {String} key - The key of the property to assign.
- * @oaram {String} value - The value to assign.
+ * @param {string} objKey - The object property to modify.
+ * @param {string} fullKey - The key of the property to assign.
+ * @param {string} value - The value to assign.
  */
-const assignPrefixProperty = (obj, objKey, key, value) => {
+const assignPrefixProperty = (obj, objKey, fullKey, value) => {
   if (!obj[objKey]) {
     obj[objKey] = {};
   }
 
-  key = key.split('.')[1];
+  const [, key] = fullKey.split('.');
   obj[objKey][key] = value;
   return obj;
 };
@@ -246,12 +257,12 @@ const assignPrefixProperty = (obj, objKey, key, value) => {
 /**
  * Consume CSV row cell by cell, since splitting on ',' doesn't work for cells that contain ','.
  *
- * @param {String} row - The row to consume.
- * @returns [String[]] Array of cell contents.
+ * @param {string} row - The row to consume.
+ * @returns {string[]} Array of cell contents.
  */
 const readCells = (row) => {
   const result = [];
-  while(row) {
+  while (row) {
     switch (row.charAt(0)) {
       case '"':
         // Value between (" to ",)
@@ -259,12 +270,22 @@ const readCells = (row) => {
         row = row.substring(row.indexOf('"', 1) + 2);
         break;
       case ',':
-        // Empty cell (,)
+        // Empty cell (,,)
         result.push('');
         row = row.substring(1);
         break;
       default:
-        throw new Error(`Unexpected row substring: ${row}`);
+        // Assume a cell until the next comma (,until,)
+        if (!row.includes(',')) {
+          // Last cell
+          result.push(row);
+          row = '';
+          return result;
+        }
+        
+        // Not the last cell
+        result.push(row.substring(0, row.indexOf(',')));
+        row = row.substring(row.indexOf(',') + 1);  
         break;
     }
   }
@@ -274,12 +295,12 @@ const readCells = (row) => {
 /**
  * Convert a CSV row to an EVRYTHNG resource, using the CSV headers.
  *
- * @param {String} row - The row to convert.
- * @param {String[]} headers - The CSV headers.
+ * @param {string} row - The row to convert.
+ * @param {string[]} headers - The CSV headers.
  * @returns {Object} - An object representation of this CSV row.
  */
 const rowToObject = (row, headers) => {
-  const cells = readCells(row);
+  const cells = readCells(row.trim());
   return headers.reduce((res, key, i) => {
     // Skip read-only keys, or empty cells
     if (READ_ONLY.includes(key) || !cells[i]) {
@@ -288,7 +309,7 @@ const rowToObject = (row, headers) => {
 
     // Decode CSV comma escaping
     const value = cells[i].split('"').join('');
-    
+
     // Sub-objects are not supported
     if (value === '[object Object]') {
       logger.info(`Warning: Object importing not supported (key: ${key})`);
@@ -342,8 +363,7 @@ const rowToObject = (row, headers) => {
 /**
  * Read a CSV file and upload the contents to the account.
  *
- * @async
- * @param {String} type - Type of EVRYTHNG resource the items in the file should be treated as.
+ * @param {string} type - Type of EVRYTHNG resource the items in the file should be treated as.
  * @returns {Promise} A Promise that resolves when all items have been created.
  */
 const read = async (type) => {
@@ -355,10 +375,10 @@ const read = async (type) => {
   // Get headers
   const rows = fs.readFileSync(path, 'utf8').toString().split('\n');
   const headers = rows[0].split(',').filter(item => item.length);
-  
+
   const scope = new evrythng.Operator(operator.getKey());
   const resourceRows = rows.slice(1);
-  await util.nextTask(resourceRows.map((item) => () => {
+  await util.nextTask(resourceRows.map(item => () => {
     const resource = rowToObject(item, headers);
     return createResource(scope, resource, type);
   }));

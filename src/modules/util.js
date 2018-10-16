@@ -82,7 +82,7 @@ const validate = (instance, schema) => {
 
 /**
  * Sequentially run a series of functions that return Promises.
- * @async
+ *
  * @param {Function[]} items - Array of functions that return Promises.
  * @return {Promise} A Promise that resolves when all items have been processed.
  */
