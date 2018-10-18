@@ -23,8 +23,7 @@ module.exports = {
         return http.post('/products', payload);
       },
       pattern: 'create $payload',
-      buildable: true,
-      importable: true,
+      helpPattern: 'create [$payload|--build|--from-csv]',
     },
     readProduct: {
       execute: async ([id]) => http.get(`/products/${id}`),

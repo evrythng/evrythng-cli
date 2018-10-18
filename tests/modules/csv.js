@@ -4,7 +4,7 @@
  */
 
 const { expect } = require('chai');
-const _ = require('lodash');
+const { isEqual } = require('lodash');
 const fs = require('fs');
 const config = require('../../src/modules/config');
 const csv = require('../../src/modules/csv');
@@ -16,8 +16,12 @@ const TEST_OBJECTS = [{
   customFields: { foo: 'bar' },
   tags: ['some', 'tags'],
   product: 'UKGwQrgHq3shEqRaw2KyTt2n',
-  identifiers: { dm: '8742278493' },
-  properties: { color: 'red' },
+  identifiers: { storeCode: 'd29hf89' },
+  properties: { 
+    color: 'red', 
+    serial_number: 123,
+    is_active: true,
+  },
   collections: [
     'UH4nVsWVMG8EEqRawkMnybMh',
     'UHHHeHc5MGsYhqRawF6Hybgg',
@@ -41,10 +45,10 @@ const TEST_OBJECTS = [{
   name: 'Thng3',
 }];
 const TEST_ROWS = [
-  'id,name,tags,product,collections,position,address.street,address.city,address.countryCode,customFields.foo,customFields.baz,identifiers.dm,identifiers.gs1:21,properties.color',
-  'U5GSbgP7KwddXtRRwkwxYgPq,"Name, with commas",some|tags,UKGwQrgHq3shEqRaw2KyTt2n,UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg,-0.119123|51.519435,East Road,London,GB,bar,,8742278493,,red',
-  'UpmSnYxUDDbasCwwRkRNQehq,Thng2,,,,,,,,,123,,4837289,',
-  'UK3x87gBpwAAXtawamsKRtmr,Thng3,,,,,,,,,,,,',
+  'id,name,tags,product,collections,position,address.street,address.city,address.countryCode,customFields.foo,customFields.baz,identifiers.storeCode,identifiers.gs1:21,properties.color,properties.serial_number,properties.is_active',
+  'U5GSbgP7KwddXtRRwkwxYgPq,"Name, with commas",some|tags,UKGwQrgHq3shEqRaw2KyTt2n,UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg,-0.119123|51.519435,East Road,London,GB,bar,,d29hf89,,red,123,true',
+  'UpmSnYxUDDbasCwwRkRNQehq,Thng2,,,,,,,,,123,,4837289,,,',
+  'UK3x87gBpwAAXtawamsKRtmr,Thng3,,,,,,,,,,,,,,',
 ];
 
 describe('csv', () => {
@@ -54,7 +58,7 @@ describe('csv', () => {
 
   it('should convert objects to CSV rows', () => {
     const rows = csv.createCsvData(TEST_OBJECTS);
-    expect(_.isEqual(rows, TEST_ROWS)).to.equal(true);
+    expect(isEqual(rows, TEST_ROWS)).to.equal(true);
   });
 
   it('should not throw when writing to a CSV file', async () => {
@@ -98,8 +102,12 @@ describe('csv', () => {
       tags: [ 'some', 'tags' ],
       customFields: { foo: 'bar' },
       product: 'UKGwQrgHq3shEqRaw2KyTt2n',
-      properties: { color: 'red' },
-      identifiers: { dm: '8742278493' },
+      properties: { 
+        color: 'red', 
+        serial_number: 123,
+        is_active: true,
+      },
+      identifiers: { storeCode: 'd29hf89' },
       collections: [
         'UH4nVsWVMG8EEqRawkMnybMh',
         'UHHHeHc5MGsYhqRawF6Hybgg',
@@ -114,7 +122,7 @@ describe('csv', () => {
         countryCode: 'GB',
       },
     };
-    expect(_.isEqual(object, expected)).to.equal(true);
+    expect(isEqual(object, expected)).to.equal(true);
   });
 
   it('should encode a simple JSON object', () => {
@@ -127,6 +135,6 @@ describe('csv', () => {
     const objStr = '{foo:bar|baz:thng}';
     const expected = { foo: 'bar', 'baz': 'thng' };
     const result = csv.decodeObject(objStr);
-    expect(_.isEqual(result, expected)).to.equal(true);    
+    expect(isEqual(result, expected)).to.equal(true);    
   });
 });

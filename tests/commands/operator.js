@@ -11,7 +11,6 @@ const cli = require('../../src/functions/cli');
 const config = require('../../src/modules/config');
 const operator = require('../../src/commands/operator');
 
-chai.should();
 chai.use(chaiAsPromised);
 
 const { expect } = chai;
@@ -60,16 +59,17 @@ describe('operators', () => {
   });
 
   it('should not throw error for \'operators $name use\'', async () => {
-    return cli(`operators ${ctx.operatorName} use`).should.be.fulfilled;
+    await cli(`operators ${ctx.operatorName} use`);
   });
 
   it('should not throw error for \'operators $name remove\'', async () => {
-    return cli(`operators ${ctx.operatorName} remove`).should.be.fulfilled;
+    await cli(`operators ${ctx.operatorName} remove`);
   });
 
   it('should throw error if operator credentials are not real', async () => {
     sinon.restore();
 
-    return operator.validateCredentials('us', 'somebadapikey').should.be.rejected;
+    const validate = operator.validateCredentials('us', 'somebadapikey');
+    return expect(validate).to.eventually.be.rejected;
   });
 });

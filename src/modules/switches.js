@@ -80,7 +80,7 @@ const apply = (args) => {
     .forEach((arg) => {
       const valid = SWITCH_LIST.find(({ name }) => name === arg);
       if (!valid) {
-        throw new Error(`Invalid switch: ${arg}`);
+        throw new Error(`Invalid switch: ${arg}.\nType 'evrythng help' to see a list of available switches.`);
       }
 
       const foundIndex = args.indexOf(arg);

@@ -23,8 +23,7 @@ module.exports = {
         return http.post('/thngs', payload);
       },
       pattern: 'create $payload',
-      buildable: true,
-      importable: true,
+      helpPattern: 'create [$payload|--build|--from-csv]',
     },
     readThng: {
       execute: async ([id]) => http.get(`/thngs/${id}`),

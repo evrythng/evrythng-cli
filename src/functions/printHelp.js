@@ -92,5 +92,4 @@ module.exports = () => {
 
   logger.info('\nUsage Examples:\n');
   formatList(EXAMPLES, 'about', 'command', false);
-  logger.info();
 };

@@ -14,6 +14,7 @@ const operator = require('../commands/operator');
 const switches = require('./switches');
 const util = require('./util');
 
+const INDENT_SIZE = 2;
 const TO_PAGE_MAX = 30;
 const STATUS_LABELS = {
   200: 'OK',
@@ -81,7 +82,7 @@ const printRequest = (options) => {
   formatHeaders(options.displayHeaders).forEach(item => logger.info(item));
   logger.info();
   if (options.data) {
-    logger.info(`${JSON.stringify(options.data, null, 2)}\n`);
+    logger.info(`${JSON.stringify(options.data, null, INDENT_SIZE)}\n`);
   }
 };
 

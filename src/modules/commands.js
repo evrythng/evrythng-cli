@@ -32,8 +32,8 @@ const COMMAND_LIST = [
 const showSyntax = (command) => {
   const { firstArg, operations } = command;
   const specs = Object.keys(operations).map((item) => {
-    const { pattern, buildable, importable } = operations[item];
-    return `evrythng ${firstArg} ${pattern} ${buildable ? '(or --build)' : ''} ${importable ? '(or --from-csv)' : ''}`;
+    const { pattern, helpPattern } = operations[item];
+    return `evrythng ${firstArg} ${helpPattern || pattern}`;
   });
 
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);

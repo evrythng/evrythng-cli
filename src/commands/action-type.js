@@ -22,8 +22,7 @@ module.exports = {
         return http.post('/actions', payload);
       },
       pattern: 'create $payload',
-      buildable: true,
-      importable: true,
+      helpPattern: 'create [$payload|--build|--from-csv]',
     },
     listActionType: {
       execute: async () => http.get('/actions'),

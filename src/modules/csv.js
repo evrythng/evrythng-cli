@@ -44,6 +44,7 @@ const CONVERTED_ARRAYS = [
   'photos',
   'tags',
   'collections',
+  'categories',
 ];
 
 /* Use a character other than ','' to encode lists and object pairs */
@@ -293,6 +294,23 @@ const readCells = (row) => {
 };
 
 /**
+ * Preserve the type of a number or boolean that was extracted as a string token.
+ *
+ * @param {string} value - The string to process.
+ * @returns {string|number|boolean} The extracted value in its 'original' type.
+ */
+const preserveType = (value) => {
+  if (!isNaN(Number(value))) {
+    return Number(value);
+  }
+  if (['true', 'false'].includes(value)) {
+    return value === 'true';
+  }
+
+  return value;
+};
+
+/**
  * Convert a CSV row to an EVRYTHNG resource, using the CSV headers.
  *
  * @param {string} row - The row to convert.
@@ -308,7 +326,7 @@ const rowToObject = (row, headers) => {
     }
 
     // Decode CSV comma escaping
-    const value = cells[i].split('"').join('');
+    const value = preserveType(cells[i].split('"').join(''));
 
     // Sub-objects are not supported
     if (value === '[object Object]') {
