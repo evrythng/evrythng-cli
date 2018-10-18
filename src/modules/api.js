@@ -24,8 +24,9 @@ const COMMAND_SCHEMA = {
           additionalProperties: false,
           requried: ['pattern', 'execute'],
           properties: {
-            pattern: { type: 'string' },
             execute: { type: 'any' },
+            pattern: { type: 'string' },
+            helpPattern: { type: 'string' },
           },
         },
       },
