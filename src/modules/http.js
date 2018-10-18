@@ -188,7 +188,7 @@ const printResponse = async (res) => {
   // Get just one field
   const field = switches.FIELD;
   if (field) {
-    logger.info(JSON.stringify(data[field], null, 2));
+    logger.info(JSON.stringify(data[field], null, INDENT_SIZE));
     return data[field];
   }
 
