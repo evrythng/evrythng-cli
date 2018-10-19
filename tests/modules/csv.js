@@ -6,6 +6,7 @@
 const { expect } = require('chai');
 const { isEqual } = require('lodash');
 const fs = require('fs');
+const neatCsv = require('neat-csv');
 const config = require('../../src/modules/config');
 const csv = require('../../src/modules/csv');
 
@@ -95,8 +96,10 @@ describe('csv', () => {
     expect(simpleObj.customFields[realKey]).to.equal(testValue);
   });
 
-  it('should convert a row into an object', () => {
-    const object = csv.rowToObject(TEST_ROWS[1], TEST_ROWS[0].split(','));
+  it('should convert a row into an object', async () => {
+    const rowObjs = await neatCsv(TEST_ROWS.join('\n'));
+    const result = csv.rowToObject(rowObjs[0]);
+
     const expected = {
       name: 'Name, with commas',
       tags: [ 'some', 'tags' ],
@@ -122,7 +125,7 @@ describe('csv', () => {
         countryCode: 'GB',
       },
     };
-    expect(isEqual(object, expected)).to.equal(true);
+    expect(isEqual(result, expected)).to.equal(true);
   });
 
   it('should encode a simple JSON object', () => {
@@ -136,5 +139,28 @@ describe('csv', () => {
     const expected = { foo: 'bar', 'baz': 'thng' };
     const result = csv.decodeObject(objStr);
     expect(isEqual(result, expected)).to.equal(true);    
+  });
+
+  it('should manually read a CSV row', () => {
+    const expected = [ 
+      'U5GSbgP7KwddXtRRwkwxYgPq',
+      'Name, with commas',
+      'some|tags',
+      'UKGwQrgHq3shEqRaw2KyTt2n',
+      'UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg',
+      '-0.119123|51.519435',
+      'East Road',
+      'London',
+      'GB',
+      'bar',
+      '',
+      'd29hf89',
+      '',
+      'red',
+      '123',
+      'true',
+    ];
+    const result = csv.readCells(TEST_ROWS[1]);
+    expect(isEqual(result, expected)).to.equal(true);
   });
 });

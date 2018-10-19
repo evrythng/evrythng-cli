@@ -5,6 +5,7 @@
 
 const evrythng = require('evrythng-extended');
 const fs = require('fs');
+const neatCsv = require('neat-csv');
 const logger = require('./logger');
 const operator = require('../commands/operator');
 const switches = require('./switches');
@@ -257,6 +258,7 @@ const assignPrefixProperty = (obj, objKey, fullKey, value) => {
 
 /**
  * Consume CSV row cell by cell, since splitting on ',' doesn't work for cells that contain ','.
+ * Currently not used in favor of neat-csv.
  *
  * @param {string} row - The row to consume.
  * @returns {string[]} Array of cell contents.
@@ -311,22 +313,20 @@ const preserveType = (value) => {
 };
 
 /**
- * Convert a CSV row to an EVRYTHNG resource, using the CSV headers.
+ * Convert a CSV row object to an EVRYTHNG resource.
+ * Some special decoding and filtering is still required.
  *
- * @param {string} row - The row to convert.
- * @param {string[]} headers - The CSV headers.
- * @returns {Object} - An object representation of this CSV row.
+ * @param {Object} row - The row to convert.
+ * @returns {Object} - An EVRYTHNG-compatible object representation of this CSV row.
  */
-const rowToObject = (row, headers) => {
-  const cells = readCells(row.trim());
-  return headers.reduce((res, key, i) => {
+const rowToObject = (row) => {
+  return Object.keys(row).reduce((res, key, i) => {
     // Skip read-only keys, or empty cells
-    if (READ_ONLY.includes(key) || !cells[i]) {
+    if (READ_ONLY.includes(key) || !row[key]) {
       return res;
     }
 
-    // Decode CSV comma escaping
-    const value = preserveType(cells[i].split('"').join(''));
+    const value = preserveType(row[key]);
 
     // Sub-objects are not supported
     if (value === '[object Object]') {
@@ -391,13 +391,12 @@ const read = async (type) => {
   }
 
   // Get headers
-  const rows = fs.readFileSync(path, 'utf8').toString().split('\n');
-  const headers = rows[0].split(',').filter(item => item.length);
+  const csvStr = fs.readFileSync(path, 'utf8').toString();
+  const rows = await neatCsv(csvStr);
 
   const scope = new evrythng.Operator(operator.getKey());
-  const resourceRows = rows.slice(1);
-  await util.nextTask(resourceRows.map(item => () => {
-    const resource = rowToObject(item, headers);
+  await util.nextTask(rows.map(item => () => {
+    const resource = rowToObject(item);
     return createResource(scope, resource, type);
   }));
 };
@@ -405,6 +404,7 @@ const read = async (type) => {
 module.exports = {
   write,
   read,
+  readCells,
   rowToObject,
   assignPrefixProperty,
   createCsvData,
