@@ -7,6 +7,7 @@ const fs = require('fs');
 const { validate } = require('./util');
 const commands = require('./commands');
 const config = require('./config');
+const operator = require('../commands/operator');
 const switches = require('./switches');
 
 const COMMAND_SCHEMA = {
@@ -38,6 +39,21 @@ const COMMAND_SCHEMA = {
 const NODE_MODULES_PATH = `${__dirname}/../../../`;
 const PREFIX = 'evrythng-cli-plugin-';
 
+/**
+ * Run a list of args as a command.
+ *
+ * @param {string[]} args - The args to identify and run.
+ */
+const runCommand = async (args) => {
+  const command = commands.identify(args);
+  if (!command) {
+    throw new Error(`Command '${args.join(' ')}' was not recognised.`);
+  }
+
+  operator.applyRegion();
+  await command.execute(args.slice(1));
+};
+
 const API = {
   registerCommand: (command) => {
     const errors = validate(command, COMMAND_SCHEMA);
@@ -50,13 +66,14 @@ const API = {
   },
   getOptions: () => config.get('options'),
   getSwitches: () => switches.active,
+  runCommand,
 };
 
 const loadPlugin = (moduleName) => {
   try {
     require(`${NODE_MODULES_PATH}/${moduleName}`)(API);
   } catch (e) {
-    throw new Error(`Failed to load plugin: ${moduleName} (${e.message})`);
+    throw new Error(`Failed to load plugin: ${moduleName} (${e.stack})`);
   }
 };
 
