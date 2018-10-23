@@ -197,14 +197,12 @@ const createCsvData = (arr) => {
     ...object, ...address, ...customFields, ...identifiers, ...properties,
   ].join(',');
 
-  const rows = arr.map((item) => {
-    return objectToCells(item, object)
-      .concat(objectToCells(item.address, address))
-      .concat(objectToCells(item.customFields, customFields))
-      .concat(objectToCells(item.identifiers, identifiers))
-      .concat(objectToCells(item.properties, properties))
-      .join(',');
-  });
+  const rows = arr.map(item => objectToCells(item, object)
+    .concat(objectToCells(item.address, address))
+    .concat(objectToCells(item.customFields, customFields))
+    .concat(objectToCells(item.identifiers, identifiers))
+    .concat(objectToCells(item.properties, properties))
+    .join(','));
   return [columnHeaders, ...rows];
 };
 
