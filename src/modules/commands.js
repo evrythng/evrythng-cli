@@ -15,6 +15,7 @@ const COMMAND_LIST = [
   require('../commands/batch'),
   require('../commands/collection'),
   require('../commands/file'),
+  require('../commands/help'),
   require('../commands/operator'),
   require('../commands/option'),
   require('../commands/place'),
@@ -31,8 +32,8 @@ const COMMAND_LIST = [
 const showSyntax = (command) => {
   const { firstArg, operations } = command;
   const specs = Object.keys(operations).map((item) => {
-    const { pattern, buildable } = operations[item];
-    return `evrythng ${firstArg} ${pattern} ${buildable ? '(or --build)' : ''}`;
+    const { pattern, helpPattern } = operations[item];
+    return `evrythng ${firstArg} ${helpPattern || pattern}`;
   });
 
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
@@ -44,7 +45,8 @@ const matchArg = (arg = '', spec) => {
     $id: val => val.length === 24,
     // Value must be JSON
     $payload: (val) => {
-      if (switches.BUILD) {
+      // Some switches work instead of a payload
+      if (switches.BUILD || switches.FROM_CSV) {
         return true;
       }
 

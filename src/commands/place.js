@@ -3,7 +3,9 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const csv = require('../modules/csv');
 const http = require('../modules/http');
+const switches = require('../modules/switches');
 const util = require('../modules/util');
 
 module.exports = {
@@ -12,11 +14,15 @@ module.exports = {
   operations: {
     create: {
       execute: async ([, json]) => {
+        if (switches.FROM_CSV) {
+          return csv.read('place');
+        }
+
         const payload = await util.getPayload('PlaceDocument', json);
         return http.post('/places', payload);
       },
       pattern: 'create $payload',
-      buildable: true,
+      helpPattern: 'create [$payload|--build|--from-csv]',
     },
     read: {
       execute: async ([placeId]) => http.get(`/places/${placeId}`),

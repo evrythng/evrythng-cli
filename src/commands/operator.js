@@ -52,7 +52,27 @@ const showKey = ([name]) => {
   return key;
 };
 
-const addOperator = ([, name, region, apiKey]) => {
+/**
+ * Test an operator's credentials work, else throw.
+ *
+ * @param {string} region - User entered region.
+ * @param {string} apiKey - User entered API key.
+ */
+const validateCredentials = async (region, apiKey) => {
+  evrythng.setup({ apiUrl: REGIONS[region] });
+  const access = await evrythng.api({ url: '/access', authorization: apiKey });
+  if (access.actor.type !== 'operator') {
+    throw new Error('Actor was not operator');
+  }
+};
+
+/**
+ * Add an operator record to the configuration, if it is valid.
+ *
+ * @param {string[]} args - The command arguments provided.
+ */
+const addOperator = async (args) => {
+  const [, name, region, apiKey] = args;
   if (!REGIONS[region]) {
     throw new Error(`$region must be one of ${Object.keys(REGIONS).join(', ')}`);
   }
@@ -61,6 +81,13 @@ const addOperator = ([, name, region, apiKey]) => {
   }
   if (apiKey.length !== 80) {
     throw new Error('API key is an invalid length');
+  }
+
+  // Check the key is valid
+  try {
+    await module.exports.validateCredentials(region, apiKey);
+  } catch (e) {
+    throw new Error('Failed to add operator - check $apiKey and $region are correct and compatible.');
   }
 
   const operators = config.get('operators');
@@ -107,7 +134,7 @@ const checkFirstRun = async () => {
   const name = await getValue('Short Operator name (e.g: \'personal\')');
   const region = await getValue('Account region (\'us\' or \'eu\')');
   const apiKey = await getValue('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
-  addOperator([null, name, region, apiKey]);
+  await addOperator([null, name, region, apiKey]);
 
   logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. '
     + 'Some examples to get you started:\n');
@@ -164,4 +191,5 @@ module.exports = {
   checkFirstRun,
   resolveKey,
   getCurrent,
+  validateCredentials,
 };

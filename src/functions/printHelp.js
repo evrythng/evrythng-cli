@@ -21,7 +21,7 @@ const EXAMPLES = [{
   about: 'Read a page of Thngs',
 }, {
   command: 'thngs UpUxnWAXeMPNQraRaGmKQdHr read',
-  about: 'Read a known Thng',
+  about: 'Read a single Thng',
 }, {
   command: 'products create \'{"name": "My New Product"}\'',
   about: 'Create a new product',
@@ -31,6 +31,12 @@ const EXAMPLES = [{
 }, {
   command: 'thngs create --build',
   about: 'Interactively create a Thng',
+}, {
+  command: 'products list --per-page 100 --to-csv ./products.csv',
+  about: 'Save products to a CSV file',
+}, {
+  command: 'products create --from-csv ./products.csv --project UnghCKffVg8a9KwRwE5C9qBs',
+  about: 'Create products from a CSV file',
 }];
 
 const printVersion = () => logger.info(`\n${name} v${version}\n${description}`);
@@ -81,10 +87,9 @@ module.exports = () => {
   formatList(switchList, 'name', 'about');
 
   logger.info('\nAvailable Options:\n');
-  logger.info(indent('Use \'option list\' to see option states.\n', 4));
+  logger.info(indent('Use \'options list\' to see current option states.\n', 4));
   formatList(OPTION_LIST, 'name', 'about');
 
   logger.info('\nUsage Examples:\n');
   formatList(EXAMPLES, 'about', 'command', false);
-  logger.info();
 };

@@ -16,7 +16,7 @@ module.exports = {
         return http.post('/batches', payload);
       },
       pattern: 'create $payload',
-      buildable: true,
+      helpPattern: 'create [$payload|--build]',
     },
     readBatch: {
       execute: async ([id]) => http.get(`/batches/${id}`),
@@ -40,7 +40,7 @@ module.exports = {
         return http.post(`/batches/${id}/tasks`, payload);
       },
       pattern: '$id tasks create $payload',
-      buildable: true,
+      helpPattern: '$id tasks create [$payload|--build]',
     },
     listTasks: {
       execute: async ([id]) => http.get(`/batches/${id}/tasks`),

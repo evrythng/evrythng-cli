@@ -16,7 +16,7 @@ module.exports = {
         return http.post(`/actions/${type}`, payload);
       },
       pattern: '$type create $payload',
-      buildable: true,
+      helpPattern: '$type create [$payload|--build]',
     },
     listActions: {
       execute: async ([type]) => http.get(`/actions/${type}`),

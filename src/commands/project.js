@@ -17,7 +17,7 @@ module.exports = {
         return http.post('/projects', payload);
       },
       pattern: 'create $payload',
-      buildable: true,
+      helpPattern: 'create [$payload|--build]',
     },
     listProject: {
       execute: async () => http.get('/projects'),
@@ -43,7 +43,7 @@ module.exports = {
         return http.post(`/projects/${projectId}/applications`, payload);
       },
       pattern: '$id applications create $payload',
-      buildable: true,
+      helpPattern: '$id applications create [$payload|--build]',
     },
     listApplication: {
       execute: async ([projectId]) => http.get(`/projects/${projectId}/applications`),

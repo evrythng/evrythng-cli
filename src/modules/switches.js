@@ -9,17 +9,31 @@ const SWITCH_LIST = [{
   constant: 'FILTER',
   valueLabel: '<query>',
 }, {
-  name: '--with-scopes',
-  about: 'Include resource scopes in the response.',
-  constant: 'SCOPES',
-}, {
   name: '--per-page',
   about: 'Specify number of resources per page.',
   constant: 'PER_PAGE',
   valueLabel: '<count>',
 }, {
+  name: '--project',
+  about: 'Specify the \'project\' query parameter.',
+  constant: 'PROJECT',
+  valueLabel: '<project ID>',
+}, {
+  name: '--with-scopes',
+  about: 'Include resource scopes in the response.',
+  constant: 'SCOPES',
+}, {
+  name: '--context',
+  about: 'Specify the \'context=true\' query parameter.',
+  constant: 'CONTEXT',
+}, {
+  name: '--page',
+  about: 'Iterate to a specific page of results.',
+  constant: 'PAGE',
+  valueLabel: '<page>',
+}, {
   name: '--summary',
-  about: 'Show a list of resources as a summarised single-line format',
+  about: 'Show a list of resources as a summarised (id, name) single-line format.',
   constant: 'SUMMARY',
 }, {
   name: '--api-key',
@@ -31,6 +45,10 @@ const SWITCH_LIST = [{
   about: 'Expand some ID fields, timestamps to date, etc.',
   constant: 'EXPAND',
 }, {
+  name: '--build',
+  about: 'Interactively build a create request payload using the EVRYTHNG Swagger API description.',
+  constant: 'BUILD',
+}, {
   name: '--field',
   about: 'Print only a certain field from the response.',
   constant: 'FIELD',
@@ -40,33 +58,20 @@ const SWITCH_LIST = [{
   about: 'Print response in non-JSON friendly format.',
   constant: 'SIMPLE',
 }, {
-  name: '--build',
-  about: 'Interactively build a create request payload using the EVRYTHNG Swagger API description.',
-  constant: 'BUILD',
-}, {
-  name: '--project',
-  about: 'Specify the \'project\' query parameter.',
-  constant: 'PROJECT',
-  valueLabel: '<project ID>',
-}, {
-  name: '--page',
-  about: 'Go to a specific page of results.',
-  constant: 'PAGE',
-  valueLabel: '<page>',
-}, {
   name: '--to-csv',
   about: 'Output array response to a CSV file, such as \'./data.csv\'.',
   constant: 'TO_CSV',
   valueLabel: '<output file>',
 }, {
-  name: '--context',
-  about: 'Specify the \'context=true\' query parameter.',
-  constant: 'CONTEXT',
-}, {
   name: '--to-page',
   about: 'Read up to 30 pages before returning results (only with --to-csv).',
   constant: 'TO_PAGE',
   valueLabel: '<page>',
+}, {
+  name: '--from-csv',
+  about: 'Load resources from a CSV file that was previously exported with --to-csv.',
+  constant: 'FROM_CSV',
+  valueLabel: '<input file>',
 }];
 
 const apply = (args) => {
@@ -75,7 +80,7 @@ const apply = (args) => {
     .forEach((arg) => {
       const valid = SWITCH_LIST.find(({ name }) => name === arg);
       if (!valid) {
-        throw new Error(`Invalid switch: ${arg}`);
+        throw new Error(`Invalid switch: ${arg}.\nType 'evrythng help' to see a list of available switches.`);
       }
 
       const foundIndex = args.indexOf(arg);

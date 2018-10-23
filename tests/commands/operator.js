@@ -5,11 +5,12 @@
 
 const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
+const sinon = require('sinon');
 const { ctx } = require('../util');
 const cli = require('../../src/functions/cli');
 const config = require('../../src/modules/config');
+const operator = require('../../src/commands/operator');
 
-chai.should();
 chai.use(chaiAsPromised);
 
 const { expect } = chai;
@@ -17,12 +18,15 @@ const { expect } = chai;
 describe('operators', () => {
   before(async () => {
     const res = await cli('operators list');
-
     ctx.using = res.using;
+
+    sinon.stub(operator, 'validateCredentials').returns(Promise.resolve());
   });
 
   after(async () => {
     await cli(`operators ${ctx.using} use`);
+
+    sinon.restore();
   });
 
   it('return object for \'operators add $name $region $apiKey\'', async () => {
@@ -55,10 +59,17 @@ describe('operators', () => {
   });
 
   it('should not throw error for \'operators $name use\'', async () => {
-    return cli(`operators ${ctx.operatorName} use`).should.be.fulfilled;
+    await cli(`operators ${ctx.operatorName} use`);
   });
 
   it('should not throw error for \'operators $name remove\'', async () => {
-    return cli(`operators ${ctx.operatorName} remove`).should.be.fulfilled;
+    await cli(`operators ${ctx.operatorName} remove`);
+  });
+
+  it('should throw error if operator credentials are not real', async () => {
+    sinon.restore();
+
+    const validate = operator.validateCredentials('us', 'somebadapikey');
+    return expect(validate).to.eventually.be.rejected;
   });
 });
