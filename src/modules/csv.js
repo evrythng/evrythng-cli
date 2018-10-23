@@ -65,10 +65,11 @@ const getAllKeys = (arr, prefix) => {
   const buildKey = item => { return prefix ? `${prefix}.${item}` : item; };
 
   return arr.reduce((res, arrItem) => {
-    Object.keys(arrItem)
-      .filter(itemKey => !res.includes(itemKey))
-      .filter(itemKey => !IGNORE.includes(itemKey))
-      .forEach(newItem => res.push(newItem));
+    Object.keys(arrItem).forEach((itemKey) => {
+      if (!res.includes(itemKey) && !IGNORE.includes(itemKey)) {
+        res.push(itemKey);
+      }
+    });
     return res;
   }, []).map(buildKey);
 };
@@ -230,8 +231,8 @@ const createResource = async (scope, resource, type) => {
       params.project = projectId;
     }
 
-    const res = await scope[type]().create(resource, { params });
-    logger.info(`Created ${type} ${res.id}`);
+    const { id } = await scope[type]().create(resource, { params });
+    logger.info(`Created ${type} ${id}`);
   } catch (e) {
     logger.error(`Failed to create ${JSON.stringify(resource)} as a ${type}!`);
     logger.error(e.message || e.errors[0]);
@@ -257,59 +258,17 @@ const assignPrefixProperty = (obj, objKey, fullKey, value) => {
 };
 
 /**
- * Consume CSV row cell by cell, since splitting on ',' doesn't work for cells that contain ','.
- * Currently not used in favor of neat-csv.
- *
- * @param {string} row - The row to consume.
- * @returns {string[]} Array of cell contents.
- */
-const readCells = (row) => {
-  const result = [];
-  while (row) {
-    switch (row.charAt(0)) {
-      case '"':
-        // Value between (" to ",)
-        result.push(row.substring(1, row.indexOf('"', 1)));
-        row = row.substring(row.indexOf('"', 1) + 2);
-        break;
-      case ',':
-        // Empty cell (,,)
-        result.push('');
-        row = row.substring(1);
-        break;
-      default:
-        // Assume a cell until the next comma (,until,)
-        if (!row.includes(',')) {
-          // Last cell
-          result.push(row);
-          row = '';
-          return result;
-        }
-        
-        // Not the last cell
-        result.push(row.substring(0, row.indexOf(',')));
-        row = row.substring(row.indexOf(',') + 1);  
-        break;
-    }
-  }
-  return result;
-};
-
-/**
  * Preserve the type of a number or boolean that was extracted as a string token.
  *
  * @param {string} value - The string to process.
  * @returns {string|number|boolean} The extracted value in its 'original' type.
  */
 const preserveType = (value) => {
-  if (!isNaN(Number(value))) {
-    return Number(value);
+  try {
+    return JSON.parse(value);
+  } catch (e) {
+    return value;
   }
-  if (['true', 'false'].includes(value)) {
-    return value === 'true';
-  }
-
-  return value;
 };
 
 /**
@@ -390,21 +349,16 @@ const read = async (type) => {
     throw new Error('File was not found!');
   }
 
-  // Get headers
   const csvStr = fs.readFileSync(path, 'utf8').toString();
   const rows = await neatCsv(csvStr);
 
   const scope = new evrythng.Operator(operator.getKey());
-  await util.nextTask(rows.map(item => () => {
-    const resource = rowToObject(item);
-    return createResource(scope, resource, type);
-  }));
+  await util.nextTask(rows.map(item => () => createResource(scope, rowToObject(item, type))));
 };
 
 module.exports = {
   write,
   read,
-  readCells,
   rowToObject,
   assignPrefixProperty,
   createCsvData,

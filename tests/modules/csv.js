@@ -140,27 +140,4 @@ describe('csv', () => {
     const result = csv.decodeObject(objStr);
     expect(isEqual(result, expected)).to.equal(true);    
   });
-
-  it('should manually read a CSV row', () => {
-    const expected = [ 
-      'U5GSbgP7KwddXtRRwkwxYgPq',
-      'Name, with commas',
-      'some|tags',
-      'UKGwQrgHq3shEqRaw2KyTt2n',
-      'UH4nVsWVMG8EEqRawkMnybMh|UHHHeHc5MGsYhqRawF6Hybgg',
-      '-0.119123|51.519435',
-      'East Road',
-      'London',
-      'GB',
-      'bar',
-      '',
-      'd29hf89',
-      '',
-      'red',
-      '123',
-      'true',
-    ];
-    const result = csv.readCells(TEST_ROWS[1]);
-    expect(isEqual(result, expected)).to.equal(true);
-  });
 });
