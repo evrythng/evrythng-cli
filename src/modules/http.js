@@ -203,6 +203,14 @@ const printResponse = async (res) => {
   return res;
 };
 
+/**
+ * Log a confirmation of a deletion, showing the path deleted.
+ * This isn't done for CRU, since they could be piped to other inputs.
+ *
+ * @parm {string} url - API URL of the resource deleted.
+ */
+const confirmDeletion = async url => logger.info(`\nDeleted ${url}`);
+
 const apiRequest = async (options) => {
   if (!options.method) {
     options.method = 'GET';
@@ -256,11 +264,16 @@ const put = async (url, data) => apiRequest({
   data,
 }).then(printResponse);
 
+/**
+ * Perform a deletion request.
+ *
+ * @param {string} url - URL of the resource to delete.
+ */
 const deleteMethod = async url => apiRequest({
   url,
   method: 'DELETE',
   authorization: operator.getKey(),
-});
+}).then(() => confirmDeletion(url));
 
 module.exports = {
   post,

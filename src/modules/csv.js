@@ -212,7 +212,10 @@ const createCsvData = (arr) => {
  * @param {Object[]} arr - Array of objects to write to file.
  * @param {string} path - Path of the file to write.
  */
-const write = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');
+const write = (arr, path) => {
+  fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');
+  logger.info(`\nWrote ${arr.length} items to '${path}'.`);
+};
 
 /**
  * Create a single resource from a data object.
@@ -234,7 +237,7 @@ const createResource = async (scope, resource, type) => {
   } catch (e) {
     if (e.errors) {
       // Report a data-specific error
-      logger.error(e.errors[0]);
+      logger.error(`Error: ${e.errors[0]}`);
       return;
     }
 
@@ -357,6 +360,7 @@ const read = async (type) => {
 
   const scope = new evrythng.Operator(operator.getKey());
   await util.nextTask(rows.map(item => () => createResource(scope, rowToObject(item), type)));
+  logger.info(`\nImport from '${path}' complete.`);
 };
 
 module.exports = {

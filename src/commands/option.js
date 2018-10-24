@@ -79,6 +79,11 @@ const stringSetter = allowed => (options, key, newValue) => {
   options[key] = newValue;
 };
 
+/**
+ * Check an option exists, and update it if it does.
+ *
+ * @param {string[]} args - The remaining launch arguments, including new option value.
+ */
 const checkAndSetOptionValue = ([name, newValue]) => {
   const option = OPTION_LIST.find(item => item.name === name);
   if (!option) {
@@ -87,7 +92,6 @@ const checkAndSetOptionValue = ([name, newValue]) => {
 
   const options = config.get('options');
   const { key, type, range, allowed } = option;
-
   const typeMap = {
     boolean: booleanSetter(),
     integer: integerSetter(range),
@@ -96,6 +100,7 @@ const checkAndSetOptionValue = ([name, newValue]) => {
 
   typeMap[type](options, key, newValue);
   config.set('options', options);
+  logger.info(`\nSet option '${name}' to '${newValue}'`);
 };
 
 module.exports = {

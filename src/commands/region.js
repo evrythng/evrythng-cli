@@ -40,6 +40,7 @@ const addRegion = ([, name, apiUrl]) => {
   const regions = config.get('regions');
   regions[name] = apiUrl;
   config.set('regions', regions);
+  logger.info(`\nAdded region '${name}' for '${apiUrl}'.`);
 
   return regions;
 };
@@ -57,6 +58,7 @@ const removeRegion = ([name]) => {
   const regions = config.get('regions');
   delete regions[name];
   config.set('regions', regions);
+  logger.info(`\nRemoved region '${name}'.`);
 };
 
 
