@@ -351,7 +351,7 @@ const read = async (type) => {
   const rows = await neatCsv(csvStr);
 
   const scope = new evrythng.Operator(operator.getKey());
-  await util.nextTask(rows.map(item => () => createResource(scope, rowToObject(item, type))));
+  await util.nextTask(rows.map(item => () => createResource(scope, rowToObject(item), type)));
 };
 
 module.exports = {
