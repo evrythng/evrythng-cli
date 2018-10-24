@@ -9,6 +9,7 @@ const fs = require('fs');
 const neatCsv = require('neat-csv');
 const config = require('../../src/modules/config');
 const csv = require('../../src/modules/csv');
+const switches = require('../../src/modules/switches');
 
 const CSV_PATH = `${__dirname}/output.csv`;
 const TEST_OBJECTS = [{
@@ -139,5 +140,10 @@ describe('csv', () => {
     const expected = { foo: 'bar', 'baz': 'thng' };
     const result = csv.decodeObject(objStr);
     expect(isEqual(result, expected)).to.equal(true);    
+  });
+
+  it('should not throw when reading from a CSV file', async () => {
+    switches.FROM_CSV = CSV_PATH;
+    await csv.read('thng');
   });
 });

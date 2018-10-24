@@ -222,18 +222,24 @@ const write = (arr, path) => fs.writeFileSync(path, createCsvData(arr).join('\n'
  * @param {string} type - The resource type, as evrythng.js Operator member name.
  */
 const createResource = async (scope, resource, type) => {
-  try {
-    const params = {};
-    const projectId = switches.PROJECT;
-    if (projectId) {
-      params.project = projectId;
-    }
+  const params = {};
+  const projectId = switches.PROJECT;
+  if (projectId) {
+    params.project = projectId;
+  }
 
+  try {
     const { id } = await scope[type]().create(resource, { params });
     logger.info(`Created ${type} ${id}`);
   } catch (e) {
-    logger.error(`Failed to create ${JSON.stringify(resource)} as a ${type}!`);
-    logger.error(e.message || e.errors[0]);
+    if (e.errors) {
+      // Report a data-specific error
+      logger.error(e.errors[0]);
+      return;
+    }
+
+    // Throw a syntax error
+    throw e;
   }
 };
 
@@ -362,5 +368,6 @@ module.exports = {
   createCsvData,
   encodeObject,
   decodeObject,
+  createResource,
   READ_ONLY,
 };
