@@ -62,7 +62,7 @@ const PAIR_SEPARATOR = ':';
  * @returns {string[]} Array of keys found in the objects.
  */
 const getAllKeys = (arr, prefix) => {
-  const buildKey = item => { return prefix ? `${prefix}.${item}` : item; };
+  const buildKey = (item) => { return prefix ? `${prefix}.${item}` : item; };
 
   return arr.reduce((res, arrItem) => {
     Object.keys(arrItem).forEach((itemKey) => {
@@ -76,8 +76,8 @@ const getAllKeys = (arr, prefix) => {
 
 /**
  * Get all applicable column headers for all objects.
- *
  * Object, 'address', 'customFields', 'identifiers', and 'properties' are supported as types.
+ *
  * @param {Object[]} arr - Array of objects to search for keys.
  * @returns {Object} Object containing a list of each kind of keys
  */
@@ -115,7 +115,7 @@ const escapeCommas = (value) => {
  * @param {Object} obj - The object to encode.
  * @returns {string} The encoded form.
  */
-const encodeObject = obj => {
+const encodeObject = (obj) => {
   const pairs = Object.keys(obj).map(key => `${key}:${obj[key]}`);
   return `{${pairs.join(LIST_SEPARATOR)}}`;
 };
@@ -282,8 +282,8 @@ const preserveType = (value) => {
  * @param {Object} row - The row to convert.
  * @returns {Object} - An EVRYTHNG-compatible object representation of this CSV row.
  */
-const rowToObject = (row) => {
-  return Object.keys(row).reduce((res, key, i) => {
+const rowToObject = row => Object.keys(row)
+  .reduce((res, key) => {
     // Skip read-only keys, or empty cells
     if (READ_ONLY.includes(key) || !row[key]) {
       return res;
@@ -339,7 +339,6 @@ const rowToObject = (row) => {
     res[key] = value;
     return res;
   }, {});
-};
 
 /**
  * Read a CSV file and upload the contents to the account.

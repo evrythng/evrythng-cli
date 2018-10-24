@@ -93,7 +93,7 @@ const extractUrlFromLink = (link) => {
 
 const goToPage = async (res, endPage) => {
   for (let page = 0; page <= endPage; page += 1) {
-    const url = extractUrlFromLink(res.headers.link)
+    const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
       authorization: operator.getKey(),
       fullResponse,
