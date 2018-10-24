@@ -273,7 +273,10 @@ const deleteMethod = async url => apiRequest({
   url,
   method: 'DELETE',
   authorization: operator.getKey(),
-}).then(() => confirmDeletion(url));
+}).then((res) => {
+  confirmDeletion(url);
+  return res;
+});
 
 module.exports = {
   post,

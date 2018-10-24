@@ -3,13 +3,17 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
 const { isEqual } = require('lodash');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const fs = require('fs');
 const neatCsv = require('neat-csv');
 const config = require('../../src/modules/config');
 const csv = require('../../src/modules/csv');
 const switches = require('../../src/modules/switches');
+
+const { expect } = chai;
+chai.use(chaiAsPromised);
 
 const CSV_PATH = `${__dirname}/output.csv`;
 const TEST_OBJECTS = [{
@@ -145,5 +149,23 @@ describe('csv', () => {
   it('should not throw when reading from a CSV file', async () => {
     switches.FROM_CSV = CSV_PATH;
     await csv.read('thng');
+  });
+
+  it('should escape commas and double quotes', () => {
+    const input = 'A "string", including a comma';
+    const expected = '"A ""string"", including a comma"';
+    const result = csv.escapeCommas(input);
+    expect(isEqual(result, expected)).to.equal(true);
+  });
+
+  it('should encode a sub-object', () => {
+    const result = csv.encodeSubObject([], 'foo', { bar: 'baz', coca: 'cola' });
+    const expected = ['{bar:baz|coca:cola}'];
+    expect(isEqual(result, expected)).to.equal(true);
+  });
+
+  it('should not throw for a resource not compatible with redirections', async () => {
+    const promise = csv.createRedirection({}, {}, 'place', 'https://example.com');
+    return expect(promise).to.eventually.be.fulfilled;
   });
 });

@@ -456,5 +456,8 @@ module.exports = {
   encodeObject,
   decodeObject,
   createResource,
+  escapeCommas,
+  encodeSubObject,
+  createRedirection,
   READ_ONLY,
 };
