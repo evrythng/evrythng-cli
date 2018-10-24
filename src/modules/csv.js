@@ -48,6 +48,12 @@ const CONVERTED_ARRAYS = [
   'categories',
 ];
 
+/** Resource types that may have a redirection set. */
+const REDIRECTABLE = [
+  'thng',
+  'product',
+];
+
 /* Use a character other than ','' to encode lists and object pairs */
 const LIST_SEPARATOR = '|';
 
@@ -136,6 +142,45 @@ const decodeObject = objStr => objStr
   }, {});
 
 /**
+ * Encode an array into the CSV row
+ *
+ * @param {string[]} res - Array of CSV cells so far.
+ * @param {any[]} value - Array of items to encode.
+ * @return {string[]} The augmented array of CSV cells.
+ */
+const encodeArray = (res, value) => res.concat(escapeCommas(value.join(LIST_SEPARATOR)));
+
+/**
+ * Encode a GeoJSON point object into the CSV row.
+ *
+ * @param {string[]} res - Array of CSV cells so far.
+ * @param {number[]} coords - Coordinate pair to encode.
+ * @return {string[]} The augmented array of CSV cells.
+ */
+const encodeGeoJson = (res, coords) => res.concat(`${coords[0]}|${coords[1]}`);
+
+/**
+ * Encode an empty cell using an empty string.
+ *
+ * @param {string[]} res - Array of CSV cells so far.
+ * @return {string[]} The augmented array of CSV cells.
+ */
+const encodeEmptyCell = res => res.concat('');
+
+/**
+ * Attempt to encode a JSON sub-object into the CSV row, using a bespoke scheme.
+ *
+ * @param {string[]} res - Array of CSV cells so far.
+ * @param {string} key - Object key to use.
+ * @param {Object} value - Object to encode and add to the row.
+ * @return {string[]} The augmented array of CSV cells.
+ */
+const encodeSubObject = (res, key, value) => {
+  logger.info(`Warning: Sub-object exporting not fully supported (key: ${key})`);
+  return res.concat(escapeCommas(encodeObject(value)));
+};
+
+/**
  * Create row of cell values for each applicable key, else add empty cell (,).
  *
  * @param {Object} obj - The object to convert to a row.
@@ -154,30 +199,17 @@ const objectToCells = (obj, objKeys) => {
     const key = item.includes('.') ? item.split('.')[1] : item;
     const value = obj[key];
 
-    // Empty cell
     if (!value) {
-      res.push('');
-      return res;
+      return encodeEmptyCell(res);
     }
-
-    // Handle Array types
     if (CONVERTED_ARRAYS.includes(key) && value.length) {
-      res.push(escapeCommas(value.join(LIST_SEPARATOR)));
-      return res;
+      return encodeArray(res, value);
     }
-
-    // Position - special case, encode with the separator
     if (key === 'position') {
-      const [lon, lat] = obj.position.coordinates;
-      res.push(`${lon}|${lat}`);
-      return res;
+      return encodeGeoJson(res, obj.position.coordinates);
     }
-
-    // Other objects not supported
     if (String(value).includes('[object Object]')) {
-      logger.info(`Warning: Object exporting not fully supported (key: ${item})`);
-      res.push(escapeCommas(encodeObject(value)));
-      return res;
+      return encodeSubObject(res, item, value);
     }
 
     res.push(escapeCommas(value));
@@ -232,8 +264,9 @@ const createResource = async (scope, resource, type) => {
   }
 
   try {
-    const { id } = await scope[type]().create(resource, { params });
-    logger.info(`Created ${type} ${id}`);
+    const res = await scope[type]().create(resource, { params });
+    logger.info(`Created ${type} ${res.id}`);
+    return res;
   } catch (e) {
     if (e.errors) {
       // Report a data-specific error
@@ -243,6 +276,32 @@ const createResource = async (scope, resource, type) => {
 
     // Throw a syntax error
     throw e;
+  }
+};
+
+/**
+ * Create a redirection for a resource. The URL must include a suitable placeholder.
+ *
+ * @param {Object} scope - The SDK scope making the request.
+ * @param {Object} res - The resource that requires a redirection.
+ * @param {string} type - The resource type.
+ * @param {string} redirection - The redirection URL.
+ */
+const createRedirection = async (scope, res, type, redirection) => {
+  try {
+    if (!REDIRECTABLE.includes(type)) {
+      throw new Error(`'${type}' resources cannot have a redirection set.`);
+    }
+
+    res = await evrythng.api({
+      url: `/${type}s/${res.id}/redirector`,
+      method: 'post',
+      authorization: scope.apiKey,
+      data: { defaultRedirectUrl: redirection },
+    });
+    logger.info(`Created redirection: ${res.defaultRedirectUrl}`);
+  } catch (e) {
+    logger.error(`Error: ${e.errors ? e.errors[0]: e.message}`);
   }
 };
 
@@ -279,6 +338,36 @@ const preserveType = (value) => {
 };
 
 /**
+ * Decode an cell encoded as an array of values.
+ *
+ * @param {Object} res - The object being constructed.
+ * @param {string} key - Result object key.
+ * @param {string} value - Array to be decoded.
+ */
+const decodeArray = (res, key, value) => {
+  if (value.length) {
+    res[key] = value.split(LIST_SEPARATOR);
+  }
+  return res;
+};
+
+/**
+ * Decode an cell encoded as a lat/lon pair to GeoJSON object.
+ *
+ * @param {Object} res - The object being constructed.
+ * @param {string} key - Result object key.
+ * @param {string} value - Coordinate pair to be decoded.
+ */
+const decodeGeoJson = (res, key, value) => {
+  const [lon, lat] = value.split(LIST_SEPARATOR);
+  res[key] = {
+    type: 'Point',
+    coordinates: [parseFloat(lon), parseFloat(lat)],
+  };
+  return res;
+};
+
+/**
  * Convert a CSV row object to an EVRYTHNG resource.
  * Some special decoding and filtering is still required.
  *
@@ -293,28 +382,18 @@ const rowToObject = row => Object.keys(row)
     }
 
     const value = preserveType(row[key]);
-
-    // Sub-objects are not supported
     if (value === '[object Object]') {
-      logger.info(`Warning: Object importing not supported (key: ${key})`);
+      logger.info(`Warning: Sub-object not supported (key: ${key})`);
       return res;
     }
-
-    // Other unsupported object
     if (IMPORT_UNSUPPORTED.includes(key)) {
       logger.info(`Warning: Importing not supported (key: ${key})`);
       return res;
     }
 
-    // Tags
     if (CONVERTED_ARRAYS.includes(key)) {
-      if (value.length) {
-        res[key] = value.split(LIST_SEPARATOR);
-      }
-      return res;
+      return decodeArray(res, key, value);
     }
-
-    // Sub-objects
     if (key.includes('address')) {
       return assignPrefixProperty(res, 'address', key, value);
     }
@@ -327,15 +406,8 @@ const rowToObject = row => Object.keys(row)
     if (key.includes('properties')) {
       return assignPrefixProperty(res, 'properties', key, value);
     }
-
-    // Position - special case, decode with the separator into fixed object
     if (key === 'position') {
-      const [lon, lat] = value.split(LIST_SEPARATOR);
-      res[key] = {
-        type: 'Point',
-        coordinates: [parseFloat(lon), parseFloat(lat)],
-      };
-      return res;
+      return decodeGeoJson(res, key, value);
     }
 
     // Simple value
@@ -359,7 +431,19 @@ const read = async (type) => {
   const rows = await neatCsv(csvStr);
 
   const scope = new evrythng.Operator(operator.getKey());
-  await util.nextTask(rows.map(item => () => createResource(scope, rowToObject(item), type)));
+  await util.nextTask(rows.map(item => async () => {
+    // If there's a 'redirection' column, preserve it
+    let redirection;
+    if (item.redirection) {
+      redirection = item.redirection;
+      delete item.redirection;
+    }
+
+    const res = await createResource(scope, rowToObject(item), type);
+    if (redirection) {
+      await createRedirection(scope, res, type, redirection);
+    }
+  }));
   logger.info(`\nImport from '${path}' complete.`);
 };
 
