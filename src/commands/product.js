@@ -66,6 +66,10 @@ module.exports = {
       execute: async ([id, , key]) => http.delete(`/products/${id}/properties/${key}`),
       pattern: '$id properties $key delete',
     },
+    deleteProperties: {
+      execute: async ([id]) => http.delete(`/products/${id}/properties`),
+      pattern: '$id properties delete',
+    },
 
     // Product actions
     createProductAction: {

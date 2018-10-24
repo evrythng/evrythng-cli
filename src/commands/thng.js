@@ -66,6 +66,10 @@ module.exports = {
       execute: async ([id, , key]) => http.delete(`/thngs/${id}/properties/${key}`),
       pattern: '$id properties $key delete',
     },
+    deleteProperties: {
+      execute: async ([id]) => http.delete(`/thngs/${id}/properties`),
+      pattern: '$id properties delete',
+    },
 
     // Thng actions
     createThngAction: {
