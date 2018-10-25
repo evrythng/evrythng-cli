@@ -218,23 +218,63 @@ const objectToCells = (obj, objKeys) => {
 };
 
 /**
+ * Read any available redirections for the list of resources.
+ *
+ * @param {Object[]} arr - Array of objects to find redirections for.
+ * @param {string} shortDomain - The short domain to find those redirections, such as 'tn.gg'.
+ */
+const readRedirections = async (arr, shortDomain) => {
+  const tasks = arr.map(item => async () => {
+    try {
+      const [redirection] = await evrythng.api({
+        apiUrl: `https://${shortDomain}`,
+        url: `/redirections?evrythngId=${item.id}`,
+        authorization: operator.getKey(),
+      });
+
+      if (redirection) {
+        item.redirection = redirection.defaultRedirectUrl;
+      }
+    } catch (e) {
+      // Type can have no redirection
+      if (e.errors && e.errors[0].includes('requested resource')) {
+        throw new Error('This resource type does not support redirections.');
+      }
+
+      logger.error(e.errors ? e.errors[0] : e.message);
+    }
+  });
+  return util.nextTask(tasks);
+};
+
+/**
  * Create CSV data from input object array.
  *
  * @param {Object[]} arr - Array of input objects to convert.
  * @returns {string[]} Array of CSV rows as strings.
  */
-const createCsvData = (arr) => {
+const createCsvData = async (arr) => {
+  // Include short domain?
+  const shortDomain = switches.WITH_REDIRECTIONS;
+  if (shortDomain) {
+    logger.info(`Reading ${arr.length} redirections...`);
+    await readRedirections(arr, shortDomain);
+  }
+
+  // Get all column headings
   const { object, address, customFields, identifiers, properties } = getColumnHeaders(arr);
   const columnHeaders = [
     ...object, ...address, ...customFields, ...identifiers, ...properties,
   ].join(',');
 
+  // Convert to rows
   const rows = arr.map(item => objectToCells(item, object)
     .concat(objectToCells(item.address, address))
     .concat(objectToCells(item.customFields, customFields))
     .concat(objectToCells(item.identifiers, identifiers))
     .concat(objectToCells(item.properties, properties))
     .join(','));
+
   return [columnHeaders, ...rows];
 };
 
@@ -244,8 +284,9 @@ const createCsvData = (arr) => {
  * @param {Object[]} arr - Array of objects to write to file.
  * @param {string} path - Path of the file to write.
  */
-const write = (arr, path) => {
-  fs.writeFileSync(path, createCsvData(arr).join('\n'), 'utf8');
+const write = async (arr, path) => {
+  const data = await createCsvData(arr);
+  fs.writeFileSync(path, data.join('\n'), 'utf8');
   logger.info(`\nWrote ${arr.length} items to '${path}'.`);
 };
 
@@ -280,26 +321,40 @@ const createResource = async (scope, resource, type) => {
 };
 
 /**
+ * Create request options for creating a resource redirection.
+ *
+ * @param {Object} scope - The actor scope.
+ * @param {string} evrythngId - The resource ID.
+ * @param {string} type - The resource type.
+ * @param {string} defaultRedirectUrl - The redirection URL.
+ * @returns {Object} The complete request options for evrythng.api().
+ */
+const createRedirectionOptions = (scope, evrythngId, type, defaultRedirectUrl) => ({
+  apiUrl: `https://${switches.WITH_REDIRECTIONS}`,
+  url: '/redirections',
+  method: 'post',
+  authorization: scope.apiKey,
+  headers: { Accept: 'application/json' },
+  data: { evrythngId, defaultRedirectUrl, type },
+});
+
+/**
  * Create a redirection for a resource. The URL must include a suitable placeholder.
  *
  * @param {Object} scope - The SDK scope making the request.
- * @param {Object} res - The resource that requires a redirection.
+ * @param {string} evrythngId - The resource ID.
  * @param {string} type - The resource type.
- * @param {string} redirection - The redirection URL.
+ * @param {string} defaultRedirectUrl - The redirection URL.
  */
-const createRedirection = async (scope, res, type, redirection) => {
+const createRedirection = async (scope, evrythngId, type, defaultRedirectUrl) => {
   try {
     if (!REDIRECTABLE.includes(type)) {
       throw new Error(`'${type}' resources cannot have a redirection set.`);
     }
 
-    res = await evrythng.api({
-      url: `/${type}s/${res.id}/redirector`,
-      method: 'post',
-      authorization: scope.apiKey,
-      data: { defaultRedirectUrl: redirection },
-    });
-    logger.info(`Created redirection: ${res.defaultRedirectUrl}`);
+    const options = createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
+    const res = await evrythng.api(options);
+    logger.info(`  Created redirection: ${res.defaultRedirectUrl}`);
   } catch (e) {
     logger.error(`Error: ${e.errors ? e.errors[0]: e.message}`);
   }
@@ -439,9 +494,12 @@ const read = async (type) => {
       delete item.redirection;
     }
 
+    // Create the resource
     const res = await createResource(scope, rowToObject(item), type);
-    if (redirection) {
-      await createRedirection(scope, res, type, redirection);
+
+    // Create the redirection, if required
+    if (redirection && switches.WITH_REDIRECTIONS) {
+      await createRedirection(scope, res.id, type, redirection);
     }
   }));
   logger.info(`\nImport from '${path}' complete.`);
@@ -459,5 +517,6 @@ module.exports = {
   escapeCommas,
   encodeSubObject,
   createRedirection,
+  createRedirectionOptions,
   READ_ONLY,
 };

@@ -194,7 +194,7 @@ const printResponse = async (res) => {
 
   // Print to file?
   if (csvFileName) {
-    csv.write(Array.isArray(data) ? data : [data], csvFileName);
+    await csv.write(Array.isArray(data) ? data : [data], csvFileName);
     return res;
   }
 

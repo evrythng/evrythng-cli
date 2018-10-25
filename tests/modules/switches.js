@@ -124,4 +124,12 @@ describe('switches', () => {
     expect(res.status).to.equal(200);
     expect(res.data).to.be.an('array');
   });
+
+  it('should accept the --build switch');
+
+  it('should accept the --to-csv switch');
+
+  it('should accept the --from-csv switch');
+
+  it('should accept the --with-redirections switch');
 });

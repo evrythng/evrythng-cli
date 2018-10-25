@@ -62,14 +62,25 @@ describe('csv', () => {
     fs.unlinkSync(CSV_PATH);
   });
 
-  it('should convert objects to CSV rows', () => {
-    const rows = csv.createCsvData(TEST_OBJECTS);
+  afterEach(() => {
+    switches.FROM_CSV = '';
+    switches.WITH_REDIRECTIONS = '';
+  });
+
+  it('should convert objects to CSV rows', async () => {
+    const rows = await csv.createCsvData(TEST_OBJECTS);
     expect(isEqual(rows, TEST_ROWS)).to.equal(true);
   });
 
   it('should not throw when writing to a CSV file', async () => {
     const writeCsvFile = () => csv.write(TEST_OBJECTS, CSV_PATH);
     expect(writeCsvFile).to.not.throw();
+  });
+
+  it('should throw if the specified file doesn\'t exist', async () => {
+    switches.FROM_CSV = 'badpath.txt';
+    const promise = csv.read('thng');
+    return expect(promise).to.eventually.be.rejected;
   });
 
   it('should have written the correct content to file', () => {
@@ -167,5 +178,24 @@ describe('csv', () => {
   it('should not throw for a resource not compatible with redirections', async () => {
     const promise = csv.createRedirection({}, {}, 'place', 'https://example.com');
     return expect(promise).to.eventually.be.fulfilled;
+  });
+
+  it('should create valid redirection creation options', () => {
+    const scope = { apiKey: 'abc' };
+    const evrythngId = 'UH4nVsWVMG8EEqRawkMnybMh';
+    const type = 'thng';
+    const defaultRedirectUrl = 'https://example.com';
+    switches.WITH_REDIRECTIONS = 'tn.gg';
+    const expected = {
+      apiUrl: 'https://tn.gg',
+      url: '/redirections',
+      method: 'post',
+      authorization: 'abc',
+      headers: { Accept: 'application/json' },
+      data: { evrythngId, defaultRedirectUrl, type },
+    };
+
+    const result = csv.createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
+    expect(isEqual(expected, result)).to.equal(true);
   });
 });
