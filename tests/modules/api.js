@@ -4,6 +4,7 @@
  */
 
 const { expect } = require('chai');
+const { NAME, mockApi } = require('../util');
 const api = require('../../src/modules/api');
 const cli = require('../../src/functions/cli');
 const commands = require('../../src/modules/commands');
@@ -61,5 +62,13 @@ describe('api', () => {
     const switches = api.API.getSwitches();
 
     expect(switches).to.be.an('object');
+  });
+
+  it('should allow a command to be run', async () => {
+    mockApi()
+      .get('/products?perPage=30')
+      .reply(200, [{ name: NAME }]);
+
+    await api.API.runCommand(['products', 'list']);
   });
 });

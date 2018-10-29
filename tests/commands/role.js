@@ -3,68 +3,73 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('roles', () => {
   // Role CRUD
-  it('should return 201 for \'roles create $payload\'', async () => {
+  it('should make correct request for \'roles create $payload\'', async () => {
     const payload = JSON.stringify({
       name: 'Test role',
       version: 2,
       type: 'userInApp',
     });
-    const res = await cli(`roles create ${payload}`);
+    mockApi()
+      .post('/roles', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.roleId = res.data.id;
+    await cli(`roles create ${payload}`);
   });
 
-  it('should return 200 for \'roles list\'', async () => {
-    const res = await cli('roles list');
+  it('should make correct request for \'roles list\'', async () => {
+    mockApi()
+      .get('/roles?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('roles list');
   });
 
-  it('should return 200 for \'roles $id read\'', async () => {
-    const res = await cli(`roles ${ctx.roleId} read`);
+  it('should make correct request for \'roles $id read\'', async () => {
+    mockApi()
+      .get(`/roles/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`roles ${ID} read`);
   });
 
-  it('should return 200 for \'roles $id update $payload\'', async () => {
+  it('should make correct request for \'roles $id update $payload\'', async () => {
     const payload = JSON.stringify({ customFields: { key: 'value' } });
-    const res = await cli(`roles ${ctx.roleId} update ${payload}`);
+    mockApi()
+      .put(`/roles/${ID}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`roles ${ID} update ${payload}`);
   });
 
   // Role Permissions
-  it('should return 200 for \'roles $id permissions list\'', async () => {
-    const res = await cli(`roles ${ctx.roleId} permissions list`);
+  it('should make correct request for \'roles $id permissions list\'', async () => {
+    mockApi()
+      .get(`/roles/${ID}/permissions?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`roles ${ID} permissions list`);
   });
 
-  it('should return 200 for \'roles $id permissions update $payload\'', async () => {
+  it('should make correct request for \'roles $id permissions update $payload\'', async () => {
     const payload = JSON.stringify([{ path: '/thngs', access: 'r' }]);
-    const res = await cli(`roles ${ctx.roleId} permissions update ${payload}`);
+    mockApi()
+      .put(`/roles/${ID}/permissions`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`roles ${ID} permissions update ${payload}`);
   });
 
   // Finally
-  it('should return 200 for \'roles $id delete\'', async () => {
-    const res = await cli(`roles ${ctx.roleId} delete`);
+  it('should make correct request for \'roles $id delete\'', async () => {
+    mockApi()
+      .delete(`/roles/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`roles ${ID} delete`);
   });
 });

@@ -3,14 +3,15 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
+const { mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('rate-limits', () => {
-  it('should return 200 for \'rate-limits read\'', async () => {
-    const res = await cli(`rate-limits read`);
+  it('should make correct request for \'rate-limits read\'', async () => {
+    mockApi()
+      .get('/rateLimits?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`rate-limits read`);
   });
 });

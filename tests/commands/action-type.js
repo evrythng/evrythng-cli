@@ -3,39 +3,43 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
+const NAME = 'scans';
+
 describe('action-types', () => {
-  it('should return 201 for \'action-types create $payload\'', async () => {
+  it('should make correct request for \'action-types create $payload\'', async () => {
     const payload = JSON.stringify({ name: `_action-type-${Date.now()}` });
-    const res = await cli(`action-types create ${payload}`);
+    mockApi()
+      .post('/actions', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.actionType = res.data.name;
+    await cli(`action-types create ${payload}`);
   });
 
-  it('should return 200 for \'action-types list\'', async () => {
-    const res = await cli('action-types list');
+  it('should make correct request for \'action-types list\'', async () => {
+    mockApi()
+      .get('/actions?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('action-types list');
   });
 
-  it('should return 200 for \'action-types $type update $payload\'', async () => {
+  it('should make correct request for \'action-types $type update $payload\'', async () => {
     const payload = JSON.stringify({ description: 'Example action type' });
-    const res = await cli(`action-types ${ctx.actionType} update ${payload}`);
+    mockApi()
+      .put(`/actions/${NAME}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`action-types ${NAME} update ${payload}`);
   });
 
-  it('should return 200 for \'action-types $type delete\'', async () => {
-    const res = await cli(`action-types ${ctx.actionType} delete`);
+  it('should make correct request for \'action-types $type delete\'', async () => {
+    mockApi()
+      .delete(`/actions/${NAME}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`action-types ${NAME} delete`);
   });
 });

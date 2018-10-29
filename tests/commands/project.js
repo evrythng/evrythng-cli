@@ -3,208 +3,222 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('projects', () => {
   // Project CRUD
-  it('should return 201 for \'projects create $payload\'', async () => {
+  it('should make correct request for \'projects create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test project' });
-    const res = await cli(`projects create ${payload}`);
+    mockApi()
+      .post('/projects', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.projectId = res.data.id;
+    await cli(`projects create ${payload}`);
   });
 
-  it('should return 200 for \'projects list\'', async () => {
-    const res = await cli('projects list');
+  it('should make correct request for \'projects list\'', async () => {
+    mockApi()
+      .get('/projects?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('projects list');
   });
 
-  it('should return 200 for \'projects $id read\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} read`);
+  it('should make correct request for \'projects $id read\'', async () => {
+    mockApi()
+      .get(`/projects/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`projects ${ID} read`);
   });
 
-  it('should return 200 for \'projects $id update $payload\'', async () => {
+  it('should make correct request for \'projects $id update $payload\'', async () => {
     const payload = JSON.stringify({ tags: ['test'] });
-    const res = await cli(`projects ${ctx.projectId} update ${payload}`);
+    mockApi()
+      .put(`/projects/${ID}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`projects ${ID} update ${payload}`);
   });
 
   // Applications CRUD
-  it('should return 200 for \'projects $id applications create $payload\'', async () => {
+  it('should make correct request for \'projects $id applications create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test application', socialNetworks: {} });
-    const res = await cli(`projects ${ctx.projectId} applications create ${payload}`);
+    mockApi()
+      .post(`/projects/${ID}/applications`, payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.appId = res.data.id;
+    await cli(`projects ${ID} applications create ${payload}`);
   });
 
-  it('should return 200 for \'projects $id applications list\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} applications list`);
+  it('should make correct request for \'projects $id applications list\'', async () => {
+    mockApi()
+      .get(`/projects/${ID}/applications?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`projects ${ID} applications list`);
   });
 
-  it('should return 200 for \'projects $id applications $id read\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} applications ${ctx.appId} read`);
+  it('should make correct request for \'projects $id applications $id read\'', async () => {
+    mockApi()
+      .get(`/projects/${ID}/applications/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`projects ${ID} applications ${ID} read`);
   });
 
-  it('should return 200 for \'projects $id applications $id update $payload\'', async () => {
-    const payload = JSON.stringify({ description: 'Updated application' });
-    const res = await cli(`projects ${ctx.projectId} applications ${ctx.appId} update ${payload}`);
+  it('should make correct request for \'projects $id applications $id update $payload\'',
+    async () => {
+      const payload = JSON.stringify({ description: 'Updated application' });
+      mockApi()
+        .put(`/projects/${ID}/applications/${ID}`, payload)
+        .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
-  });
+      await cli(`projects ${ID} applications ${ID} update ${payload}`);
+    });
 
   // Trusted API Key
-  it('should return 200 for \'projects $id applications $id secret-key read\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} applications ${ctx.appId} secret-key read`);
+  it('should make correct request for \'projects $id applications $id secret-key read\'',
+    async () => {
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/secretKey?perPage=30`)
+        .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
-  });
+      await cli(`projects ${ID} applications ${ID} secret-key read`);
+    });
 
   // Application Redirector
-  it('should return 200 for \'projects $id applications $id redirector read\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} applications ${ctx.appId} redirector read`);
+  it('should make correct request for \'projects $id applications $id redirector read\'',
+    async () => {
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/redirector?perPage=30`,)
+        .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
-  });
+      await cli(`projects ${ID} applications ${ID} redirector read`);
+    });
 
-  it('should return 200 for \'projects $id applications $id redirector update $payload\'',
+  it('should make correct request for \'projects $id applications $id redirector update $payload\'',
     async () => {
       const payload = JSON.stringify({
         rules: [{ match: 'thng.name=test', redirectUrl: 'https://evrythng.com' }],
       });
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} redirector update ${payload}`;
-      const res = await cli(argStr);
+      mockApi()
+        .put(`/projects/${ID}/applications/${ID}/redirector`, payload)
+        .reply(200);
 
-      expect(res.status).to.equal(200);
-      expect(res.data).to.be.an('object');
+      await cli(`projects ${ID} applications ${ID} redirector update ${payload}`);
     });
 
   // Application Reactor
-  it('should return 200 for \'projects $id applications $id reactor script read\'', async () => {
-    const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor script read`;
-    const res = await cli(argStr);
-
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
-  });
-
-  it('should return 200 for \'projects $id applications $id reactor script update $payload\'',
+  it('should make correct request for \'projects $id applications $id reactor script read\'',
     async () => {
-      const payload = JSON.stringify({
-        script: 'function onActionCreated(event) {\n logger.debug(\'Hello World!\');\n done();}',
-      });
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor script update ${payload}`;
-      const res = await cli(argStr);
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/reactor/script?perPage=30`)
+        .reply(200);
 
-      expect(res.status).to.equal(200);
-      expect(res.data).to.be.an('object');
+      await cli(`projects ${ID} applications ${ID} reactor script read`);
     });
 
-  it('should return 200 for \'projects $id applications $id reactor script status read\'',
+  it('should make correct request for \'projects $id applications $id reactor script update $payload\'',
     async () => {
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor script status read`;
-      const res = await cli(argStr);
+      const script = 'function onActionCreated(event) {\n logger.debug(\'Hello World!\');\n done();}';
+      const payload = JSON.stringify({ script });
+      mockApi()
+        .put(`/projects/${ID}/applications/${ID}/reactor/script`, payload)
+        .reply(200);
 
-      expect(res.status).to.equal(200);
-      expect(res.data).to.be.an('object');
+      await cli(`projects ${ID} applications ${ID} reactor script update ${payload}`);
     });
 
-  it('should return 200 for \'projects $id applications $id reactor logs read\'', async () => {
-    const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor logs read`;
-    const res = await cli(argStr);
+  it('should make correct request for \'projects $id applications $id reactor script status read\'',
+    async () => {
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/reactor/script/status?perPage=30`)
+        .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
-  });
+      await cli(`projects ${ID} applications ${ID} reactor script status read`);
+    });
 
-  it('should return 200 for \'projects $id applications $id reactor logs delete\'', async () => {
-    const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor logs delete`;
-    const res = await cli(argStr);
+  it('should make correct request for \'projects $id applications $id reactor logs read\'',
+    async () => {
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/reactor/logs?perPage=30`)
+        .reply(200);
 
-    expect(res.status).to.equal(200);
-  });
+      await cli(`projects ${ID} applications ${ID} reactor logs read`);
+    });
 
-  it('should return 201 for \'projects $id applications $id reactor schedules create $payload\'',
+  it('should make correct request for \'projects $id applications $id reactor logs delete\'',
+    async () => {
+      mockApi()
+        .delete(`/projects/${ID}/applications/${ID}/reactor/logs`)
+        .reply(200);
+
+      await cli(`projects ${ID} applications ${ID} reactor logs delete`);
+    });
+
+  it('should make correct request for \'projects $id applications $id reactor schedules create $payload\'',
     async () => {
       const payload = JSON.stringify({ event: {}, executeAt: Date.now() + 60000 });
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor schedules create ${payload}`;
-      const res = await cli(argStr);
+      mockApi()
+        .post(`/projects/${ID}/applications/${ID}/reactor/schedules`, payload)
+        .reply(201);
 
-      expect(res.status).to.equal(201);
-      expect(res.data).to.be.an('object');
-
-      ctx.scheduleId = res.data.id;
+      await cli(`projects ${ID} applications ${ID} reactor schedules create ${payload}`);
     });
 
-  it('should return 200 for \'projects $id applications $id reactor schedules list\'', async () => {
-    const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor schedules list`;
-    const res = await cli(argStr);
-
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
-  });
-
-  it('should return 200 for \'projects $id applications $id reactor schedules $id read\'',
+  it('should make correct request for \'projects $id applications $id reactor schedules list\'',
     async () => {
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor schedules ${ctx.scheduleId} read`;
-      const res = await cli(argStr);
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/reactor/schedules?perPage=30`)
+        .reply(200);
 
-      expect(res.status).to.equal(200);
-      expect(res.data).to.be.an('object');
+      await cli(`projects ${ID} applications ${ID} reactor schedules list`);
     });
 
-  it(
-    'should return 200 for \'projects $id applications $id reactor schedules $id update $payload\'',
+  it('should make correct request for \'projects $id applications $id reactor schedules $id read\'',
+    async () => {
+      mockApi()
+        .get(`/projects/${ID}/applications/${ID}/reactor/schedules/${ID}`)
+        .reply(200);
+
+      await cli(`projects ${ID} applications ${ID} reactor schedules ${ID} read`);
+    });
+
+  it('should make correct request for \'projects $id applications $id reactor schedules $id update $payload\'',
     async () => {
       const payload = JSON.stringify({ description: 'Updated schedule' });
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor schedules ${ctx.scheduleId} update ${payload}`;
-      const res = await cli(argStr);
+      mockApi()
+        .put(`/projects/${ID}/applications/${ID}/reactor/schedules/${ID}`, payload)
+        .reply(200);
 
-      expect(res.status).to.equal(200);
-      expect(res.data).to.be.an('object');
+      await cli(`projects ${ID} applications ${ID} reactor schedules ${ID} update ${payload}`);
     });
 
-  it('should return 200 for \'projects $id applications $id reactor schedules $id delete\'',
+  it('should make correct request for \'projects $id applications $id reactor schedules $id delete\'',
     async () => {
-      const argStr = `projects ${ctx.projectId} applications ${ctx.appId} reactor schedules ${ctx.scheduleId} delete`;
-      const res = await cli(argStr);
+      mockApi()
+        .delete(`/projects/${ID}/applications/${ID}/reactor/schedules/${ID}`)
+        .reply(200);
 
-      expect(res.status).to.equal(200);
+      await cli(`projects ${ID} applications ${ID} reactor schedules ${ID} delete`);
     });
 
   // Finally
-  it('should return 200 for \'projects $id applications $id delete\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} applications ${ctx.appId} delete`);
+  it('should make correct request for \'projects $id applications $id delete\'', async () => {
+    mockApi()
+      .delete(`/projects/${ID}/applications/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`projects ${ID} applications ${ID} delete`);
   });
 
-  it('should return 200 for \'projects $id delete\'', async () => {
-    const res = await cli(`projects ${ctx.projectId} delete`);
+  it('should make correct request for \'projects $id delete\'', async () => {
+    mockApi()
+      .delete(`/projects/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`projects ${ID} delete`);
   });
 });

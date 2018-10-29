@@ -8,6 +8,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const fs = require('fs');
 const neatCsv = require('neat-csv');
+const { mockApi } = require('../util');
 const config = require('../../src/modules/config');
 const csv = require('../../src/modules/csv');
 const switches = require('../../src/modules/switches');
@@ -158,8 +159,14 @@ describe('csv', () => {
   });
 
   it('should not throw when reading from a CSV file', async () => {
+    const mock = mockApi()
+      .persist()
+      .post('/thngs?')
+      .reply(201, {});
+
     switches.FROM_CSV = CSV_PATH;
     await csv.read('thng');
+    mock.persist(false);
   });
 
   it('should escape commas and double quotes', () => {

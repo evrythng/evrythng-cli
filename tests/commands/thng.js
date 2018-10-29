@@ -3,199 +3,210 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { ID, NAME, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
-const TEST_KEY = 'test';
-
 describe('thngs', () => {
-  before(async () => {
-    const payload = JSON.stringify({ name: `_action-type-${Date.now()}` });
-    const res = await cli(`action-types create ${payload}`);
-
-    ctx.actionType = res.data.name;
-  });
-
-  after(async () => {
-    await cli(`action-types ${ctx.actionType} delete`);
-  });
-
   // Thng CRUD
-  it('should return 201 for \'thngs create $payload\'', async () => {
+  it('should make correct request for \'thngs create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test thng' });
-    const res = await cli(`thngs create ${payload}`);
+    mockApi()
+      .post('/thngs', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.thngId = res.data.id;
+    await cli(`thngs create ${payload}`);
   });
 
-  it('should return 200 for \'thngs list\'', async () => {
-    const res = await cli('thngs list');
+  it('should make correct request for \'thngs list\'', async () => {
+    mockApi()
+      .get('/thngs?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('thngs list');
   });
 
-  it('should return 200 for \'thngs $id read\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} read`);
+  it('should make correct request for \'thngs $id read\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} read`);
   });
 
-  it('should return 200 for \'thngs $id update $payload\'', async () => {
+  it('should make correct request for \'thngs $id update $payload\'', async () => {
     const payload = JSON.stringify({ tags: ['test'] });
-    const res = await cli(`thngs ${ctx.thngId} update ${payload}`);
+    mockApi()
+      .put(`/thngs/${ID}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} update ${payload}`);
   });
 
   // Thng properties
-  it('should return 200 for \'thngs $id properties create $payload\'', async () => {
-    const payload = JSON.stringify([{ key: TEST_KEY, value: 'some value' }]);
-    const res = await cli(`thngs ${ctx.thngId} properties create ${payload}`);
+  it('should make correct request for \'thngs $id properties create $payload\'', async () => {
+    const payload = JSON.stringify([{ key: NAME, value: 'some value' }]);
+    mockApi()
+      .put(`/thngs/${ID}/properties`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} properties create ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id properties list\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} properties list`);
+  it('should make correct request for \'thngs $id properties list\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}/properties?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`thngs ${ID} properties list`);
   });
 
-  it('should return 200 for \'thngs $id properties $key read\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} properties ${TEST_KEY} read`);
+  it('should make correct request for \'thngs $id properties $key read\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}/properties/${NAME}?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`thngs ${ID} properties ${NAME} read`);
   });
 
-  it('should return 200 for \'thngs $id properties $key update $payload\'', async () => {
+  it('should make correct request for \'thngs $id properties $key update $payload\'', async () => {
     const payload = JSON.stringify([{ value: 'some value' }]);
-    const res = await cli(`thngs ${ctx.thngId} properties ${TEST_KEY} update ${payload}`);
+    mockApi()
+      .put(`/thngs/${ID}/properties/${NAME}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} properties ${NAME} update ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id properties $key delete\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} properties ${TEST_KEY} delete`);
+  it('should make correct request for \'thngs $id properties $key delete\'', async () => {
+    mockApi()
+      .delete(`/thngs/${ID}/properties/${NAME}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} properties ${NAME} delete`);
   });
 
   // Thng actions
-  it('should return 201 for \'thngs $id actions create $payload\'', async () => {
-    const payload = JSON.stringify({ type: ctx.actionType });
-    const res = await cli(`thngs ${ctx.thngId} actions create ${payload}`);
+  it('should make correct request for \'thngs $id actions create $payload\'', async () => {
+    const payload = JSON.stringify({ type: NAME });
+    mockApi()
+      .post(`/thngs/${ID}/actions/all`, payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.actionId = res.data.id;
+    await cli(`thngs ${ID} actions create ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id actions list\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} actions list`);
+  it('should make correct request for \'thngs $id actions list\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}/actions/all?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`thngs ${ID} actions list`);
   });
 
-  it('should return 200 for \'thngs $id actions $id read\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} actions ${ctx.actionId} read`);
+  it('should make correct request for \'thngs $id actions $id read\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}/actions/all/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} actions ${ID} read`);
   });
 
   // Thng redirection
-  it('should return 201 for \'thngs $id redirection create $payload\'', async () => {
+  it('should make correct request for \'thngs $id redirection create $payload\'', async () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/' });
-    const res = await cli(`thngs ${ctx.thngId} redirection create ${payload}`);
+    mockApi()
+      .post(`/thngs/${ID}/redirector`, payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} redirection create ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id redirection read\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} redirection read`);
+  it('should make correct request for \'thngs $id redirection read\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}/redirector?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} redirection read`);
   });
 
-  it('should return 201 for \'thngs $id redirection update $payload\'', async () => {
+  it('should make correct request for \'thngs $id redirection update $payload\'', async () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
-    const res = await cli(`thngs ${ctx.thngId} redirection update ${payload}`);
+    mockApi()
+      .put(`/thngs/${ID}/redirector`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} redirection update ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id redirection delete\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} redirection delete`);
+  it('should make correct request for \'thngs $id redirection delete\'', async () => {
+    mockApi()
+      .delete(`/thngs/${ID}/redirector`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} redirection delete`);
   });
 
   // Thng location
-  it('should return 200 for \'thngs $id location read\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} location read`);
+  it('should make correct request for \'thngs $id location read\'', async () => {
+    mockApi()
+      .get(`/thngs/${ID}/location?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`thngs ${ID} location read`);
   });
 
-  it('should return 200 for \'thngs $id location update $payload\'', async () => {
+  it('should make correct request for \'thngs $id location update $payload\'', async () => {
     const payload = JSON.stringify([{
       position: { type: 'Point', coordinates: [ -17.3, 36 ] },
     }]);
-    const res = await cli(`thngs ${ctx.thngId} location update ${payload}`);
+    mockApi()
+      .put(`/thngs/${ID}/location`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`thngs ${ID} location update ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id location delete\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} location delete`);
+  it('should make correct request for \'thngs $id location delete\'', async () => {
+    mockApi()
+      .delete(`/thngs/${ID}/location`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} location delete`);
   });
 
   // Thng Device API Key
-  it('should return 201 for \'thngs device-key create $payload\'', async () => {
-    const payload = JSON.stringify({ thngId: ctx.thngId });
-    const res = await cli(`thngs device-key create ${payload}`);
+  it('should make correct request for \'thngs device-key create $payload\'', async () => {
+    const payload = JSON.stringify({ thngId: ID });
+    mockApi()
+      .post('/auth/evrythng/thngs')
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs device-key create ${payload}`);
   });
 
-  it('should return 200 for \'thngs $id device-key read\'', async () => {
-    const payload = JSON.stringify({ thngId: ctx.thngId });
-    const res = await cli(`thngs ${ctx.thngId} device-key read`);
+  it('should make correct request for \'thngs $id device-key read\'', async () => {
+    const payload = JSON.stringify({ thngId: ID });
+    mockApi()
+      .get(`/auth/evrythng/thngs/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`thngs ${ID} device-key read`);
   });
 
-  it('should return 200 for \'thngs $id device-key delete\'', async () => {
-    const payload = JSON.stringify({ thngId: ctx.thngId });
-    const res = await cli(`thngs ${ctx.thngId} device-key delete`);
+  it('should make correct request for \'thngs $id device-key delete\'', async () => {
+    mockApi()
+      .delete(`/auth/evrythng/thngs/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} device-key delete`);
   });
 
   // Finally
-  it('should return 200 for \'thngs $id delete\'', async () => {
-    const res = await cli(`thngs ${ctx.thngId} delete`);
+  it('should make correct request for \'thngs $id delete\'', async () => {
+    mockApi()
+      .delete(`/thngs/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`thngs ${ID} delete`);
   });
 });
