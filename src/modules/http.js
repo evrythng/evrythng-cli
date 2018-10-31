@@ -93,6 +93,11 @@ const extractUrlFromLink = (link) => {
 
 const goToPage = async (res, endPage) => {
   for (let page = 0; page <= endPage; page += 1) {
+    if (!res.headers.link) {
+      logger.info('No more pages. Returning last found page.');
+      return res;
+    }
+
     const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
       authorization: operator.getKey(),
@@ -101,10 +106,6 @@ const goToPage = async (res, endPage) => {
     });
     if (page === endPage - 1) {
       return res;
-    }
-
-    if (!res.headers.link) {
-      throw new Error(`Ran out of pages at page ${page}`);
     }
   }
 
@@ -116,6 +117,10 @@ const getMorePages = async (res, max) => {
   const items = [...res.data];
 
   for (let page = 1; page < max; page += 1) {
+    if (!res.headers.link) {
+      break;
+    }
+
     const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
       authorization: operator.getKey(),
@@ -124,9 +129,6 @@ const getMorePages = async (res, max) => {
     });
     items.push(...res.data);
     logger.info(`Reading - ${items.length} items`, true);
-    if (!res.headers.link) {
-      break;
-    }
   }
 
   logger.info(`\nRead ${items.length} items.`);
