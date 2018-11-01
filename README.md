@@ -67,6 +67,10 @@ add/extend custom functionality as the user requires. These plugins are provided
 with an `api` parameter that contains methods and data they can use to implement 
 additional functionality, such as adding new commands.
 
+See the 
+[_Plugins_](https://developers.evrythng.com/v3.0/docs/evrythng-cli-plugins#section-published-examples)
+page of the documentation for some example plugin implementations.
+
 
 ### Plugin Requirements
 
