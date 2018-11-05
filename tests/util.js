@@ -58,38 +58,6 @@ const createAppUser = async (name) => {
 };
 
 /**
- * Validate a CLI command string produces an API request. Quicker than an E2E test.
- *
- * @param {String} argStr - The CLI command, such as 'thngs list'.
- * @param {Object} spec - The expected options produced by sendRequest.
- * @param {String} apiKey - API key to use as the authorization header value, if not the Operator.
- * @returns {Promise} A Promise that resolves when Sinon hears the call from http.js
- */
-const validateRequest = (argStr, spec, apiKey) => new Promise((resolve, reject) => {
-  apiKey = apiKey || operator.getKey();
-
-  // Add extra fields not required for the test spec
-  Object.assign(spec, {
-    fullResponse: true,
-    authorization: apiKey,
-    displayHeaders: { Authorization: `${apiKey.slice(0, 4)}...` },
-  });
-
-  // Add listener for options produced by CLI command
-  sinon.stub(http, 'sendRequest').callsFake((options) => {
-    if (!_.isEqual(options, spec)) {
-      reject(`Options did not match spec: ${JSON.stringify(options)}`);
-      return;
-    }
-
-    resolve();
-  });
-
-  // Invoke the command for Sinon to listen for
-  cli(argStr);
-});
-
-/**
  * Prepare nock for an API request.
  *
  * @param {boolean} allowUnmocked - Allow nock to make unmocked requests to the API.
@@ -107,7 +75,6 @@ module.exports = {
   createAppUser,
   createProject,
   createApplication,
-  validateRequest,
   mockApi,
   ID,
   API_KEY,
