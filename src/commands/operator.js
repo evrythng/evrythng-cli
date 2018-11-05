@@ -26,9 +26,19 @@ const resolveKey = (name) => {
   return config.get('operators')[name].apiKey;
 };
 
-const useOperator = ([name]) => {
+/**
+ * Switch the config to a new operator, by name.
+ *
+ * @param {string[]} args - Remaining launch arguments, including the operator name to use.
+ */
+const useOperator = (args) => {
+  const [name] = args;
+
   checkOperatorExists(name);
   config.set('using', name);
+
+  const { region } = config.get('operators')[name];
+  logger.info(`\nSwitched to operator '${name}' in region '${region}'`);
 };
 
 const formatOperator = item => `'${item}' (Key: ${resolveKey(item).substring(0, 4)}...)`;
@@ -93,6 +103,7 @@ const addOperator = async (args) => {
   const operators = config.get('operators');
   operators[name] = { apiKey, region };
   config.set('operators', operators);
+  logger.info(`\nAdded operator '${name}' in region '${region}'`);
 
   // If this is the first one, automatically use it.
   if (Object.keys(operators).length === 1) {
@@ -102,10 +113,18 @@ const addOperator = async (args) => {
   return operators[name];
 };
 
-const removeOperator = ([name]) => {
+/**
+ * Remove an operator by name. If it's the current one, unset `config.using`.
+ *
+ * @param {string[]} args - Remaining launch arguments, including the operator name to delete.
+ */
+const removeOperator = (args) => {
+  const [name] = args;
+  
   const operators = config.get('operators');
   delete operators[name];
   config.set('operators', operators);
+  logger.info(`\nRemoved operator '${name}'`);
 
   if (config.get('using') === name) {
     config.set('using', '');
@@ -122,6 +141,9 @@ const applyRegion = () => {
   evrythng.setup({ apiUrl: REGIONS[region] });
 };
 
+/**
+ * Present a first-launch experience to the user if no operators are found.
+ */
 const checkFirstRun = async () => {
   const operators = config.get('operators');
   if (Object.keys(operators).length) {
@@ -136,12 +158,13 @@ const checkFirstRun = async () => {
   const apiKey = await getValue('Operator API Key (from \'Account Settings\' in the EVRYTHNG Dashboard\')');
   await addOperator([null, name, region, apiKey]);
 
-  logger.info('\nYou\'re all set! Commands follow a \'resource type\' \'verb\' format. '
-    + 'Some examples to get you started:\n');
+  logger.info('\n------------------------ Setup Complete ------------------------');
+  logger.info('You\'re all set! Commands follow a \'resource type\' \'verb\' format.\n');
+  logger.info('Some examples to get you started:');
   logger.info('  evrythng thngs list');
   logger.info('  evrythng thngs UnQ8nqfQeD8aQpwRanrXaaPt read');
   logger.info('  evrythng products create \'{"name": "My New Product"}\'\n');
-  logger.info('Type \'evrythng\' to see all available commands and options.\n');
+  logger.info('Type \'evrythng\' to see all available commands and options. Enjoy!');
   process.exit();
 };
 

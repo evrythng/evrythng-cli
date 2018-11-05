@@ -46,7 +46,7 @@ const SWITCH_LIST = [{
   constant: 'EXPAND',
 }, {
   name: '--build',
-  about: 'Interactively build a create request payload using the EVRYTHNG Swagger API description.',
+  about: 'Interactively build a create request payload using evrythng/swagger',
   constant: 'BUILD',
 }, {
   name: '--field',
@@ -72,6 +72,11 @@ const SWITCH_LIST = [{
   about: 'Load resources from a CSV file that was previously exported with --to-csv.',
   constant: 'FROM_CSV',
   valueLabel: '<input file>',
+}, {
+  name: '--with-redirections',
+  about: 'When importing/exporting, include each resource\'s redirection URL.',
+  constant: 'WITH_REDIRECTIONS',
+  valueLabel: '<short domain>',
 }];
 
 const apply = (args) => {

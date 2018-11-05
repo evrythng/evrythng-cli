@@ -79,7 +79,13 @@ const stringSetter = allowed => (options, key, newValue) => {
   options[key] = newValue;
 };
 
-const checkAndSetOptionValue = ([name, newValue]) => {
+/**
+ * Check an option exists, and update it if it does.
+ *
+ * @param {string[]} args - The remaining launch arguments, including new option value.
+ */
+const checkAndSetOptionValue = (args) => {
+  const [name, newValue] = args;
   const option = OPTION_LIST.find(item => item.name === name);
   if (!option) {
     throw new Error(`Unknown option name '${name}'`);
@@ -87,7 +93,6 @@ const checkAndSetOptionValue = ([name, newValue]) => {
 
   const options = config.get('options');
   const { key, type, range, allowed } = option;
-
   const typeMap = {
     boolean: booleanSetter(),
     integer: integerSetter(range),
@@ -96,6 +101,7 @@ const checkAndSetOptionValue = ([name, newValue]) => {
 
   typeMap[type](options, key, newValue);
   config.set('options', options);
+  logger.info(`\nSet option '${name}' to '${newValue}'`);
 };
 
 module.exports = {

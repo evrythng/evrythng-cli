@@ -3,12 +3,17 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
 const { isEqual } = require('lodash');
+const chai = require('chai');
+const chaiAsPromised = require('chai-as-promised');
 const fs = require('fs');
 const neatCsv = require('neat-csv');
 const config = require('../../src/modules/config');
 const csv = require('../../src/modules/csv');
+const switches = require('../../src/modules/switches');
+
+const { expect } = chai;
+chai.use(chaiAsPromised);
 
 const CSV_PATH = `${__dirname}/output.csv`;
 const TEST_OBJECTS = [{
@@ -57,14 +62,25 @@ describe('csv', () => {
     fs.unlinkSync(CSV_PATH);
   });
 
-  it('should convert objects to CSV rows', () => {
-    const rows = csv.createCsvData(TEST_OBJECTS);
+  afterEach(() => {
+    switches.FROM_CSV = '';
+    switches.WITH_REDIRECTIONS = '';
+  });
+
+  it('should convert objects to CSV rows', async () => {
+    const rows = await csv.createCsvData(TEST_OBJECTS);
     expect(isEqual(rows, TEST_ROWS)).to.equal(true);
   });
 
   it('should not throw when writing to a CSV file', async () => {
     const writeCsvFile = () => csv.write(TEST_OBJECTS, CSV_PATH);
     expect(writeCsvFile).to.not.throw();
+  });
+
+  it('should throw if the specified file doesn\'t exist', async () => {
+    switches.FROM_CSV = 'badpath.txt';
+    const promise = csv.read('thng');
+    return expect(promise).to.eventually.be.rejected;
   });
 
   it('should have written the correct content to file', () => {
@@ -139,5 +155,47 @@ describe('csv', () => {
     const expected = { foo: 'bar', 'baz': 'thng' };
     const result = csv.decodeObject(objStr);
     expect(isEqual(result, expected)).to.equal(true);    
+  });
+
+  it('should not throw when reading from a CSV file', async () => {
+    switches.FROM_CSV = CSV_PATH;
+    await csv.read('thng');
+  });
+
+  it('should escape commas and double quotes', () => {
+    const input = 'A "string", including a comma';
+    const expected = '"A ""string"", including a comma"';
+    const result = csv.escapeCommas(input);
+    expect(isEqual(result, expected)).to.equal(true);
+  });
+
+  it('should encode a sub-object', () => {
+    const result = csv.encodeSubObject([], 'foo', { bar: 'baz', coca: 'cola' });
+    const expected = ['{bar:baz|coca:cola}'];
+    expect(isEqual(result, expected)).to.equal(true);
+  });
+
+  it('should not throw for a resource not compatible with redirections', async () => {
+    const promise = csv.createRedirection({}, {}, 'place', 'https://example.com');
+    return expect(promise).to.eventually.be.fulfilled;
+  });
+
+  it('should create valid redirection creation options', () => {
+    const scope = { apiKey: 'abc' };
+    const evrythngId = 'UH4nVsWVMG8EEqRawkMnybMh';
+    const type = 'thng';
+    const defaultRedirectUrl = 'https://example.com';
+    switches.WITH_REDIRECTIONS = 'tn.gg';
+    const expected = {
+      apiUrl: 'https://tn.gg',
+      url: '/redirections',
+      method: 'post',
+      authorization: 'abc',
+      headers: { Accept: 'application/json' },
+      data: { evrythngId, defaultRedirectUrl, type },
+    };
+
+    const result = csv.createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
+    expect(isEqual(expected, result)).to.equal(true);
   });
 });

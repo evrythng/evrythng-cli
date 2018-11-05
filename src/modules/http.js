@@ -93,7 +93,12 @@ const extractUrlFromLink = (link) => {
 
 const goToPage = async (res, endPage) => {
   for (let page = 0; page <= endPage; page += 1) {
-    const url = extractUrlFromLink(res.headers.link)
+    if (!res.headers.link) {
+      logger.info('No more pages. Returning last found page.');
+      return res;
+    }
+
+    const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
       authorization: operator.getKey(),
       fullResponse,
@@ -101,10 +106,6 @@ const goToPage = async (res, endPage) => {
     });
     if (page === endPage - 1) {
       return res;
-    }
-
-    if (!res.headers.link) {
-      throw new Error(`Ran out of pages at page ${page}`);
     }
   }
 
@@ -116,6 +117,10 @@ const getMorePages = async (res, max) => {
   const items = [...res.data];
 
   for (let page = 1; page < max; page += 1) {
+    if (!res.headers.link) {
+      break;
+    }
+
     const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
       authorization: operator.getKey(),
@@ -124,9 +129,6 @@ const getMorePages = async (res, max) => {
     });
     items.push(...res.data);
     logger.info(`Reading - ${items.length} items`, true);
-    if (!res.headers.link) {
-      break;
-    }
   }
 
   logger.info(`\nRead ${items.length} items.`);
@@ -194,7 +196,7 @@ const printResponse = async (res) => {
 
   // Print to file?
   if (csvFileName) {
-    csv.write(Array.isArray(data) ? data : [data], csvFileName);
+    await csv.write(Array.isArray(data) ? data : [data], csvFileName);
     return res;
   }
 
@@ -202,6 +204,14 @@ const printResponse = async (res) => {
   logger.info(util.pretty(data));
   return res;
 };
+
+/**
+ * Log a confirmation of a deletion, showing the path deleted.
+ * This isn't done for CRU, since they could be piped to other inputs.
+ *
+ * @parm {string} url - API URL of the resource deleted.
+ */
+const confirmDeletion = async url => logger.info(`\nDeleted ${url}`);
 
 const apiRequest = async (options) => {
   if (!options.method) {
@@ -256,10 +266,18 @@ const put = async (url, data) => apiRequest({
   data,
 }).then(printResponse);
 
+/**
+ * Perform a deletion request.
+ *
+ * @param {string} url - URL of the resource to delete.
+ */
 const deleteMethod = async url => apiRequest({
   url,
   method: 'DELETE',
   authorization: operator.getKey(),
+}).then((res) => {
+  confirmDeletion(url);
+  return res;
 });
 
 module.exports = {
