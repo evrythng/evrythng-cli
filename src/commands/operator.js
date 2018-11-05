@@ -31,7 +31,9 @@ const resolveKey = (name) => {
  *
  * @param {string[]} args - Remaining launch arguments, including the operator name to use.
  */
-const useOperator = ([name]) => {
+const useOperator = (args) => {
+  const [name] = args;
+
   checkOperatorExists(name);
   config.set('using', name);
 
@@ -116,7 +118,9 @@ const addOperator = async (args) => {
  *
  * @param {string[]} args - Remaining launch arguments, including the operator name to delete.
  */
-const removeOperator = ([name]) => {
+const removeOperator = (args) => {
+  const [name] = args;
+  
   const operators = config.get('operators');
   delete operators[name];
   config.set('operators', operators);

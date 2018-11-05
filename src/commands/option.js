@@ -84,7 +84,8 @@ const stringSetter = allowed => (options, key, newValue) => {
  *
  * @param {string[]} args - The remaining launch arguments, including new option value.
  */
-const checkAndSetOptionValue = ([name, newValue]) => {
+const checkAndSetOptionValue = (args) => {
+  const [name, newValue] = args;
   const option = OPTION_LIST.find(item => item.name === name);
   if (!option) {
     throw new Error(`Unknown option name '${name}'`);

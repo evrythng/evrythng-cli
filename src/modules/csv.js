@@ -68,7 +68,7 @@ const PAIR_SEPARATOR = ':';
  * @returns {string[]} Array of keys found in the objects.
  */
 const getAllKeys = (arr, prefix) => {
-  const buildKey = (item) => { return prefix ? `${prefix}.${item}` : item; };
+  const buildKey = item => (prefix ? `${prefix}.${item}` : item);
 
   return arr.reduce((res, arrItem) => {
     Object.keys(arrItem).forEach((itemKey) => {
