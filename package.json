@@ -17,6 +17,7 @@
     "evrythng-swagger": "^1.0.0",
     "json-schema-ref-parser": "^5.0.3",
     "jsonschema": "^1.2.4",
+    "lodash": "^4.17.11",
     "neat-csv": "^3.0.0"
   },
   "devDependencies": {
@@ -28,7 +29,6 @@
     "eslint-plugin-import": "^2.12.0",
     "eslint-plugin-jsdoc": "^3.7.1",
     "eslint-plugin-react": "^7.10.0",
-    "lodash": "^4.17.11",
     "mocha": "^5.2.0",
     "nyc": "^12.0.2",
     "sinon": "^6.1.4"

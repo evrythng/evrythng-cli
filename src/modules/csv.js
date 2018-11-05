@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const { omit } = require('lodash');
 const evrythng = require('evrythng-extended');
 const fs = require('fs');
 const neatCsv = require('neat-csv');
@@ -403,6 +404,7 @@ const decodeArray = (res, key, value) => {
   if (value.length) {
     res[key] = value.split(LIST_SEPARATOR);
   }
+
   return res;
 };
 
@@ -419,6 +421,7 @@ const decodeGeoJson = (res, key, value) => {
     type: 'Point',
     coordinates: [parseFloat(lon), parseFloat(lat)],
   };
+
   return res;
 };
 
@@ -441,6 +444,7 @@ const rowToObject = row => Object.keys(row)
       logger.info(`Warning: Sub-object not supported (key: ${key})`);
       return res;
     }
+
     if (IMPORT_UNSUPPORTED.includes(key)) {
       logger.info(`Warning: Importing not supported (key: ${key})`);
       return res;
@@ -449,18 +453,23 @@ const rowToObject = row => Object.keys(row)
     if (CONVERTED_ARRAYS.includes(key)) {
       return decodeArray(res, key, value);
     }
+
     if (key.includes('address')) {
       return assignPrefixProperty(res, 'address', key, value);
     }
+
     if (key.includes('customFields')) {
       return assignPrefixProperty(res, 'customFields', key, value);
     }
+
     if (key.includes('identifiers')) {
       return assignPrefixProperty(res, 'identifiers', key, value);
     }
+
     if (key.includes('properties')) {
       return assignPrefixProperty(res, 'properties', key, value);
     }
+
     if (key === 'position') {
       return decodeGeoJson(res, key, value);
     }
@@ -487,19 +496,12 @@ const read = async (type) => {
 
   const scope = new evrythng.Operator(operator.getKey());
   await util.nextTask(rows.map(item => async () => {
-    // If there's a 'redirection' column, preserve it
-    let redirection;
-    if (item.redirection) {
-      redirection = item.redirection;
-      delete item.redirection;
-    }
-
-    // Create the resource
-    const res = await createResource(scope, rowToObject(item), type);
+    const payload = omit(item, ['redirection']);
+    const res = await createResource(scope, rowToObject(payload), type);
 
     // Create the redirection, if required
-    if (redirection && switches.WITH_REDIRECTIONS) {
-      await createRedirection(scope, res.id, type, redirection);
+    if (item.redirection && switches.WITH_REDIRECTIONS) {
+      await createRedirection(scope, res.id, type, item.redirection);
     }
   }));
   logger.info(`\nImport from '${path}' complete.`);
