@@ -3,46 +3,49 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('places', () => {
-  it('should return 201 for \'places create $payload\'', async () => {
+  it('should make correct request for \'places create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test place' });
-    const res = await cli(`places create ${payload}`);
+    mockApi()
+      .post('/places', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.placeId = res.data.id;
+    await cli(`places create ${payload}`);
   });
 
-  it('should return 200 for \'places list\'', async () => {
-    const res = await cli('places list');
+  it('should make correct request for \'places list\'', async () => {
+    mockApi()
+      .get('/places?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('places list');
   });
 
-  it('should return 200 for \'places $id read\'', async () => {
-    const res = await cli(`places ${ctx.placeId} read`);
+  it('should make correct request for \'places $id read\'', async () => {
+    mockApi()
+      .get(`/places/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`places ${ID} read`);
   });
 
-  it('should return 200 for \'places $id update $payload\'', async () => {
+  it('should make correct request for \'places $id update $payload\'', async () => {
     const payload = JSON.stringify({ tags: ['test'] });
-    const res = await cli(`places ${ctx.placeId} update ${payload}`);
+    mockApi()
+      .put(`/places/${ID}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`places ${ID} update ${payload}`);
   });
 
-  it('should return 200 for \'places $id delete\'', async () => {
-    const res = await cli(`places ${ctx.placeId} delete`);
+  it('should make correct request for \'places $id delete\'', async () => {
+    mockApi()
+      .delete(`/places/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`places ${ID} delete`);
   });
 });

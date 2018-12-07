@@ -3,10 +3,25 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const _  = require('lodash');
+const sinon = require('sinon');
+const nock = require('nock');
+const config = require('../src/modules/config');
 const cli = require('../src/functions/cli');
+const http = require('../src/modules/http');
+const operator = require('../src/commands/operator');
 const switches = require('../src/modules/switches');
 
 const ctx = {};
+
+/** Fake ID */
+const ID = '012345678901234567890123';
+
+/** Fake API key */
+const API_KEY = '01234567890123456789012345678901234567890123456789012345678901234567890123456789';
+
+/** Fake name for action types, property keys, etc. */
+const NAME = 'scans';
 
 const waitAsync = async ms => new Promise(resolve => setTimeout(resolve, ms));
 
@@ -42,10 +57,26 @@ const createAppUser = async (name) => {
   return res.data;
 };
 
+/**
+ * Prepare nock for an API request.
+ *
+ * @param {boolean} allowUnmocked - Allow nock to make unmocked requests to the API.
+ * @returns {Object} nock scope object.
+ */
+const mockApi = (allowUnmocked = false) => {
+  const regions = config.get('regions');
+  const { region } = config.get('operators')[config.get('using')];
+  return nock(regions[region], { allowUnmocked });
+};
+
 module.exports = {
   ctx,
   waitAsync,
   createAppUser,
   createProject,
   createApplication,
+  mockApi,
+  ID,
+  API_KEY,
+  NAME,
 };

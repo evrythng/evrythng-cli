@@ -3,14 +3,15 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
+const { mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('access', () => {
-  it('should return 200 for \'access read\'', async () => {
-    const res = await cli('access read');
+  it('should make correct request for \'access read\'', async () => {
+    mockApi()
+      .get('/access?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli('access read');
   });
 });

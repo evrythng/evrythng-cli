@@ -33,7 +33,26 @@ const STATUS_LABELS = {
 
 const fullResponse = true;
 
-const buildQueryParams = (method) => {
+/**
+ * Determine if a request is a list request for a list of results.
+ * In this case, the perPage param isn't required.
+ *
+ * @param {string} url - The request url.
+ * @returns {boolean} true if the request URL looks like it might be a list request.
+ */
+const isListRequest = (url) => {
+  const parts = url.split('/');
+  return parts[parts.length - 1].length !== 24;
+};
+
+/**
+ * Build a query params dictionary object.
+ *
+ * @param {string} method - The request method.
+ * @param {string} url - The request url.
+ * @returns {Object} Object containing all applicable query param keys and values.
+ */
+const buildQueryParams = (method, url) => {
   const { defaultPerPage } = config.get('options');
   const filter = switches.FILTER;
   const perPage = switches.PER_PAGE;
@@ -45,7 +64,7 @@ const buildQueryParams = (method) => {
   }
 
   // Use options value, unless it's specified with the --per-page flag
-  if (method === 'get') {
+  if (method === 'get' && isListRequest(url)) {
     result.perPage = perPage || defaultPerPage;
   }
   if (project) {
@@ -61,17 +80,23 @@ const buildQueryParams = (method) => {
   return result;
 };
 
-const buildParamString = (method) => {
-  const params = buildQueryParams(method);
+/**
+ * Build the query parameter string.
+ *
+ * @param {string} method - The request method.
+ * @param {string} url - The request url.
+ * @returns {string} The completed query parameter string.
+ */
+const buildParamString = (method, url) => {
+  const params = buildQueryParams(method, url);
   const keys = Object.keys(params);
   if (!keys.length) {
     return '';
   }
 
-  return Object.keys(params).reduce((result, item) => {
-    const addition = `${item}=${encodeURIComponent(params[item])}&`;
-    return `${result}${addition}`;
-  }, '?');
+  return Object.keys(params)
+    .reduce((res, item) => res.concat(`${item}=${encodeURIComponent(params[item])}`), [])
+    .reduce((res, item, i) => i === 0 ? `${res}${item}` : `${res}&${item}`, '?');
 };
 
 const formatHeaders = headers => Object.keys(headers)
@@ -206,6 +231,14 @@ const printResponse = async (res) => {
 };
 
 /**
+ * Make an EVRYTHNG.js request.
+ *
+ * @param {Object} options - The request options.
+ * @returns {Promise} A promise that resolves to the result of the request
+ */
+const sendRequest = options => evrythng.api(options);
+
+/**
  * Log a confirmation of a deletion, showing the path deleted.
  * This isn't done for CRU, since they could be piped to other inputs.
  *
@@ -213,7 +246,7 @@ const printResponse = async (res) => {
  */
 const confirmDeletion = async url => logger.info(`\nDeleted ${url}`);
 
-const apiRequest = async (options) => {
+const createApiRequest = async (options) => {
   if (!options.method) {
     options.method = 'GET';
   }
@@ -238,47 +271,55 @@ const apiRequest = async (options) => {
   }
 
   options.fullResponse = true;
-  return evrythng.api(options);
+  return options;
 };
 
-const post = async (url, data) => apiRequest({
-  url: `${url}${buildParamString('post')}`,
+const post = async (url, data) => createApiRequest({
+  url: `${url}${buildParamString('post', url)}`,
   method: 'post',
   authorization: operator.getKey(),
   data,
-}).then(printResponse);
+})
+  .then(module.exports.sendRequest)
+  .then(printResponse);
 
-const get = async (url, silent = false) => apiRequest({
-  url: `${url}${buildParamString('get')}`,
+const get = async (url, silent = false) => createApiRequest({
+  url: `${url}${buildParamString('get', url)}`,
   authorization: operator.getKey(),
-}).then((res) => {
-  if (silent) {
-    return res;
-  }
+})
+  .then(module.exports.sendRequest)
+  .then((res) => {
+    if (silent) {
+      return res;
+    }
 
-  return printResponse(res);
-});
+    return printResponse(res);
+  });
 
-const put = async (url, data) => apiRequest({
+const put = async (url, data) => createApiRequest({
   url,
   method: 'PUT',
   authorization: operator.getKey(),
   data,
-}).then(printResponse);
+})
+  .then(module.exports.sendRequest)
+  .then(printResponse);
 
 /**
  * Perform a deletion request.
  *
  * @param {string} url - URL of the resource to delete.
  */
-const deleteMethod = async url => apiRequest({
+ const deleteMethod = async url => createApiRequest({
   url,
   method: 'DELETE',
   authorization: operator.getKey(),
-}).then((res) => {
-  confirmDeletion(url);
-  return res;
-});
+})
+  .then(module.exports.sendRequest)
+  .then((res) => {
+    confirmDeletion(url);
+    return res;
+  });
 
 module.exports = {
   post,
@@ -287,4 +328,5 @@ module.exports = {
   delete: deleteMethod,
   formatHeaders,
   printRequest,
+  sendRequest,
 };
