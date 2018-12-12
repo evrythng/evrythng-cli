@@ -37,6 +37,17 @@ module.exports = {
       execute: async ([id, , json]) => http.put(`/products/${id}`, JSON.parse(json)),
       pattern: '$id update $payload',
     },
+    updateProducts: {
+      execute: async ([, json]) => {
+        if (!switches.IDS) {
+          throw new Error('--ids switch is required for bulk update');
+        }
+
+        return http.put('/products', JSON.parse(json));
+      },
+      pattern: 'update $payload',
+      helpPattern: 'update $payload --ids <list of IDs>',
+    },
     deleteProduct: {
       execute: async ([id]) => http.delete(`/products/${id}`),
       pattern: '$id delete',

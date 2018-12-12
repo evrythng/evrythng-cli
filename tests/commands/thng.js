@@ -5,6 +5,7 @@
 
 const { ID, NAME, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
+const switches = require('../../src/modules/switches');
 
 describe('thngs', () => {
   // Thng CRUD
@@ -40,6 +41,17 @@ describe('thngs', () => {
       .reply(200);
 
     await cli(`thngs ${ID} update ${payload}`);
+  });
+
+  it('should make correct request for \'thngs update $payload --ids\'', async () => {
+    const payload = JSON.stringify({ tags: ['test'] });
+    mockApi()
+      .put(`/thngs?ids=Up5dVdGwhqSrY5aRwneKddgb%2CUKgVb5QFfRtNQBRRw2Dxmkar`, payload)
+      .reply(200);
+
+    await cli(`thngs update ${payload} --ids Up5dVdGwhqSrY5aRwneKddgb,UKgVb5QFfRtNQBRRw2Dxmkar`);
+
+    switches.IDS = false;
   });
 
   // Thng properties

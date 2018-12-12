@@ -5,6 +5,7 @@
 
 const { ID, NAME, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
+const switches = require('../../src/modules/switches');
 
 describe('products', () => {
   // Product CRUD
@@ -40,6 +41,17 @@ describe('products', () => {
       .reply(200);
 
     await cli(`products ${ID} update ${payload}`);
+  });
+
+  it('should make correct request for \'products update $payload --ids\'', async () => {
+    const payload = JSON.stringify({ tags: ['test'] });
+    mockApi()
+      .put(`/products?ids=Up5dVdGwhqSrY5aRwneKddgb%2CUKgVb5QFfRtNQBRRw2Dxmkar`, payload)
+      .reply(200);
+
+    await cli(`products update ${payload} --ids Up5dVdGwhqSrY5aRwneKddgb,UKgVb5QFfRtNQBRRw2Dxmkar`);
+
+    switches.IDS = false;
   });
 
   // Product properties

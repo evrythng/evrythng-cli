@@ -301,7 +301,7 @@ const get = async (url, silent = false) => createApiRequest({
   });
 
 const put = async (url, data) => createApiRequest({
-  url,
+  url: `${url}${buildParamString('put', url)}`,
   method: 'PUT',
   authorization: operator.getKey(),
   data,
