@@ -57,6 +57,7 @@ const buildQueryParams = (method, url) => {
   const filter = switches.FILTER;
   const perPage = switches.PER_PAGE;
   const project = switches.PROJECT;
+  const ids = switches.IDS;
 
   const result = {};
   if (filter) {
@@ -75,6 +76,9 @@ const buildQueryParams = (method, url) => {
   }
   if (switches.CONTEXT) {
     result.context = true;
+  }
+  if (ids) {
+    result.ids = ids;
   }
 
   return result;

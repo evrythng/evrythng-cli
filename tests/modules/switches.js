@@ -132,6 +132,15 @@ describe('switches', () => {
     switches.TO_CSV = false;
   });
 
+  it('should accept the --ids switch', async () => {
+    mockApi()
+      .get('/thngs?perPage=30&ids=UMa5MAFANhYGgwaaaGcqqh6c%2CU5Qs7YPEXEsWshaaaFM8egnh')
+      .reply(200);
+
+    await cli('thngs list --ids UMa5MAFANhYGgwaaaGcqqh6c,U5Qs7YPEXEsWshaaaFM8egnh');
+    switches.IDS = false;
+  });
+
   it('should accept the --build switch');
 
   it('should accept the --to-csv switch');

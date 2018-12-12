@@ -77,6 +77,11 @@ const SWITCH_LIST = [{
   about: 'When importing/exporting, include each resource\'s redirection URL.',
   constant: 'WITH_REDIRECTIONS',
   valueLabel: '<short domain>',
+}, {
+  name: '--ids',
+  about: 'Specify the \'ids\' query parameter with a list of specific IDs.',
+  constant: 'IDS',
+  valueLabel: '<list of IDs>',
 }];
 
 const apply = (args) => {
