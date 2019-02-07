@@ -217,6 +217,49 @@ const readFile = async (type, path, getItems, transform) => {
   }));
 };
 
+/**
+ * Read any available redirections for the list of resources.
+ *
+ * @param {Array} items - Array of objects to find redirections for.
+ * @param {string} shortDomain - The short domain to find those redirections, such as 'tn.gg'.
+ */
+const readRedirections = async (items, shortDomain) => {
+  const tasks = items.map(item => async () => {
+    try {
+      const [redirection] = await evrythng.api({
+        apiUrl: `https://${shortDomain}`,
+        url: `/redirections?evrythngId=${item.id}`,
+        authorization: operator.getKey(),
+      });
+
+      if (redirection) {
+        item.redirection = redirection.defaultRedirectUrl;
+      }
+    } catch (e) {
+      // Type can have no redirection
+      if (e.errors && e.errors[0].includes('requested resource')) {
+        throw new Error('This resource type does not support redirections.');
+      }
+
+      logger.error(e.errors ? e.errors[0] : e.message);
+    }
+  });
+  return nextTask(tasks);
+};
+
+/**
+ * Modify items to include a 'redirection', if required.
+ *
+ * @param {Array} items - The array of items to check.
+ */
+const addResourceRedirections = async (items) => {
+  const shortDomain = switches.WITH_REDIRECTIONS;
+  if (shortDomain) {
+    logger.info(`Reading ${items.length} redirections...`);
+    await readRedirections(items, shortDomain);
+  }
+}
+
 module.exports = {
   READ_ONLY_KEYS,
   isId,
@@ -231,4 +274,5 @@ module.exports = {
   createRedirectionOptions,
   createResource,
   readFile,
+  addResourceRedirections,
 };

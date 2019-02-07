@@ -7,6 +7,7 @@ const chai = require('chai');
 const chaiAsPromised = require('chai-as-promised');
 const fs = require('fs');
 const { mockApi } = require('../util');
+const cli = require('../../src/functions/cli');
 const jsonFile = require('../../src/modules/jsonFile');
 const switches = require('../../src/modules/switches');
 
@@ -56,6 +57,7 @@ describe('jsonFile', () => {
 
   afterEach(() => {
     switches.FROM_JSON = '';
+    switches.TO_JSON = '';
     switches.WITH_REDIRECTIONS = '';
   });
 
@@ -75,7 +77,7 @@ describe('jsonFile', () => {
     expect(thngs).to.deep.equal(TEST_OBJECTS);
   });
 
-  it('should not throw when reading from a CSV file', async () => {
+  it('should not throw when reading from a JSON file', async () => {
     const mock = mockApi()
       .persist()
       .post('/thngs?')

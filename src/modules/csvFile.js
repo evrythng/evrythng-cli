@@ -201,36 +201,6 @@ const objectToCells = (obj, objKeys) => {
 };
 
 /**
- * Read any available redirections for the list of resources.
- *
- * @param {Object[]} arr - Array of objects to find redirections for.
- * @param {string} shortDomain - The short domain to find those redirections, such as 'tn.gg'.
- */
-const readRedirections = async (arr, shortDomain) => {
-  const tasks = arr.map(item => async () => {
-    try {
-      const [redirection] = await evrythng.api({
-        apiUrl: `https://${shortDomain}`,
-        url: `/redirections?evrythngId=${item.id}`,
-        authorization: operator.getKey(),
-      });
-
-      if (redirection) {
-        item.redirection = redirection.defaultRedirectUrl;
-      }
-    } catch (e) {
-      // Type can have no redirection
-      if (e.errors && e.errors[0].includes('requested resource')) {
-        throw new Error('This resource type does not support redirections.');
-      }
-
-      logger.error(e.errors ? e.errors[0] : e.message);
-    }
-  });
-  return util.nextTask(tasks);
-};
-
-/**
  * Create CSV data from input object array.
  *
  * @param {Object[]} arr - Array of input objects to convert.
@@ -238,11 +208,7 @@ const readRedirections = async (arr, shortDomain) => {
  */
 const createCsvData = async (arr) => {
   // Include short domain?
-  const shortDomain = switches.WITH_REDIRECTIONS;
-  if (shortDomain) {
-    logger.info(`Reading ${arr.length} redirections...`);
-    await readRedirections(arr, shortDomain);
-  }
+  await util.addResourceRedirections(arr);
 
   // Get all column headings
   const { object, address, customFields, identifiers, properties } = getColumnHeaders(arr);

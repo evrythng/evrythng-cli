@@ -143,9 +143,27 @@ describe('switches', () => {
 
   it('should accept the --build switch');
 
-  it('should accept the --to-csv switch');
+  it('should accept the --to-csv switch', async () => {
+    const mock = mockApi()
+      .persist()
+      .get('/thngs?perPage=30')
+      .reply(200, []);
+
+    await cli(`thngs list --to-csv ./output.csv`);
+    switches.TO_CSV = '';
+  });
 
   it('should accept the --from-csv switch');
 
   it('should accept the --with-redirections switch');
+
+  it('should accept the --to-json switch', async () => {
+    const mock = mockApi()
+      .persist()
+      .get('/thngs?perPage=30')
+      .reply(200, []);
+
+    await cli(`thngs list --to-json ./output.json`);
+    switches.TO_JSON = '';
+  });
 });
