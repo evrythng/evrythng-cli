@@ -58,7 +58,7 @@ describe('CLI', () => {
   require('./modules/api');
   require('./modules/commands');
   require('./modules/config');
-  require('./modules/csv');
+  require('./modules/csvFile');
   require('./modules/functions');
   require('./modules/http');
   require('./modules/logger');

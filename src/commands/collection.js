@@ -3,7 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const csv = require('../modules/csv');
+const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
 const switches = require('../modules/switches');
 const util = require('../modules/util');
@@ -16,7 +16,7 @@ module.exports = {
     createCollection: {
       execute: async ([, json]) => {
         if (switches.FROM_CSV) {
-          return csv.read('collection');
+          return csvFile.read('collection');
         }
 
         const payload = await util.getPayload('CollectionDocument', json);

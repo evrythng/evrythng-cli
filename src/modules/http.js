@@ -7,7 +7,7 @@ const { parse } = require('url');
 const evrythng = require('evrythng-extended');
 const { getConfirmation } = require('./prompt');
 const config = require('./config');
-const csv = require('./csv');
+const csvFile = require('./csvFile');
 const expand = require('../functions/expand');
 const logger = require('./logger');
 const operator = require('../commands/operator');
@@ -183,7 +183,7 @@ const printResponse = async (res) => {
   const toPage = switches.TO_PAGE;
   if (toPage) {
     if (!csvFileName) {
-      throw new Error('--to-page is only available when using --to-csv.');
+      throw new Error('--to-page is only available when using --to-csv');
     }
 
     res.data = await getMorePages(res, toPage);
@@ -225,7 +225,7 @@ const printResponse = async (res) => {
 
   // Print to file?
   if (csvFileName) {
-    await csv.write(Array.isArray(data) ? data : [data], csvFileName);
+    await csvFile.write(Array.isArray(data) ? data : [data], csvFileName);
     return res;
   }
 

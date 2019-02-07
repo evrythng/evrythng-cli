@@ -82,6 +82,11 @@ const SWITCH_LIST = [{
   about: 'When importing/exporting, include each resource\'s redirection URL.',
   constant: 'WITH_REDIRECTIONS',
   valueLabel: '<short domain>',
+}, {
+  name: '--from-json',
+  about: 'Load resource from a JSON array file.',
+  constant: 'FROM_JSON',
+  valueLabel: '<input file>',
 }];
 
 const apply = (args) => {
