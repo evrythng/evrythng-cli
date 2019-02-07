@@ -3,13 +3,35 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const { omit } = require('lodash');
 const jsonschema = require('jsonschema');
+const evrythng = require('evrythng-extended');
+const fs = require('fs');
 const indent = require('../functions/indent');
 const logger = require('./logger');
+const operator = require('../commands/operator');
 const payloadBuilder = require('./payloadBuilder');
 const switches = require('./switches');
 
 const INDENT_SIZE = 2;
+
+/* Keys that are read-only */
+const READ_ONLY_KEYS = [
+  'id',
+  'createdAt',
+  'updatedAt',
+  'activatedAt',
+  'batch',
+  'createdByTask',
+  'fn',
+  'scopes',
+];
+
+/** Resource types that may have a redirection set. */
+const REDIRECTABLE = [
+  'thng',
+  'product',
+];
 
 // TODO: Redirector, Reactor schedules, etc...
 const SPECIAL_BUILDERS = {
@@ -94,7 +116,109 @@ const nextTask = async (items) => {
   return items.splice(0, 1)[0]().then(() => nextTask(items));
 };
 
+/**
+ * Create request options for creating a resource redirection.
+ *
+ * @param {Object} scope - The actor scope.
+ * @param {string} evrythngId - The resource ID.
+ * @param {string} type - The resource type.
+ * @param {string} defaultRedirectUrl - The redirection URL.
+ * @returns {Object} The complete request options for evrythng.api().
+ */
+const createRedirectionOptions = (scope, evrythngId, type, defaultRedirectUrl) => ({
+  apiUrl: `https://${switches.WITH_REDIRECTIONS}`,
+  url: '/redirections',
+  method: 'post',
+  authorization: scope.apiKey,
+  headers: { Accept: 'application/json' },
+  data: { evrythngId, defaultRedirectUrl, type },
+});
+
+/**
+ * Create a redirection for a resource. The URL must include a suitable placeholder.
+ *
+ * @param {Object} scope - The SDK scope making the request.
+ * @param {string} evrythngId - The resource ID.
+ * @param {string} type - The resource type.
+ * @param {string} defaultRedirectUrl - The redirection URL.
+ */
+const createRedirection = async (scope, evrythngId, type, defaultRedirectUrl) => {
+  try {
+    if (!REDIRECTABLE.includes(type)) {
+      throw new Error(`'${type}' resources cannot have a redirection set.`);
+    }
+
+    const options = createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
+    const res = await evrythng.api(options);
+    logger.info(`  Created redirection: ${res.defaultRedirectUrl}`);
+  } catch (e) {
+    logger.error(`Error: ${e.errors ? e.errors[0]: e.message}`);
+  }
+};
+
+/**
+ * Create a single resource from a data object.
+ *
+ * @param {Object} scope - evrythng.js Operator scope.
+ * @param {Object} resource - The object to create as a resource.
+ * @param {string} type - The resource type, as evrythng.js Operator member name.
+ */
+const createResource = async (scope, resource, type) => {
+  const params = {};
+  const projectId = switches.PROJECT;
+  if (projectId) {
+    params.project = projectId;
+  }
+
+  try {
+    const res = await scope[type]().create(resource, { params });
+    logger.info(`Created ${type} ${res.id}`);
+    return res;
+  } catch (e) {
+    if (e.errors) {
+      // Report a data-specific error
+      logger.error(`Error: ${e.errors[0]}`);
+      return;
+    }
+
+    // Throw a syntax error
+    throw e;
+  }
+};
+
+/**
+ * Read a file, of any type. Path is validated before opportunities for reading items
+ * and transforming each as required.
+ *
+ * @param {string} type - The resource type.
+ * @param {string} path - The file path, which is validated.
+ * @param {function} getItems - Function given 'path' that gets the items.
+ * @param {function} transform - Optional, transform each item.
+ */
+const readFile = async (type, path, getItems, transform) => {
+  if (!fs.existsSync(path)) {
+    throw new Error('File was not found!');
+  }
+
+  const items = await getItems(path);
+  const scope = new evrythng.Operator(operator.getKey());
+  await nextTask(items.map(item => async () => {
+    let payload = omit(item, ['redirection'].concat(READ_ONLY_KEYS));
+    if (transform) {
+      payload = transform(payload);
+    }
+
+    const res = await createResource(scope, payload, type);
+
+    // Create the redirection, if required
+    if (item.redirection && switches.WITH_REDIRECTIONS) {
+      await createRedirection(scope, res.id, type, item.redirection);
+    }
+  }));
+};
+
 module.exports = {
+  READ_ONLY_KEYS,
   isId,
   pretty,
   getPayload,
@@ -103,4 +227,8 @@ module.exports = {
   requireKey,
   validate,
   nextTask,
+  createRedirection,
+  createRedirectionOptions,
+  createResource,
+  readFile,
 };

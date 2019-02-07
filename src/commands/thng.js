@@ -5,6 +5,7 @@
 
 const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
+const jsonFile = require('../modules/jsonFile');
 const switches = require('../modules/switches');
 const util = require('../modules/util');
 
@@ -18,12 +19,15 @@ module.exports = {
         if (switches.FROM_CSV) {
           return csvFile.read('thng');
         }
+        if (switches.FROM_JSON) {
+          return jsonFile.read('thng');
+        }
 
         const payload = await util.getPayload('ThngDocument', json);
         return http.post('/thngs', payload);
       },
       pattern: 'create $payload',
-      helpPattern: 'create [$payload|--build|--from-csv]',
+      helpPattern: 'create [$payload|--build|--from-csv|--from-json]',
     },
     readThng: {
       execute: async ([id]) => http.get(`/thngs/${id}`),

@@ -87,6 +87,11 @@ const SWITCH_LIST = [{
   about: 'Load resource from a JSON array file.',
   constant: 'FROM_JSON',
   valueLabel: '<input file>',
+}, {
+  name: '--to-json',
+  about: 'Output array response to a JSON file as an array.',
+  constant: 'TO_JSON',
+  valueLabel: '<input file>',
 }];
 
 const apply = (args) => {

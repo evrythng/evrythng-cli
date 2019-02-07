@@ -24,18 +24,6 @@ const IGNORE = [
   'identifiers',
 ];
 
-/* Keys that are read-only */
-const READ_ONLY = [
-  'id',
-  'createdAt',
-  'updatedAt',
-  'activatedAt',
-  'batch',
-  'createdByTask',
-  'fn',
-  'scopes',
-];
-
 /* Keys that are complex object that aren't supported or cannot be specified for import */
 const IMPORT_UNSUPPORTED = [
   'location',
@@ -47,12 +35,6 @@ const CONVERTED_ARRAYS = [
   'tags',
   'collections',
   'categories',
-];
-
-/** Resource types that may have a redirection set. */
-const REDIRECTABLE = [
-  'thng',
-  'product',
 ];
 
 /* Use a character other than ','' to encode lists and object pairs */
@@ -280,88 +262,6 @@ const createCsvData = async (arr) => {
 };
 
 /**
- * Write some array of EVRYTHNG objects to a CSV file.
- *
- * @param {Object[]} arr - Array of objects to write to file.
- * @param {string} path - Path of the file to write.
- */
-const write = async (arr, path) => {
-  const data = await createCsvData(arr);
-  fs.writeFileSync(path, data.join('\n'), 'utf8');
-  logger.info(`\nWrote ${arr.length} items to '${path}'.`);
-};
-
-/**
- * Create a single resource from a data object.
- *
- * @param {Object} scope - evrythng.js Operator scope.
- * @param {Object} resource - The object to create as a resource.
- * @param {string} type - The resource type, as evrythng.js Operator member name.
- */
-const createResource = async (scope, resource, type) => {
-  const params = {};
-  const projectId = switches.PROJECT;
-  if (projectId) {
-    params.project = projectId;
-  }
-
-  try {
-    const res = await scope[type]().create(resource, { params });
-    logger.info(`Created ${type} ${res.id}`);
-    return res;
-  } catch (e) {
-    if (e.errors) {
-      // Report a data-specific error
-      logger.error(`Error: ${e.errors[0]}`);
-      return;
-    }
-
-    // Throw a syntax error
-    throw e;
-  }
-};
-
-/**
- * Create request options for creating a resource redirection.
- *
- * @param {Object} scope - The actor scope.
- * @param {string} evrythngId - The resource ID.
- * @param {string} type - The resource type.
- * @param {string} defaultRedirectUrl - The redirection URL.
- * @returns {Object} The complete request options for evrythng.api().
- */
-const createRedirectionOptions = (scope, evrythngId, type, defaultRedirectUrl) => ({
-  apiUrl: `https://${switches.WITH_REDIRECTIONS}`,
-  url: '/redirections',
-  method: 'post',
-  authorization: scope.apiKey,
-  headers: { Accept: 'application/json' },
-  data: { evrythngId, defaultRedirectUrl, type },
-});
-
-/**
- * Create a redirection for a resource. The URL must include a suitable placeholder.
- *
- * @param {Object} scope - The SDK scope making the request.
- * @param {string} evrythngId - The resource ID.
- * @param {string} type - The resource type.
- * @param {string} defaultRedirectUrl - The redirection URL.
- */
-const createRedirection = async (scope, evrythngId, type, defaultRedirectUrl) => {
-  try {
-    if (!REDIRECTABLE.includes(type)) {
-      throw new Error(`'${type}' resources cannot have a redirection set.`);
-    }
-
-    const options = createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
-    const res = await evrythng.api(options);
-    logger.info(`  Created redirection: ${res.defaultRedirectUrl}`);
-  } catch (e) {
-    logger.error(`Error: ${e.errors ? e.errors[0]: e.message}`);
-  }
-};
-
-/**
  * Assign a prefixed property to an object property
  *
  * @param {Object} obj - The object to modify.
@@ -435,7 +335,7 @@ const decodeGeoJson = (res, key, value) => {
 const rowToObject = row => Object.keys(row)
   .reduce((res, key) => {
     // Skip read-only keys, or empty cells
-    if (READ_ONLY.includes(key) || !row[key]) {
+    if (util.READ_ONLY_KEYS.includes(key) || !row[key]) {
       return res;
     }
 
@@ -485,26 +385,23 @@ const rowToObject = row => Object.keys(row)
  * @param {string} type - Type of EVRYTHNG resource the items in the file should be treated as.
  * @returns {Promise} A Promise that resolves when all items have been created.
  */
-const read = async (type) => {
-  const path = switches.FROM_CSV;
-  if (!fs.existsSync(path)) {
-    throw new Error('File was not found!');
-  }
+const read = async type =>
+  util.readFile(
+    type,
+    switches.FROM_CSV, 
+    path => neatCsv(fs.readFileSync(path, 'utf8')), 
+    rowToObject,
+  );
 
-  const csvStr = fs.readFileSync(path, 'utf8').toString();
-  const rows = await neatCsv(csvStr);
-
-  const scope = new evrythng.Operator(operator.getKey());
-  await util.nextTask(rows.map(item => async () => {
-    const payload = omit(item, ['redirection']);
-    const res = await createResource(scope, rowToObject(payload), type);
-
-    // Create the redirection, if required
-    if (item.redirection && switches.WITH_REDIRECTIONS) {
-      await createRedirection(scope, res.id, type, item.redirection);
-    }
-  }));
-  logger.info(`\nImport from '${path}' complete.`);
+/**
+ * Write some array of EVRYTHNG objects to a CSV file.
+ *
+ * @param {Array} items - Array of objects to write to file.
+ * @param {string} path - Path of the file to write.
+ */
+const write = async (items, path) => {
+  const data = await createCsvData(items);
+  fs.writeFileSync(path, data.join('\n'), 'utf8');
 };
 
 module.exports = {
@@ -515,10 +412,6 @@ module.exports = {
   createCsvData,
   encodeObject,
   decodeObject,
-  createResource,
   escapeCommas,
   encodeSubObject,
-  createRedirection,
-  createRedirectionOptions,
-  READ_ONLY,
 };

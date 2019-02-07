@@ -12,6 +12,7 @@ const { mockApi } = require('../util');
 const config = require('../../src/modules/config');
 const csvFile = require('../../src/modules/csvFile');
 const switches = require('../../src/modules/switches');
+const util = require('../../src/modules/util');
 
 const { expect } = chai;
 chai.use(chaiAsPromised);
@@ -183,7 +184,7 @@ describe('csvFile', () => {
   });
 
   it('should not throw for a resource not compatible with redirections', async () => {
-    const promise = csvFile.createRedirection({}, {}, 'place', 'https://example.com');
+    const promise = util.createRedirection({}, {}, 'place', 'https://example.com');
     return expect(promise).to.eventually.be.fulfilled;
   });
 
@@ -202,7 +203,7 @@ describe('csvFile', () => {
       data: { evrythngId, defaultRedirectUrl, type },
     };
 
-    const result = csvFile.createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
+    const result = util.createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
     expect(isEqual(expected, result)).to.equal(true);
   });
 });
