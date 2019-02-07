@@ -27,7 +27,10 @@ const read = async type =>
  * @param {Array} items - Array of items.
  * @param {string} path - Path to the output file.
  */
-const write = (items, path) => fs.writeFileSync(path, JSON.stringify(items, null, 2), 'utf8');
+const write = async (items, path) => {
+  await util.addResourceRedirections(items);
+  fs.writeFileSync(path, JSON.stringify(items, null, 2), 'utf8');
+};
 
 module.exports = {
   write,
