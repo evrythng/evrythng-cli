@@ -5,6 +5,7 @@
 
 const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
+const jsonFile = require('../modules/jsonFile');
 const switches = require('../modules/switches');
 const util = require('../modules/util');
 
@@ -16,6 +17,9 @@ module.exports = {
       execute: async ([, json]) => {
         if (switches.FROM_CSV) {
           return csvFile.read('place');
+        }
+        if (switches.FROM_JSON) {
+          return jsonFile.read('place');
         }
 
         const payload = await util.getPayload('PlaceDocument', json);

@@ -5,6 +5,7 @@
 
 const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
+const jsonFile = require('../modules/jsonFile');
 const switches = require('../modules/switches');
 const util = require('../modules/util');
 
@@ -17,9 +18,9 @@ module.exports = {
         if (switches.FROM_CSV) {
           return csvFile.read('actionType');
         }
-        // if (switches.FROM_JSON) {
-        //   return jsonReader.read('actionType');
-        // }
+        if (switches.FROM_JSON) {
+          return jsonFile.read('actionType');
+        }
 
         const payload = await util.getPayload('ActionTypeDocument', json);
         return http.post('/actions', payload);
