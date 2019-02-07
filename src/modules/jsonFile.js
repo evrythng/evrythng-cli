@@ -22,7 +22,6 @@ const read = async type =>
 
 /**
  * Write a list of objects to file.
- * TODO: Homogenise with csvFile.
  *
  * @param {Array} items - Array of items.
  * @param {string} path - Path to the output file.
