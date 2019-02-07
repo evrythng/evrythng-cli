@@ -61,6 +61,7 @@ describe('CLI', () => {
   require('./modules/csvFile');
   require('./modules/functions');
   require('./modules/http');
+  require('./modules/jsonFile');
   require('./modules/logger');
   require('./modules/prompt');
   require('./modules/switches');
