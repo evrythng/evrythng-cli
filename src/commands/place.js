@@ -3,8 +3,9 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const csv = require('../modules/csv');
+const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
+const jsonFile = require('../modules/jsonFile');
 const switches = require('../modules/switches');
 const util = require('../modules/util');
 
@@ -15,7 +16,10 @@ module.exports = {
     create: {
       execute: async ([, json]) => {
         if (switches.FROM_CSV) {
-          return csv.read('place');
+          return csvFile.read('place');
+        }
+        if (switches.FROM_JSON) {
+          return jsonFile.read('place');
         }
 
         const payload = await util.getPayload('PlaceDocument', json);

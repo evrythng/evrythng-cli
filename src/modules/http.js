@@ -7,8 +7,9 @@ const { parse } = require('url');
 const evrythng = require('evrythng-extended');
 const { getConfirmation } = require('./prompt');
 const config = require('./config');
-const csv = require('./csv');
+const csvFile = require('./csvFile');
 const expand = require('../functions/expand');
+const jsonFile = require('./jsonFile');
 const logger = require('./logger');
 const operator = require('../commands/operator');
 const switches = require('./switches');
@@ -180,10 +181,11 @@ const printResponse = async (res) => {
 
   // Get all pages and update res.data
   const csvFileName = switches.TO_CSV;
+  const jsonFileName = switches.TO_JSON;
   const toPage = switches.TO_PAGE;
   if (toPage) {
-    if (!csvFileName) {
-      throw new Error('--to-page is only available when using --to-csv.');
+    if (!csvFileName && !jsonFileName) {
+      throw new Error('--to-page is only available when using --to-csv or --to-json');
     }
 
     res.data = await getMorePages(res, toPage);
@@ -225,7 +227,11 @@ const printResponse = async (res) => {
 
   // Print to file?
   if (csvFileName) {
-    await csv.write(Array.isArray(data) ? data : [data], csvFileName);
+    await csvFile.write(Array.isArray(data) ? data : [data], csvFileName);
+    return res;
+  }
+  if (jsonFileName) {
+    await jsonFile.write(Array.isArray(data) ? data : [data], jsonFileName);
     return res;
   }
 

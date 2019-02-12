@@ -10,8 +10,9 @@ const fs = require('fs');
 const neatCsv = require('neat-csv');
 const { mockApi } = require('../util');
 const config = require('../../src/modules/config');
-const csv = require('../../src/modules/csv');
+const csvFile = require('../../src/modules/csvFile');
 const switches = require('../../src/modules/switches');
+const util = require('../../src/modules/util');
 
 const { expect } = chai;
 chai.use(chaiAsPromised);
@@ -58,7 +59,7 @@ const TEST_ROWS = [
   'UK3x87gBpwAAXtawamsKRtmr,Thng3,,,,,,,,,,,,,,',
 ];
 
-describe('csv', () => {
+describe('csvFile', () => {
   after(async () => {
     fs.unlinkSync(CSV_PATH);
   });
@@ -69,18 +70,18 @@ describe('csv', () => {
   });
 
   it('should convert objects to CSV rows', async () => {
-    const rows = await csv.createCsvData(TEST_OBJECTS);
+    const rows = await csvFile.createCsvData(TEST_OBJECTS);
     expect(isEqual(rows, TEST_ROWS)).to.equal(true);
   });
 
   it('should not throw when writing to a CSV file', async () => {
-    const writeCsvFile = () => csv.write(TEST_OBJECTS, CSV_PATH);
+    const writeCsvFile = () => csvFile.write(TEST_OBJECTS, CSV_PATH);
     expect(writeCsvFile).to.not.throw();
   });
 
   it('should throw if the specified file doesn\'t exist', async () => {
     switches.FROM_CSV = 'badpath.txt';
-    const promise = csv.read('thng');
+    const promise = csvFile.read('thng');
     return expect(promise).to.eventually.be.rejected;
   });
 
@@ -98,7 +99,7 @@ describe('csv', () => {
     const testValue = 'testValue';
     const simpleObj = { customFields: {} };
 
-    csv.assignPrefixProperty(simpleObj, 'customFields', prefixKey, testValue);
+    csvFile.assignPrefixProperty(simpleObj, 'customFields', prefixKey, testValue);
     expect(simpleObj.customFields[realKey]).to.equal(testValue);
   });
 
@@ -108,14 +109,14 @@ describe('csv', () => {
     const testValue = 'testValue';
     const simpleObj = {};
 
-    csv.assignPrefixProperty(simpleObj, 'customFields', prefixKey, testValue);
+    csvFile.assignPrefixProperty(simpleObj, 'customFields', prefixKey, testValue);
     expect(simpleObj.customFields).to.be.an('object');
     expect(simpleObj.customFields[realKey]).to.equal(testValue);
   });
 
   it('should convert a row into an object', async () => {
     const rowObjs = await neatCsv(TEST_ROWS.join('\n'));
-    const result = csv.rowToObject(rowObjs[0]);
+    const result = csvFile.rowToObject(rowObjs[0]);
 
     const expected = {
       name: 'Name, with commas',
@@ -148,13 +149,13 @@ describe('csv', () => {
   it('should encode a simple JSON object', () => {
     const obj = { foo: 'bar', 'baz': 'thng' };
     const expected = '{foo:bar|baz:thng}';
-    expect(csv.encodeObject(obj)).to.equal(expected);    
+    expect(csvFile.encodeObject(obj)).to.equal(expected);    
   });
 
   it('should decode a simple JSON object encoded string', () => {
     const objStr = '{foo:bar|baz:thng}';
     const expected = { foo: 'bar', 'baz': 'thng' };
-    const result = csv.decodeObject(objStr);
+    const result = csvFile.decodeObject(objStr);
     expect(isEqual(result, expected)).to.equal(true);    
   });
 
@@ -165,25 +166,25 @@ describe('csv', () => {
       .reply(201, {});
 
     switches.FROM_CSV = CSV_PATH;
-    await csv.read('thng');
+    await csvFile.read('thng');
     mock.persist(false);
   });
 
   it('should escape commas and double quotes', () => {
     const input = 'A "string", including a comma';
     const expected = '"A ""string"", including a comma"';
-    const result = csv.escapeCommas(input);
+    const result = csvFile.escapeCommas(input);
     expect(isEqual(result, expected)).to.equal(true);
   });
 
   it('should encode a sub-object', () => {
-    const result = csv.encodeSubObject([], 'foo', { bar: 'baz', coca: 'cola' });
+    const result = csvFile.encodeSubObject([], 'foo', { bar: 'baz', coca: 'cola' });
     const expected = ['{bar:baz|coca:cola}'];
     expect(isEqual(result, expected)).to.equal(true);
   });
 
   it('should not throw for a resource not compatible with redirections', async () => {
-    const promise = csv.createRedirection({}, {}, 'place', 'https://example.com');
+    const promise = util.createRedirection({}, {}, 'place', 'https://example.com');
     return expect(promise).to.eventually.be.fulfilled;
   });
 
@@ -202,7 +203,7 @@ describe('csv', () => {
       data: { evrythngId, defaultRedirectUrl, type },
     };
 
-    const result = csv.createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
+    const result = util.createRedirectionOptions(scope, evrythngId, type, defaultRedirectUrl);
     expect(isEqual(expected, result)).to.equal(true);
   });
 });
