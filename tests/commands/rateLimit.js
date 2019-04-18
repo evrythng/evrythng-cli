@@ -10,7 +10,7 @@ describe('rate-limits', () => {
   it('should make correct request for \'rate-limits read\'', async () => {
     mockApi()
       .get('/rateLimits?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli(`rate-limits read`);
   });

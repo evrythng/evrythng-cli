@@ -4,7 +4,6 @@
  */
 
 const { omit } = require('lodash');
-const evrythng = require('evrythng-extended');
 const fs = require('fs');
 const neatCsv = require('neat-csv');
 const logger = require('./logger');

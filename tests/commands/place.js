@@ -11,7 +11,7 @@ describe('places', () => {
     const payload = JSON.stringify({ name: 'Test place' });
     mockApi()
       .post('/places', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`places create ${payload}`);
   });
@@ -19,7 +19,7 @@ describe('places', () => {
   it('should make correct request for \'places list\'', async () => {
     mockApi()
       .get('/places?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('places list');
   });
@@ -27,7 +27,7 @@ describe('places', () => {
   it('should make correct request for \'places $id read\'', async () => {
     mockApi()
       .get(`/places/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`places ${ID} read`);
   });
@@ -36,7 +36,7 @@ describe('places', () => {
     const payload = JSON.stringify({ tags: ['test'] });
     mockApi()
       .put(`/places/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`places ${ID} update ${payload}`);
   });
@@ -44,7 +44,7 @@ describe('places', () => {
   it('should make correct request for \'places $id delete\'', async () => {
     mockApi()
       .delete(`/places/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`places ${ID} delete`);
   });

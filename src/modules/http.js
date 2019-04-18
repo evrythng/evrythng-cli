@@ -4,7 +4,7 @@
  */
 
 const { parse } = require('url');
-const evrythng = require('evrythng-extended');
+const evrythng = require('evrythng');
 const { getConfirmation } = require('./prompt');
 const config = require('./config');
 const csvFile = require('./csvFile');
@@ -130,7 +130,7 @@ const goToPage = async (res, endPage) => {
 
     const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
-      authorization: operator.getKey(),
+      apiKey: operator.getKey(),
       fullResponse,
       url,
     });
@@ -153,7 +153,7 @@ const getMorePages = async (res, max) => {
 
     const url = extractUrlFromLink(res.headers.link);
     res = await evrythng.api({
-      authorization: operator.getKey(),
+      apiKey: operator.getKey(),
       fullResponse,
       url,
     });
@@ -246,7 +246,11 @@ const printResponse = async (res) => {
  * @param {Object} options - The request options.
  * @returns {Promise} A promise that resolves to the result of the request
  */
-const sendRequest = options => evrythng.api(options);
+const sendRequest = options => evrythng.api(options)
+  .then(res => res.json().then((json) => {
+    res.data = json;
+    return res;
+  }));
 
 /**
  * Log a confirmation of a deletion, showing the path deleted.
@@ -261,7 +265,7 @@ const createApiRequest = async (options) => {
     options.method = 'GET';
   }
 
-  options.displayHeaders = { Authorization: `${options.authorization.substring(0, 4)}...` };
+  options.displayHeaders = { Authorization: `${options.apiKey.substring(0, 4)}...` };
   if (['POST', 'PUT'].includes(options.method)) {
     options.displayHeaders['Content-Type'] = 'application/json';
   }
@@ -286,8 +290,8 @@ const createApiRequest = async (options) => {
 
 const post = async (url, data) => createApiRequest({
   url: `${url}${buildParamString('post', url)}`,
-  method: 'post',
-  authorization: operator.getKey(),
+  method: 'POST',
+  apiKey: operator.getKey(),
   data,
 })
   .then(module.exports.sendRequest)
@@ -295,7 +299,7 @@ const post = async (url, data) => createApiRequest({
 
 const get = async (url, silent = false) => createApiRequest({
   url: `${url}${buildParamString('get', url)}`,
-  authorization: operator.getKey(),
+  apiKey: operator.getKey(),
 })
   .then(module.exports.sendRequest)
   .then((res) => {
@@ -309,7 +313,7 @@ const get = async (url, silent = false) => createApiRequest({
 const put = async (url, data) => createApiRequest({
   url: `${url}${buildParamString('put', url)}`,
   method: 'PUT',
-  authorization: operator.getKey(),
+  apiKey: operator.getKey(),
   data,
 })
   .then(module.exports.sendRequest)
@@ -323,7 +327,7 @@ const put = async (url, data) => createApiRequest({
  const deleteMethod = async url => createApiRequest({
   url,
   method: 'DELETE',
-  authorization: operator.getKey(),
+  apiKey: operator.getKey(),
 })
   .then(module.exports.sendRequest)
   .then((res) => {

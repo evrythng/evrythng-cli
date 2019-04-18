@@ -16,7 +16,7 @@ describe('roles', () => {
     });
     mockApi()
       .post('/roles', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`roles create ${payload}`);
   });
@@ -24,7 +24,7 @@ describe('roles', () => {
   it('should make correct request for \'roles list\'', async () => {
     mockApi()
       .get('/roles?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('roles list');
   });
@@ -32,7 +32,7 @@ describe('roles', () => {
   it('should make correct request for \'roles $id read\'', async () => {
     mockApi()
       .get(`/roles/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`roles ${ID} read`);
   });
@@ -41,7 +41,7 @@ describe('roles', () => {
     const payload = JSON.stringify({ customFields: { key: 'value' } });
     mockApi()
       .put(`/roles/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`roles ${ID} update ${payload}`);
   });
@@ -50,7 +50,7 @@ describe('roles', () => {
   it('should make correct request for \'roles $id permissions list\'', async () => {
     mockApi()
       .get(`/roles/${ID}/permissions?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`roles ${ID} permissions list`);
   });
@@ -59,7 +59,7 @@ describe('roles', () => {
     const payload = JSON.stringify([{ path: '/thngs', access: 'r' }]);
     mockApi()
       .put(`/roles/${ID}/permissions`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`roles ${ID} permissions update ${payload}`);
   });
@@ -68,7 +68,7 @@ describe('roles', () => {
   it('should make correct request for \'roles $id delete\'', async () => {
     mockApi()
       .delete(`/roles/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`roles ${ID} delete`);
   });

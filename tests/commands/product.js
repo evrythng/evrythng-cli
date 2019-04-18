@@ -13,7 +13,7 @@ describe('products', () => {
     const payload = JSON.stringify({ name: 'Test product' });
     mockApi()
       .post('/products', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`products create ${payload}`);
   });
@@ -21,7 +21,7 @@ describe('products', () => {
   it('should make correct request for \'products list\'', async () => {
     mockApi()
       .get('/products?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('products list');
   });
@@ -29,7 +29,7 @@ describe('products', () => {
   it('should make correct request for \'products $id read\'', async () => {
     mockApi()
       .get(`/products/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} read`);
   });
@@ -38,7 +38,7 @@ describe('products', () => {
     const payload = JSON.stringify({ tags: ['test'] });
     mockApi()
       .put(`/products/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} update ${payload}`);
   });
@@ -47,7 +47,7 @@ describe('products', () => {
     const payload = JSON.stringify({ tags: ['test'] });
     mockApi()
       .put(`/products?ids=Up5dVdGwhqSrY5aRwneKddgb%2CUKgVb5QFfRtNQBRRw2Dxmkar`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products update ${payload} --ids Up5dVdGwhqSrY5aRwneKddgb,UKgVb5QFfRtNQBRRw2Dxmkar`);
 
@@ -59,7 +59,7 @@ describe('products', () => {
     const payload = JSON.stringify([{ key: NAME, value: 'some value' }]);
     mockApi()
       .put(`/products/${ID}/properties`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} properties create ${payload}`);
   });
@@ -67,7 +67,7 @@ describe('products', () => {
   it('should make correct request for \'products $id properties list\'', async () => {
     mockApi()
       .get(`/products/${ID}/properties?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} properties list`);
   });
@@ -75,7 +75,7 @@ describe('products', () => {
   it('should make correct request for \'products $id properties $key read\'', async () => {
     mockApi()
       .get(`/products/${ID}/properties/${NAME}?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} properties ${NAME} read`);
   });
@@ -85,7 +85,7 @@ describe('products', () => {
       const payload = JSON.stringify([{ value: 'some value' }]);
       mockApi()
         .put(`/products/${ID}/properties/${NAME}`, payload)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`products ${ID} properties ${NAME} update ${payload}`);
     });
@@ -93,7 +93,7 @@ describe('products', () => {
   it('should make correct request for \'products $id properties $key delete\'', async () => {
     mockApi()
       .delete(`/products/${ID}/properties/${NAME}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} properties ${NAME} delete`);
   });
@@ -103,7 +103,7 @@ describe('products', () => {
     const payload = JSON.stringify({ type: NAME });
     mockApi()
       .post(`/products/${ID}/actions/all`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`products ${ID} actions create ${payload}`);
   });
@@ -111,7 +111,7 @@ describe('products', () => {
   it('should make correct request for \'products $id actions list\'', async () => {
     mockApi()
       .get(`/products/${ID}/actions/all?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} actions list`);
   });
@@ -119,7 +119,7 @@ describe('products', () => {
   it('should make correct request for \'products $id actions $id read\'', async () => {
     mockApi()
       .get(`/products/${ID}/actions/all/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} actions ${ID} read`);
   });
@@ -129,7 +129,7 @@ describe('products', () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/' });
     mockApi()
       .post(`/products/${ID}/redirector`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`products ${ID} redirection create ${payload}`);
   });
@@ -137,7 +137,7 @@ describe('products', () => {
   it('should make correct request for \'products $id redirection read\'', async () => {
     mockApi()
       .get(`/products/${ID}/redirector?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} redirection read`);
   });
@@ -146,7 +146,7 @@ describe('products', () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
     mockApi()
       .put(`/products/${ID}/redirector`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} redirection update ${payload}`);
   });
@@ -154,7 +154,7 @@ describe('products', () => {
   it('should make correct request for \'products $id redirection delete\'', async () => {
     mockApi()
       .delete(`/products/${ID}/redirector`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} redirection delete`);
   });
@@ -163,7 +163,7 @@ describe('products', () => {
   it('should make correct request for \'products $id delete\'', async () => {
     mockApi()
       .delete(`/products/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`products ${ID} delete`);
   });

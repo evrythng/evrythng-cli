@@ -22,7 +22,7 @@ describe('files', () => {
     });
     mockApi()
       .post('/files', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`files create ${payload}`);
   });
@@ -30,7 +30,7 @@ describe('files', () => {
   it('should make correct request for \'files list\'', async () => {
     mockApi()
       .get('/files?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('files list');
   });
@@ -38,7 +38,7 @@ describe('files', () => {
   it('should make correct request for \'files $id read\'', async () => {
     mockApi()
       .get(`/files/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`files ${ID} read`);
   });
@@ -56,7 +56,7 @@ describe('files', () => {
   it('should make correct request for \'files $id delete\'', async () => {
     mockApi()
       .delete(`/files/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`files ${ID} delete`);
   });

@@ -5,7 +5,7 @@
 
 const { omit } = require('lodash');
 const jsonschema = require('jsonschema');
-const evrythng = require('evrythng-extended');
+const evrythng = require('evrythng');
 const fs = require('fs');
 const indent = require('../functions/indent');
 const logger = require('./logger');
@@ -129,7 +129,7 @@ const createRedirectionOptions = (scope, evrythngId, type, defaultRedirectUrl) =
   apiUrl: `https://${switches.WITH_REDIRECTIONS}`,
   url: '/redirections',
   method: 'post',
-  authorization: scope.apiKey,
+  apiKey: scope.apiKey,
   headers: { Accept: 'application/json' },
   data: { evrythngId, defaultRedirectUrl, type },
 });
@@ -229,7 +229,7 @@ const readRedirections = async (items, shortDomain) => {
       const [redirection] = await evrythng.api({
         apiUrl: `https://${shortDomain}`,
         url: `/redirections?evrythngId=${item.id}`,
-        authorization: operator.getKey(),
+        apiKey: operator.getKey(),
       });
 
       if (redirection) {

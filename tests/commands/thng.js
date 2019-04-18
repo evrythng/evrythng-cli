@@ -13,7 +13,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ name: 'Test thng' });
     mockApi()
       .post('/thngs', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`thngs create ${payload}`);
   });
@@ -21,7 +21,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs list\'', async () => {
     mockApi()
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('thngs list');
   });
@@ -29,7 +29,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id read\'', async () => {
     mockApi()
       .get(`/thngs/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} read`);
   });
@@ -38,7 +38,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ tags: ['test'] });
     mockApi()
       .put(`/thngs/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} update ${payload}`);
   });
@@ -47,7 +47,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ tags: ['test'] });
     mockApi()
       .put(`/thngs?ids=Up5dVdGwhqSrY5aRwneKddgb%2CUKgVb5QFfRtNQBRRw2Dxmkar`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs update ${payload} --ids Up5dVdGwhqSrY5aRwneKddgb,UKgVb5QFfRtNQBRRw2Dxmkar`);
 
@@ -59,7 +59,7 @@ describe('thngs', () => {
     const payload = JSON.stringify([{ key: NAME, value: 'some value' }]);
     mockApi()
       .put(`/thngs/${ID}/properties`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} properties create ${payload}`);
   });
@@ -67,7 +67,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id properties list\'', async () => {
     mockApi()
       .get(`/thngs/${ID}/properties?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} properties list`);
   });
@@ -75,7 +75,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id properties $key read\'', async () => {
     mockApi()
       .get(`/thngs/${ID}/properties/${NAME}?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} properties ${NAME} read`);
   });
@@ -84,7 +84,7 @@ describe('thngs', () => {
     const payload = JSON.stringify([{ value: 'some value' }]);
     mockApi()
       .put(`/thngs/${ID}/properties/${NAME}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} properties ${NAME} update ${payload}`);
   });
@@ -92,7 +92,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id properties $key delete\'', async () => {
     mockApi()
       .delete(`/thngs/${ID}/properties/${NAME}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} properties ${NAME} delete`);
   });
@@ -102,7 +102,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ type: NAME });
     mockApi()
       .post(`/thngs/${ID}/actions/all`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`thngs ${ID} actions create ${payload}`);
   });
@@ -110,7 +110,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id actions list\'', async () => {
     mockApi()
       .get(`/thngs/${ID}/actions/all?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} actions list`);
   });
@@ -118,7 +118,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id actions $id read\'', async () => {
     mockApi()
       .get(`/thngs/${ID}/actions/all/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} actions ${ID} read`);
   });
@@ -128,7 +128,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/' });
     mockApi()
       .post(`/thngs/${ID}/redirector`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`thngs ${ID} redirection create ${payload}`);
   });
@@ -136,7 +136,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id redirection read\'', async () => {
     mockApi()
       .get(`/thngs/${ID}/redirector?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} redirection read`);
   });
@@ -145,7 +145,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
     mockApi()
       .put(`/thngs/${ID}/redirector`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} redirection update ${payload}`);
   });
@@ -153,7 +153,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id redirection delete\'', async () => {
     mockApi()
       .delete(`/thngs/${ID}/redirector`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} redirection delete`);
   });
@@ -162,7 +162,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id location read\'', async () => {
     mockApi()
       .get(`/thngs/${ID}/location?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} location read`);
   });
@@ -173,7 +173,7 @@ describe('thngs', () => {
     }]);
     mockApi()
       .put(`/thngs/${ID}/location`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} location update ${payload}`);
   });
@@ -181,7 +181,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id location delete\'', async () => {
     mockApi()
       .delete(`/thngs/${ID}/location`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} location delete`);
   });
@@ -191,7 +191,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ thngId: ID });
     mockApi()
       .post('/auth/evrythng/thngs')
-      .reply(201);
+      .reply(201, {});
 
     await cli(`thngs device-key create ${payload}`);
   });
@@ -200,7 +200,7 @@ describe('thngs', () => {
     const payload = JSON.stringify({ thngId: ID });
     mockApi()
       .get(`/auth/evrythng/thngs/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} device-key read`);
   });
@@ -208,7 +208,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id device-key delete\'', async () => {
     mockApi()
       .delete(`/auth/evrythng/thngs/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} device-key delete`);
   });
@@ -217,7 +217,7 @@ describe('thngs', () => {
   it('should make correct request for \'thngs $id delete\'', async () => {
     mockApi()
       .delete(`/thngs/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`thngs ${ID} delete`);
   });

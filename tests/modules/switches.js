@@ -20,7 +20,7 @@ describe('switches', () => {
   it('should accept the --filter switch', async () => {
     mockApi()
       .get('/thngs?filter=tags%3Dtest&perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --filter tags=test');
     switches.FILTER = false;
@@ -29,7 +29,7 @@ describe('switches', () => {
   it('should accept the --with-scopes switch', async () => {
     mockApi()
       .get('/thngs?perPage=30&withScopes=true')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --with-scopes');
     switches.SCOPES = false;
@@ -38,7 +38,7 @@ describe('switches', () => {
   it('should accept the --per-page switch', async () => {
     mockApi()
       .get('/thngs?perPage=1')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --per-page 1');
     switches.PER_PAGE = false;
@@ -47,7 +47,7 @@ describe('switches', () => {
   it('should accept the --summary switch', async () => {
     mockApi()
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --summary');
     switches.SUMMARY = false;
@@ -57,7 +57,7 @@ describe('switches', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli(`thngs list --api-key ${API_KEY}`);
     switches.API_KEY = false;
@@ -66,7 +66,7 @@ describe('switches', () => {
   it('should accept the --expand switch', async () => {
     mockApi()
       .get('/products?perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli('products list --expand');
     switches.EXPAND = false;
@@ -75,7 +75,7 @@ describe('switches', () => {
   it('should accept the --field switch', async () => {
     mockApi()
       .get('/access?perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli('access read --field account');
     switches.FIELD = false;
@@ -84,7 +84,7 @@ describe('switches', () => {
   it('should accept the --simple switch', async () => {
     mockApi()
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --simple');
     switches.SIMPLE = false;
@@ -93,7 +93,7 @@ describe('switches', () => {
   it('should accept the --project switch', async () => {
     mockApi()
       .get(`/thngs?perPage=30&project=${ID}`)
-      .reply(200);
+      .reply(200, []);
 
     await cli(`thngs list --project ${ID}`);
     switches.PROJECT = false;
@@ -102,7 +102,7 @@ describe('switches', () => {
   it('should accept the --page switch', async () => {
     mockApi()
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --page 1');
     switches.PAGE = false;
@@ -111,7 +111,7 @@ describe('switches', () => {
   it('should accept the --context switch', async () => {
     mockApi()
       .get('/actions/scans?perPage=30&context=true')
-      .reply(200);
+      .reply(200, []);
 
     await cli('actions scans list --context');
     switches.CONTEXT = false;
@@ -125,7 +125,7 @@ describe('switches', () => {
   it('should accept the --to-page switch with --to-csv', async () => {
     mockApi()
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, []);
     
     await cli(`thngs list --to-page 2 --to-csv ${CSV_PATH}`);
     switches.TO_PAGE = false;
@@ -135,7 +135,7 @@ describe('switches', () => {
   it('should accept the --ids switch', async () => {
     mockApi()
       .get('/thngs?perPage=30&ids=UMa5MAFANhYGgwaaaGcqqh6c%2CU5Qs7YPEXEsWshaaaFM8egnh')
-      .reply(200);
+      .reply(200, []);
 
     await cli('thngs list --ids UMa5MAFANhYGgwaaaGcqqh6c,U5Qs7YPEXEsWshaaaFM8egnh');
     switches.IDS = false;
