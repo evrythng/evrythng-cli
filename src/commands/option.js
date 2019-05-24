@@ -86,6 +86,11 @@ const stringSetter = allowed => (options, key, newValue) => {
  */
 const checkAndSetOptionValue = (args) => {
   const [name, newValue] = args;
+  if (typeof name === 'undefined') {
+    const names = OPTION_LIST.map(p => p.name).join(', ');
+    throw new Error(`Specify a valid option name from: ${names}`);
+  }
+
   const option = OPTION_LIST.find(item => item.name === name);
   if (!option) {
     throw new Error(`Unknown option name '${name}'`);
