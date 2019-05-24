@@ -247,10 +247,13 @@ const printResponse = async (res) => {
  * @returns {Promise} A promise that resolves to the result of the request
  */
 const sendRequest = options => evrythng.api(options)
-  .then(res => res.json().then((json) => {
-    res.data = json;
-    return res;
-  }));
+  .then(res => res.json()
+    .then((json) => {
+      res.data = json;
+      res.headers = res.headers._headers;
+      return res;
+    })
+  );
 
 /**
  * Log a confirmation of a deletion, showing the path deleted.
