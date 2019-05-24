@@ -60,7 +60,7 @@ const TEST_ROWS = [
 ];
 
 describe('csvFile', () => {
-  after(async () => {
+  after(() => {
     fs.unlinkSync(CSV_PATH);
   });
 

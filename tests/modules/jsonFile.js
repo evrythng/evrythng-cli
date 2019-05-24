@@ -51,7 +51,7 @@ const TEST_OBJECTS = [{
 }];
 
 describe('jsonFile', () => {
-  after(async () => {
+  after(() => {
     fs.unlinkSync(JSON_PATH);
   });
 

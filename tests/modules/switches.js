@@ -15,8 +15,14 @@ const { expect } = chai;
 chai.use(chaiAsPromised);
 
 const CSV_PATH = './test.csv';
+const JSON_PATH = './test.json';
 
 describe('switches', () => {
+  after(() => {
+    fs.unlinkSync(CSV_PATH);
+    fs.unlinkSync(JSON_PATH);
+  });
+
   it('should accept the --filter switch', async () => {
     mockApi()
       .get('/thngs?filter=tags%3Dtest&perPage=30')
@@ -149,7 +155,7 @@ describe('switches', () => {
       .get('/thngs?perPage=30')
       .reply(200, []);
 
-    await cli(`thngs list --to-csv ./output.csv`);
+    await cli(`thngs list --to-csv ${CSV_PATH}`);
     switches.TO_CSV = '';
   });
 
@@ -163,7 +169,7 @@ describe('switches', () => {
       .get('/thngs?perPage=30')
       .reply(200, []);
 
-    await cli(`thngs list --to-json ./output.json`);
+    await cli(`thngs list --to-json ${JSON_PATH}`);
     switches.TO_JSON = '';
   });
 });
