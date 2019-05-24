@@ -246,14 +246,20 @@ const printResponse = async (res) => {
  * @param {Object} options - The request options.
  * @returns {Promise} A promise that resolves to the result of the request
  */
-const sendRequest = options => evrythng.api(options)
-  .then(res => res.json()
-    .then((json) => {
-      res.data = json;
+const sendRequest = options => evrythng.api(options).then((res) => {
+  // If not delete, transparently decode the stream to JSON
+  if (options.method && options.method.toLowerCase() !== 'delete') {
+    return res.json().then((json) => {
+      // Restore headers
       res.headers = res.headers._headers;
+
+      res.data = json;
       return res;
-    })
-  );
+    });
+  }
+
+  return res;
+});
 
 /**
  * Log a confirmation of a deletion, showing the path deleted.
