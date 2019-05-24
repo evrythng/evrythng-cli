@@ -27,7 +27,7 @@ module.exports = {
         return http.post('/products', payload);
       },
       pattern: 'create $payload',
-      helpPattern: 'create [$payload|--build|--from-csv]',
+      helpPattern: 'create [$payload|--build|--from-csv|--from-json]',
     },
     readProduct: {
       execute: async ([id]) => http.get(`/products/${id}`),
