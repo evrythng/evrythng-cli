@@ -154,13 +154,6 @@ const task = async () => {
 
   const result = await builders[taskType]();
   logger.info(`\nTask:\n${JSON.stringify(result, null, 2)}\n`);
-
-  const confirmation = await prompt.getConfirmation();
-  if (!confirmation) {
-    logger.info('Cancelled');
-    process.exit();
-  }
-
   return result;
 };
 
