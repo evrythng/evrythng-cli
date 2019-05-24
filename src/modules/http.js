@@ -255,6 +255,11 @@ const sendRequest = options => evrythng.api(options).then((res) => {
 
       res.data = json;
       return res;
+    }).catch((err) => {
+      // Some POST and PUT don't return a body, but that's OK
+      if (!err.message && err.message.includes('invalid json response body')) {
+        throw err;
+      }
     });
   }
 
