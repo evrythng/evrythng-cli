@@ -3,51 +3,45 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
-const readTasks = async () => cli(`batches ${ctx.batchId} tasks list`);
-
-const waitForTaskCompletion = async () => {
-  let res = await readTasks();
-  while (res.data[0].status !== 'EXECUTED') res = await readTasks();
-};
-
 describe('batches', async () => {
-  it('should return 201 for \'batches create $payload\'', async () => {
+  it('should make correct request for \'batches create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test batch' });
-    const res = await cli(`batches create ${payload}`);
+    mockApi()
+      .post('/batches', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.batchId = res.data.id;
+    await cli(`batches create ${payload}`);
   });
 
-  it('should return 200 for \'batches list\'', async () => {
-    const res = await cli('batches list');
+  it('should make correct request for \'batches list\'', async () => {
+    mockApi()
+      .get('/batches?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('batches list');
   });
 
-  it('should return 200 for \'batches $id read\'', async () => {
-    const res = await cli(`batches ${ctx.batchId} read`);
+  it('should make correct request for \'batches $id read\'', async () => {
+    mockApi()
+      .get(`/batches/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`batches ${ID} read`);
   });
 
-  it('should return 200 for \'batches $id update $payload\'', async () => {
+  it('should make correct request for \'batches $id update $payload\'', async () => {
     const payload = JSON.stringify({ description: 'Updated description' });
-    const res = await cli(`batches ${ctx.batchId} update ${payload}`);
+    mockApi()
+      .put(`/batches/${ID}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`batches ${ID} update ${payload}`);
   });
 
-  it('should return 202 for \'batches $id tasks create $payload\'', async () => {
+  it('should make correct request for \'batches $id tasks create $payload\'', async () => {
     const payload = JSON.stringify({
       type: 'SHORT_ID_GENERATION',
       inputParameters: {
@@ -61,38 +55,42 @@ describe('batches', async () => {
         },
       },
     });
-    const res = await cli(`batches ${ctx.batchId} tasks create ${payload}`);
+    mockApi()
+      .post(`/batches/${ID}/tasks`, payload)
+      .reply(202);
 
-    expect(res.status).to.equal(202);
-
-    await waitForTaskCompletion();
+    await cli(`batches ${ID} tasks create ${payload}`);
   });
 
-  it('should return 200 for \'batches $id tasks list\'', async () => {
-    const res = await cli(`batches ${ctx.batchId} tasks list`);
+  it('should make correct request for \'batches $id tasks list\'', async () => {
+    mockApi()
+      .get(`/batches/${ID}/tasks?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
-
-    ctx.taskId = res.data[0].id;
+    await cli(`batches ${ID} tasks list`);
   });
 
-  it('should return 200 for \'batches $id tasks $id read\'', async () => {
-    const res = await cli(`batches ${ctx.batchId} tasks ${ctx.taskId} read`);
+  it('should make correct request for \'batches $id tasks $id read\'', async () => {
+    mockApi()
+      .get(`/batches/${ID}/tasks/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`batches ${ID} tasks ${ID} read`);
   });
 
-  it('should return 200 for \'batches $id tasks $id logs list\'', async () => {
-    const res = await cli(`batches ${ctx.batchId} tasks ${ctx.taskId} logs list`);
+  it('should make correct request for \'batches $id tasks $id logs list\'', async () => {
+    mockApi()
+      .get(`/batches/${ID}/tasks/${ID}/logs?perPage=30`)
+      .reply(200);
 
-    expect(res.data).to.be.an('array');
+    await cli(`batches ${ID} tasks ${ID} logs list`);
   });
 
-  it('should return 200 for \'batches $id delete\'', async () => {
-    const res = await cli(`batches ${ctx.batchId} delete`);
+  it('should make correct request for \'batches $id delete\'', async () => {
+    mockApi()
+      .delete(`/batches/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`batches ${ID} delete`);
   });
 });

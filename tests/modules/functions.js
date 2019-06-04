@@ -22,8 +22,8 @@ describe('functions', () => {
 
     const expected = {
       id: 'UpAVKdVNBMPNQrRRa2kdTgWd',
-      createdAt: '2018-6-28 11:07:09',
-      updatedAt: '2018-6-28 11:07:09',
+      createdAt: '6/28/2018, 11:07:09 AM',
+      updatedAt: '6/28/2018, 11:07:09 AM',
       name: 'List Based Task Thng / IDF20170001',
       properties: {},
       identifiers: {
@@ -50,8 +50,8 @@ describe('functions', () => {
 
     const expected = [{
       id: 'UpAVKdVNBMPNQrRRa2kdTgWd',
-      createdAt: '2018-6-28 11:07:09',
-      updatedAt: '2018-6-28 11:07:09',
+      createdAt: '6/28/2018, 11:07:09 AM',
+      updatedAt: '6/28/2018, 11:07:09 AM',
       name: 'List Based Task Thng / IDF20170001',
       properties: {},
       identifiers: {

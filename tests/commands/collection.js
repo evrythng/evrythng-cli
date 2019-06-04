@@ -3,149 +3,140 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const { NAME, ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('collections', () => {
-  before(async () => {
-    let payload = JSON.stringify({ name: `_action-type-${Date.now()}` });
-    let res = await cli(`action-types create ${payload}`);
-
-    ctx.actionType = res.data.name;
-
-    payload = JSON.stringify({ name: 'Child collection' });
-    res = await cli(`collections create ${payload}`);
-
-    ctx.childId = res.data.id;
-
-    res = await cli('thngs list');
-    ctx.thngId = res.data[0].id;
-  });
-
-  after(async () => {
-    await cli(`action-types ${ctx.actionType} delete`);
-    await cli(`collections ${ctx.childId} delete`);
-  });
-
-  it('should return 201 for \'collections create $payload\'', async () => {
+  it('should make correct request for \'collections create $payload\'', async () => {
     const payload = JSON.stringify({ name: 'Test collection' });
-    const res = await cli(`collections create ${payload}`);
+    mockApi()
+      .post('/collections', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.parentId = res.data.id;
+    await cli(`collections create ${payload}`);
   });
 
-  it('should return 200 for \'collections list\'', async () => {
-    const res = await cli('collections list');
+  it('should make correct request for \'collections list\'', async () => {
+    mockApi()
+      .get('/collections?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('collections list');
   });
 
-  it('should return 200 for \'collections $id read\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} read`);
+  it('should make correct request for \'collections $id read\'', async () => {
+    mockApi()
+      .get(`/collections/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`collections ${ID} read`);
   });
 
-  it('should return 200 for \'collections $id update $payload\'', async () => {
+  it('should make correct request for \'collections $id update $payload\'', async () => {
     const payload = JSON.stringify({ description: 'Updated description' });
-    const res = await cli(`collections ${ctx.parentId} update ${payload}`);
+    mockApi()
+      .put(`/collections/${ID}`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`collections ${ID} update ${payload}`);
   });
 
-  it('should return 201 for \'collections $id actions create $payload\'', async () => {
-    const payload = JSON.stringify({ type: ctx.actionType });
-    const res = await cli(`collections ${ctx.parentId} actions create ${payload}`);
+  it('should make correct request for \'collections $id actions create $payload\'', async () => {
+    const payload = JSON.stringify({ type: NAME });
+    mockApi()
+      .post(`/collections/${ID}/actions/all`, payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.actionId = res.data.id;
+    await cli(`collections ${ID} actions create ${payload}`);
   });
 
-  it('should return 200 for \'collections $id actions list\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} actions list`);
+  it('should make correct request for \'collections $id actions list\'', async () => {
+    mockApi()
+      .get(`/collections/${ID}/actions/all?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`collections ${ID} actions list`);
   });
 
-  it('should return 200 for \'collections $id actions $id read\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} actions ${ctx.actionId} read`);
+  it('should make correct request for \'collections $id actions $id read\'', async () => {
+    mockApi()
+      .get(`/collections/${ID}/actions/all/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`collections ${ID} actions ${ID} read`);
   });
 
-  it('should return 200 for \'collections $id collections add $payload\'', async () => {
-    const payload = JSON.stringify([ctx.childId]);
-    const res = await cli(`collections ${ctx.parentId} collections add ${payload}`);
+  it('should make correct request for \'collections $id collections add $payload\'', async () => {
+    const payload = JSON.stringify([ID]);
+    mockApi()
+      .post(`/collections/${ID}/collections`, payload)
+      .reply(201);
 
-    expect(res.status).to.equal(200);
+    await cli(`collections ${ID} collections add ${payload}`);
   });
 
-  it('should return 200 for \'collections $id collections list\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} collections list`);
+  it('should make correct request for \'collections $id collections list\'', async () => {
+    mockApi()
+      .get(`/collections/${ID}/collections?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli(`collections ${ID} collections list`);
   });
 
-  it('should return 200 for \'collections $id collections $id delete\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} collections ${ctx.childId} delete`);
+  it('should make correct request for \'collections $id collections $id delete\'', async () => {
+    mockApi()
+      .delete(`/collections/${ID}/collections/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-
-    // Add again for the next test
-    const payload = JSON.stringify([ctx.childId]);
-    await cli(`collections ${ctx.parentId} collections add ${payload}`);
+    await cli(`collections ${ID} collections ${ID} delete`);
   });
 
-  it('should return 200 for \'collections $id collections delete\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} collections delete`);
+  it('should make correct request for \'collections $id collections delete\'', async () => {
+    mockApi()
+      .delete(`/collections/${ID}/collections`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`collections ${ID} collections delete`);
   });
 
-  it('should return 200 for \'collections $id thngs add $payload\'', async () => {
-    const payload = JSON.stringify([ctx.thngId]);
-    const res = await cli(`collections ${ctx.parentId} thngs add ${payload}`);
+  it('should make correct request for \'collections $id thngs add $payload\'', async () => {
+    const payload = JSON.stringify([ID]);
+    mockApi()
+      .put(`/collections/${ID}/thngs`, payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`collections ${ID} thngs add ${payload}`);
   });
 
-  it('should return 200 for \'collections $id thngs list\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} thngs list`);
+  it('should make correct request for \'collections $id thngs list\'', async () => {
+    mockApi()
+      .get(`/collections/${ID}/thngs?perPage=30`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`collections ${ID} thngs list`);
   });
 
-  it('should return 200 for \'collections $id thngs $id delete\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} thngs ${ctx.thngId} delete`);
+  it('should make correct request for \'collections $id thngs $id delete\'', async () => {
+    mockApi()
+      .delete(`/collections/${ID}/thngs/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-
-    // Add again for the next test
-    const payload = JSON.stringify([ctx.thngId]);
-    await cli(`collections ${ctx.parentId} thngs add ${payload}`);
+    await cli(`collections ${ID} thngs ${ID} delete`);
   });
 
-  it('should return 200 for \'collections $id thngs delete\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} thngs delete`);
+  it('should make correct request for \'collections $id thngs delete\'', async () => {
+    mockApi()
+      .delete(`/collections/${ID}/thngs`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`collections ${ID} thngs delete`);
   });
 
-  it('should return 200 for \'collections $id delete\'', async () => {
-    const res = await cli(`collections ${ctx.parentId} delete`);
+  it('should make correct request for \'collections $id delete\'', async () => {
+    mockApi()
+      .delete(`/collections/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`collections ${ID} delete`);
   });
 });

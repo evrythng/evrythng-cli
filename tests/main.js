@@ -5,6 +5,7 @@
 
 const { expect } = require('chai');
 const { ctx } = require('./util');
+const sinon = require('sinon');
 const cli = require('../src/functions/cli');
 const config = require('../src/modules/config');
 const expand = require('../src/functions/expand');
@@ -27,6 +28,10 @@ describe('CLI', () => {
 
   after(async () => {
     config.set('options', ctx.savedOpts);
+  });
+
+  afterEach(() => {
+    sinon.restore();
   });
 
   require('./commands/access');
@@ -53,9 +58,10 @@ describe('CLI', () => {
   require('./modules/api');
   require('./modules/commands');
   require('./modules/config');
-  require('./modules/csv');
+  require('./modules/csvFile');
   require('./modules/functions');
   require('./modules/http');
+  require('./modules/jsonFile');
   require('./modules/logger');
   require('./modules/prompt');
   require('./modules/switches');

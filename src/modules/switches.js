@@ -32,6 +32,11 @@ const SWITCH_LIST = [{
   constant: 'PAGE',
   valueLabel: '<page>',
 }, {
+  name: '--ids',
+  about: 'Specify the \'ids\' query parameter with a list of specific IDs.',
+  constant: 'IDS',
+  valueLabel: '<list of IDs>',
+}, {
   name: '--summary',
   about: 'Show a list of resources as a summarised (id, name) single-line format.',
   constant: 'SUMMARY',
@@ -77,6 +82,16 @@ const SWITCH_LIST = [{
   about: 'When importing/exporting, include each resource\'s redirection URL.',
   constant: 'WITH_REDIRECTIONS',
   valueLabel: '<short domain>',
+}, {
+  name: '--from-json',
+  about: 'Load resource from a JSON array file.',
+  constant: 'FROM_JSON',
+  valueLabel: '<input file>',
+}, {
+  name: '--to-json',
+  about: 'Output array response to a JSON file as an array.',
+  constant: 'TO_JSON',
+  valueLabel: '<input file>',
 }];
 
 const apply = (args) => {

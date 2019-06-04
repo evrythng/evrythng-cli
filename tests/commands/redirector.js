@@ -3,24 +3,26 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
+const { mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
 describe('redirector', () => {
-  it('should return 200 for \'redirector read\'', async () => {
-    const res = await cli(`redirector read`);
+  it('should make correct request for \'redirector read\'', async () => {
+    mockApi()
+      .get('/redirector?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`redirector read`);
   });
 
-  it('should return 200 for \'redirector update $payload\'', async () => {
+  it('should make correct request for \'redirector update $payload\'', async () => {
     const payload = JSON.stringify({
       rules: [{ match: 'thng.name=test', delegates: [] }],
     });
-    const res = await cli(`redirector update ${payload}`);
+    mockApi()
+      .put('/redirector', payload)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`redirector update ${payload}`);
   });
 });

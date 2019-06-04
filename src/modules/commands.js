@@ -46,7 +46,7 @@ const matchArg = (arg = '', spec) => {
     // Value must be JSON
     $payload: (val) => {
       // Some switches work instead of a payload
-      if (switches.BUILD || switches.FROM_CSV) {
+      if (switches.BUILD || switches.FROM_CSV || switches.FROM_JSON) {
         return true;
       }
 

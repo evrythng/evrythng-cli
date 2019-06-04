@@ -51,7 +51,7 @@ const upload = async (args) => {
   const { data: existing } = await http.get(`/files/${id}`, true);
   checkMetaDataMatches(existing, filePath, contentType);
 
-  uploadToS3(existing, fullPath, contentType);
+  module.exports.uploadToS3(existing, fullPath, contentType);
   logger.info(`File uploaded successfully.\nLocation: ${existing.contentUrl}`);
 };
 
@@ -84,4 +84,5 @@ module.exports = {
       pattern: '$id upload $file-path $mime-type',
     },
   },
+  uploadToS3,
 };

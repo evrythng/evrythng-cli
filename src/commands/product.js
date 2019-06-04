@@ -3,8 +3,9 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const csv = require('../modules/csv');
+const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
+const jsonFile = require('../modules/jsonFile');
 const switches = require('../modules/switches');
 const util = require('../modules/util');
 
@@ -16,7 +17,10 @@ module.exports = {
     createProduct: {
       execute: async ([, json]) => {
         if (switches.FROM_CSV) {
-          return csv.read('product');
+          return csvFile.read('product');
+        }
+        if (switches.FROM_JSON) {
+          return jsonFile.read('product');
         }
 
         const payload = await util.getPayload('ProductDocument', json);
@@ -36,6 +40,17 @@ module.exports = {
     updateProduct: {
       execute: async ([id, , json]) => http.put(`/products/${id}`, JSON.parse(json)),
       pattern: '$id update $payload',
+    },
+    updateProducts: {
+      execute: async ([, json]) => {
+        if (!switches.IDS) {
+          throw new Error('--ids switch is required for bulk update');
+        }
+
+        return http.put('/products', JSON.parse(json));
+      },
+      pattern: 'update $payload',
+      helpPattern: 'update $payload --ids <list of IDs>',
     },
     deleteProduct: {
       execute: async ([id]) => http.delete(`/products/${id}`),

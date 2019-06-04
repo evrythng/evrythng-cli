@@ -3,48 +3,61 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const { expect } = require('chai');
-const { ctx } = require('../util');
+const sinon = require('sinon');
+const { ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
+const file = require('../../src/commands/file');
+
+const FILE_NAME = 'test.txt';
+const FILE_TYPE = 'text/plain';
 
 describe('files', () => {
-  it('should return 201 for \'files create $payload\'', async () => {
+  after(() => sinon.restore());
+
+  it('should make correct request for \'files create $payload\'', async () => {
     const payload = JSON.stringify({
       name: 'test.txt',
       type: 'text/plain',
       privateAccess: false,
     });
-    const res = await cli(`files create ${payload}`);
+    mockApi()
+      .post('/files', payload)
+      .reply(201);
 
-    expect(res.status).to.equal(201);
-    expect(res.data).to.be.an('object');
-
-    ctx.fileId = res.data.id;
+    await cli(`files create ${payload}`);
   });
 
-  it('should return 200 for \'files list\'', async () => {
-    const res = await cli('files list');
+  it('should make correct request for \'files list\'', async () => {
+    mockApi()
+      .get('/files?perPage=30')
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('array');
+    await cli('files list');
   });
 
-  it('should return 200 for \'files $id read\'', async () => {
-    const res = await cli(`files ${ctx.fileId} read`);
+  it('should make correct request for \'files $id read\'', async () => {
+    mockApi()
+      .get(`/files/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
-    expect(res.data).to.be.an('object');
+    await cli(`files ${ID} read`);
   });
 
-  it('should not throw error for \'files $id upload $file-path $mime-type\'', async () => {
-    const uploadTestFile = async () => cli(`files ${ctx.fileId} upload ./tests/test.txt text/plain`);
+  it('should make correct request for \'files $id upload $file-path $mime-type\'', async () => {
+    mockApi()
+      .get(`/files/${ID}`)
+      .reply(200, { name: FILE_NAME, type: FILE_TYPE });
 
-    expect(uploadTestFile).to.not.throw();
+    sinon.stub(file, 'uploadToS3').returns(true);
+
+    await cli(`files ${ID} upload ./tests/${FILE_NAME} ${FILE_TYPE}`);
   });
 
-  it('should return 200 for \'files $id delete\'', async () => {
-    const res = await cli(`files ${ctx.fileId} delete`);
+  it('should make correct request for \'files $id delete\'', async () => {
+    mockApi()
+      .delete(`/files/${ID}`)
+      .reply(200);
 
-    expect(res.status).to.equal(200);
+    await cli(`files ${ID} delete`);
   });
 });
