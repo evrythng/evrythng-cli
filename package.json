@@ -9,7 +9,8 @@
     "test": "./node_modules/.bin/nyc ./node_modules/.bin/_mocha tests/main.js --slow 5000 --timeout 10000"
   },
   "bin": {
-    "evrythng": "bin/cli.js"
+    "evrythng": "bin/cli.js",
+    "evt": "bin/cli.js"
   },
   "author": "EVRYTHNG",
   "dependencies": {
