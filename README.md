@@ -136,6 +136,7 @@ following usable methods and data:
 * `getOptions()` - Retrieve an object describing the user's `options` from the 
   CLI configuration file, which defines the persistent `options` preferences.
 * `getSwitches()` - Retrieve an object describing the currently active switches.
+* `getConfig()` - Get a `get()`/`set()` interface to the config file.
 * `runCommand()` - Run a CLI command using a list of string arguments, such as 
   `['thngs', 'list']`.
 
