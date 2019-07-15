@@ -21,7 +21,7 @@ describe('accesses', () => {
       .matchHeader('authorization', API_KEY)
       .post('/accesses', payload)
       .reply(201, {});
-    
+
     await cli(`accesses create ${payload} --api-key ${API_KEY}`);
   });
 
@@ -38,7 +38,7 @@ describe('accesses', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .delete(`/accesses/${ID}`)
-      .reply(204, {});  // fullResponse used in http module, always expect Response back
+      .reply(204);
 
     await cli(`accesses ${ID} delete --api-key ${API_KEY}`);
   });
