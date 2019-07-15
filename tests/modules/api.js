@@ -81,4 +81,25 @@ describe('api', () => {
     expect(res).to.be.an('array');
     expect(res).to.have.length.gte(0);
   });
+
+  it('should provide access to config interface', () => {
+    const config = api.API.getConfig();
+
+    expect(config.get).to.be.a('function');
+    expect(config.set).to.be.a('function');
+  });
+
+  it('should provide access to operators', () => {
+    const config = api.API.getConfig();
+
+    const operators = config.get('operators');
+    expect(operators).to.be.an('object');
+  });
+
+  it('should provide access to selected operator name', () => {
+    const config = api.API.getConfig();
+
+    const using = config.get('using');
+    expect(using).to.be.a('string');
+  });
 });

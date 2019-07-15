@@ -72,6 +72,7 @@ const API = {
   },
   getOptions: () => config.get('options'),
   getSwitches: () => switches.active,
+  getConfig: () => config,
   runCommand,
 };
 
