@@ -51,7 +51,7 @@ const TEST_OBJECTS = [{
 }];
 
 describe('jsonFile', () => {
-  after(async () => {
+  after(() => {
     fs.unlinkSync(JSON_PATH);
   });
 
@@ -82,6 +82,12 @@ describe('jsonFile', () => {
       .persist()
       .post('/thngs?')
       .reply(201, {});
+
+    // Includes Operator creation
+    const accessMock = mockApi()
+      .persist()
+      .get('/access')
+      .reply(200, { actor: { id: '123' } })
 
     switches.FROM_JSON = JSON_PATH;
     await jsonFile.read('thng');

@@ -25,7 +25,7 @@ describe('app-users', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .post('/auth/evrythng/users', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`app-users create ${payload} --api-key ${API_KEY}`);
   });
@@ -35,7 +35,7 @@ describe('app-users', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .post(`/auth/evrythng/users/${ID}/validate`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`app-users ${ID} validate ${payload} --api-key ${API_KEY}`);
   });
@@ -45,7 +45,7 @@ describe('app-users', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .post('/auth/evrythng/users?anonymous=true', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`app-users anonymous create --api-key ${API_KEY}`);
   });
@@ -53,7 +53,7 @@ describe('app-users', () => {
   it('should make correct request for \'app-users list\'', async () => {
     mockApi()
       .get('/users?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('app-users list');
   });
@@ -61,7 +61,7 @@ describe('app-users', () => {
   it('should make correct request for \'app-users $id read\'', async () => {
     mockApi()
       .get(`/users/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`app-users ${ID} read`);
   });
@@ -70,7 +70,7 @@ describe('app-users', () => {
     const payload = JSON.stringify({ firstName: 'Test '});
     mockApi()
       .put(`/users/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`app-users ${ID} update ${payload}`);
   });
@@ -80,7 +80,7 @@ describe('app-users', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .post('/users/login', payload)
-      .reply(200);    
+      .reply(200, {});
     
     await cli(`app-users login ${payload} --api-key ${API_KEY}`);
   });
@@ -89,7 +89,7 @@ describe('app-users', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .post('/auth/all/logout')
-      .reply(200);
+      .reply(200, {});
 
     await cli(`app-users logout --api-key ${API_KEY}`);
   });
@@ -97,7 +97,7 @@ describe('app-users', () => {
   it('should make correct request for \'app-users $id delete\'', async () => {
     mockApi()
       .delete(`/users/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`app-users ${ID} delete`);
   });

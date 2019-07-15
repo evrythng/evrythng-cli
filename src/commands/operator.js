@@ -3,7 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const evrythng = require('evrythng-extended');
+const evrythng = require('evrythng');
 const { getValue } = require('../modules/prompt');
 const config = require('../modules/config');
 const logger = require('../modules/logger');
@@ -70,7 +70,7 @@ const showKey = ([name]) => {
  */
 const validateCredentials = async (region, apiKey) => {
   evrythng.setup({ apiUrl: REGIONS[region] });
-  const access = await evrythng.api({ url: '/access', authorization: apiKey });
+  const access = await evrythng.api({ url: '/access', apiKey: apiKey });
   if (access.actor.type !== 'operator') {
     throw new Error('Actor was not operator');
   }

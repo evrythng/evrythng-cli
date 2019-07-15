@@ -11,7 +11,7 @@ describe('collections', () => {
     const payload = JSON.stringify({ name: 'Test collection' });
     mockApi()
       .post('/collections', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`collections create ${payload}`);
   });
@@ -19,7 +19,7 @@ describe('collections', () => {
   it('should make correct request for \'collections list\'', async () => {
     mockApi()
       .get('/collections?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('collections list');
   });
@@ -27,7 +27,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id read\'', async () => {
     mockApi()
       .get(`/collections/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} read`);
   });
@@ -36,7 +36,7 @@ describe('collections', () => {
     const payload = JSON.stringify({ description: 'Updated description' });
     mockApi()
       .put(`/collections/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} update ${payload}`);
   });
@@ -45,7 +45,7 @@ describe('collections', () => {
     const payload = JSON.stringify({ type: NAME });
     mockApi()
       .post(`/collections/${ID}/actions/all`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`collections ${ID} actions create ${payload}`);
   });
@@ -53,7 +53,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id actions list\'', async () => {
     mockApi()
       .get(`/collections/${ID}/actions/all?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} actions list`);
   });
@@ -61,7 +61,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id actions $id read\'', async () => {
     mockApi()
       .get(`/collections/${ID}/actions/all/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} actions ${ID} read`);
   });
@@ -70,7 +70,7 @@ describe('collections', () => {
     const payload = JSON.stringify([ID]);
     mockApi()
       .post(`/collections/${ID}/collections`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`collections ${ID} collections add ${payload}`);
   });
@@ -78,7 +78,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id collections list\'', async () => {
     mockApi()
       .get(`/collections/${ID}/collections?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} collections list`);
   });
@@ -86,7 +86,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id collections $id delete\'', async () => {
     mockApi()
       .delete(`/collections/${ID}/collections/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} collections ${ID} delete`);
   });
@@ -94,7 +94,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id collections delete\'', async () => {
     mockApi()
       .delete(`/collections/${ID}/collections`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} collections delete`);
   });
@@ -103,7 +103,7 @@ describe('collections', () => {
     const payload = JSON.stringify([ID]);
     mockApi()
       .put(`/collections/${ID}/thngs`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} thngs add ${payload}`);
   });
@@ -111,7 +111,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id thngs list\'', async () => {
     mockApi()
       .get(`/collections/${ID}/thngs?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} thngs list`);
   });
@@ -119,7 +119,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id thngs $id delete\'', async () => {
     mockApi()
       .delete(`/collections/${ID}/thngs/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} thngs ${ID} delete`);
   });
@@ -127,7 +127,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id thngs delete\'', async () => {
     mockApi()
       .delete(`/collections/${ID}/thngs`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} thngs delete`);
   });
@@ -135,7 +135,7 @@ describe('collections', () => {
   it('should make correct request for \'collections $id delete\'', async () => {
     mockApi()
       .delete(`/collections/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`collections ${ID} delete`);
   });

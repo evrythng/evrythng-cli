@@ -20,8 +20,8 @@ describe('accesses', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .post('/accesses', payload)
-      .reply(201);
-    
+      .reply(201, {});
+
     await cli(`accesses create ${payload} --api-key ${API_KEY}`);
   });
 
@@ -29,7 +29,7 @@ describe('accesses', () => {
     mockApi()
       .matchHeader('authorization', API_KEY)
       .get('/accesses?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli(`accesses list --api-key ${API_KEY}`);
   });

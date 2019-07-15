@@ -3,14 +3,14 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const evrythng = require('evrythng-extended');
+const evrythng = require('evrythng');
 const operator = require('../commands/operator');
 
 const expandTimestamp = async timestamp => Promise.resolve(new Date(timestamp).toLocaleString());
 
 const expandResourceId = (type, id) => evrythng.api({
   url: `/${type}s/${id}`,
-  authorization: operator.getKey(),
+  apiKey: operator.getKey(),
 });
 
 const EXPANSION_MAP = {

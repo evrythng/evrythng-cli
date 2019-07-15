@@ -10,7 +10,7 @@ describe('redirector', () => {
   it('should make correct request for \'redirector read\'', async () => {
     mockApi()
       .get('/redirector?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli(`redirector read`);
   });
@@ -21,7 +21,7 @@ describe('redirector', () => {
     });
     mockApi()
       .put('/redirector', payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`redirector update ${payload}`);
   });

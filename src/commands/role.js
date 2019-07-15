@@ -16,7 +16,9 @@ module.exports = {
     },
     readRole: {
       execute: async ([roleId]) => http.get(`/roles/${roleId}`),
-      pattern: '$id read',
+
+      /** Allow base_app_user as a role ID (not 24 chars) */
+      pattern: '$roleId read',
     },
     listRole: {
       execute: async () => http.get('/roles'),
@@ -34,7 +36,9 @@ module.exports = {
     // Role permissions
     listPermissions: {
       execute: async ([roleId]) => http.get(`/roles/${roleId}/permissions`),
-      pattern: '$id permissions list',
+
+      /** Allow base_app_user as a role ID (not 24 chars) */
+      pattern: '$roleId permissions list',
     },
     updatePermissions: {
       execute: async ([roleId, , , json]) => {

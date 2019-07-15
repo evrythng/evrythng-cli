@@ -72,6 +72,16 @@ describe('api', () => {
     await api.API.runCommand(['products', 'list']);
   });
 
+  it('should receive the JSON response for an API command', async () => {
+    mockApi()
+      .get('/products?perPage=30')
+      .reply(200, [{ name: NAME }]);
+
+    const res = await api.API.runCommand(['products', 'list']);
+    expect(res).to.be.an('array');
+    expect(res).to.have.length.gte(0);
+  });
+
   it('should provide access to config interface', () => {
     const config = api.API.getConfig();
 

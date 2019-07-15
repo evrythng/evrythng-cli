@@ -11,7 +11,7 @@ describe('batches', async () => {
     const payload = JSON.stringify({ name: 'Test batch' });
     mockApi()
       .post('/batches', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`batches create ${payload}`);
   });
@@ -19,7 +19,7 @@ describe('batches', async () => {
   it('should make correct request for \'batches list\'', async () => {
     mockApi()
       .get('/batches?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('batches list');
   });
@@ -27,7 +27,7 @@ describe('batches', async () => {
   it('should make correct request for \'batches $id read\'', async () => {
     mockApi()
       .get(`/batches/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`batches ${ID} read`);
   });
@@ -36,7 +36,7 @@ describe('batches', async () => {
     const payload = JSON.stringify({ description: 'Updated description' });
     mockApi()
       .put(`/batches/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`batches ${ID} update ${payload}`);
   });
@@ -57,7 +57,7 @@ describe('batches', async () => {
     });
     mockApi()
       .post(`/batches/${ID}/tasks`, payload)
-      .reply(202);
+      .reply(202, {});
 
     await cli(`batches ${ID} tasks create ${payload}`);
   });
@@ -65,7 +65,7 @@ describe('batches', async () => {
   it('should make correct request for \'batches $id tasks list\'', async () => {
     mockApi()
       .get(`/batches/${ID}/tasks?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`batches ${ID} tasks list`);
   });
@@ -73,7 +73,7 @@ describe('batches', async () => {
   it('should make correct request for \'batches $id tasks $id read\'', async () => {
     mockApi()
       .get(`/batches/${ID}/tasks/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`batches ${ID} tasks ${ID} read`);
   });
@@ -81,7 +81,7 @@ describe('batches', async () => {
   it('should make correct request for \'batches $id tasks $id logs list\'', async () => {
     mockApi()
       .get(`/batches/${ID}/tasks/${ID}/logs?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`batches ${ID} tasks ${ID} logs list`);
   });
@@ -89,7 +89,7 @@ describe('batches', async () => {
   it('should make correct request for \'batches $id delete\'', async () => {
     mockApi()
       .delete(`/batches/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`batches ${ID} delete`);
   });

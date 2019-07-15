@@ -51,7 +51,13 @@ const runCommand = async (args) => {
   }
 
   operator.applyRegion();
-  await command.execute(args.slice(1));
+  const res = await command.execute(args.slice(1));
+  if (!res) {
+    return;
+  }
+
+  // Pass the data back for convenience, not the full fetch() response object
+  return res.data ? res.data : res;
 };
 
 const API = {

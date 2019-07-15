@@ -12,7 +12,7 @@ describe('projects', () => {
     const payload = JSON.stringify({ name: 'Test project' });
     mockApi()
       .post('/projects', payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`projects create ${payload}`);
   });
@@ -20,7 +20,7 @@ describe('projects', () => {
   it('should make correct request for \'projects list\'', async () => {
     mockApi()
       .get('/projects?perPage=30')
-      .reply(200);
+      .reply(200, {});
 
     await cli('projects list');
   });
@@ -28,7 +28,7 @@ describe('projects', () => {
   it('should make correct request for \'projects $id read\'', async () => {
     mockApi()
       .get(`/projects/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`projects ${ID} read`);
   });
@@ -37,7 +37,7 @@ describe('projects', () => {
     const payload = JSON.stringify({ tags: ['test'] });
     mockApi()
       .put(`/projects/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`projects ${ID} update ${payload}`);
   });
@@ -47,7 +47,7 @@ describe('projects', () => {
     const payload = JSON.stringify({ name: 'Test application', socialNetworks: {} });
     mockApi()
       .post(`/projects/${ID}/applications`, payload)
-      .reply(201);
+      .reply(201, {});
 
     await cli(`projects ${ID} applications create ${payload}`);
   });
@@ -55,7 +55,7 @@ describe('projects', () => {
   it('should make correct request for \'projects $id applications list\'', async () => {
     mockApi()
       .get(`/projects/${ID}/applications?perPage=30`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`projects ${ID} applications list`);
   });
@@ -63,7 +63,7 @@ describe('projects', () => {
   it('should make correct request for \'projects $id applications $id read\'', async () => {
     mockApi()
       .get(`/projects/${ID}/applications/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`projects ${ID} applications ${ID} read`);
   });
@@ -73,7 +73,7 @@ describe('projects', () => {
       const payload = JSON.stringify({ description: 'Updated application' });
       mockApi()
         .put(`/projects/${ID}/applications/${ID}`, payload)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} update ${payload}`);
     });
@@ -83,7 +83,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/secretKey?perPage=30`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} secret-key read`);
     });
@@ -93,7 +93,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/redirector?perPage=30`,)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} redirector read`);
     });
@@ -105,7 +105,7 @@ describe('projects', () => {
       });
       mockApi()
         .put(`/projects/${ID}/applications/${ID}/redirector`, payload)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} redirector update ${payload}`);
     });
@@ -115,7 +115,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/reactor/script?perPage=30`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor script read`);
     });
@@ -126,7 +126,7 @@ describe('projects', () => {
       const payload = JSON.stringify({ script });
       mockApi()
         .put(`/projects/${ID}/applications/${ID}/reactor/script`, payload)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor script update ${payload}`);
     });
@@ -135,7 +135,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/reactor/script/status?perPage=30`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor script status read`);
     });
@@ -144,7 +144,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/reactor/logs?perPage=30`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor logs read`);
     });
@@ -153,7 +153,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .delete(`/projects/${ID}/applications/${ID}/reactor/logs`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor logs delete`);
     });
@@ -163,7 +163,7 @@ describe('projects', () => {
       const payload = JSON.stringify({ event: {}, executeAt: Date.now() + 60000 });
       mockApi()
         .post(`/projects/${ID}/applications/${ID}/reactor/schedules`, payload)
-        .reply(201);
+        .reply(201, {});
 
       await cli(`projects ${ID} applications ${ID} reactor schedules create ${payload}`);
     });
@@ -172,7 +172,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/reactor/schedules?perPage=30`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor schedules list`);
     });
@@ -181,7 +181,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .get(`/projects/${ID}/applications/${ID}/reactor/schedules/${ID}`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor schedules ${ID} read`);
     });
@@ -191,7 +191,7 @@ describe('projects', () => {
       const payload = JSON.stringify({ description: 'Updated schedule' });
       mockApi()
         .put(`/projects/${ID}/applications/${ID}/reactor/schedules/${ID}`, payload)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor schedules ${ID} update ${payload}`);
     });
@@ -200,7 +200,7 @@ describe('projects', () => {
     async () => {
       mockApi()
         .delete(`/projects/${ID}/applications/${ID}/reactor/schedules/${ID}`)
-        .reply(200);
+        .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor schedules ${ID} delete`);
     });
@@ -209,7 +209,7 @@ describe('projects', () => {
   it('should make correct request for \'projects $id applications $id delete\'', async () => {
     mockApi()
       .delete(`/projects/${ID}/applications/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`projects ${ID} applications ${ID} delete`);
   });
@@ -217,7 +217,7 @@ describe('projects', () => {
   it('should make correct request for \'projects $id delete\'', async () => {
     mockApi()
       .delete(`/projects/${ID}`)
-      .reply(200);
+      .reply(200, {});
 
     await cli(`projects ${ID} delete`);
   });

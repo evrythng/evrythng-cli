@@ -26,7 +26,7 @@ module.exports = {
         return http.post('/places', payload);
       },
       pattern: 'create $payload',
-      helpPattern: 'create [$payload|--build|--from-csv]',
+      helpPattern: 'create [$payload|--build|--from-csv|--from-json]',
     },
     read: {
       execute: async ([placeId]) => http.get(`/places/${placeId}`),

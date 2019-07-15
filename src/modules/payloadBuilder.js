@@ -3,7 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
-const evrythng = require('evrythng-extended');
+const evrythng = require('evrythng');
 const evrythngSwagger = require('evrythng-swagger');
 const jsonSchemaParser = require('json-schema-ref-parser');
 const config = require('./config');
@@ -35,7 +35,7 @@ const FILE_FORMATS = ['CSV', 'ZIP'];
 
 const apiRequest = (url) => {
   const apiKey = operator.resolveKey(config.get('using'));
-  return evrythng.api({ url, authorization: apiKey });
+  return evrythng.api({ url, apiKey: apiKey });
 };
 
 const getShortDomains = async () => {
@@ -154,13 +154,6 @@ const task = async () => {
 
   const result = await builders[taskType]();
   logger.info(`\nTask:\n${JSON.stringify(result, null, 2)}\n`);
-
-  const confirmation = await prompt.getConfirmation();
-  if (!confirmation) {
-    logger.info('Cancelled');
-    process.exit();
-  }
-
   return result;
 };
 

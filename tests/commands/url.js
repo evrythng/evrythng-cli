@@ -11,7 +11,7 @@ describe('url', () => {
     const payload = JSON.stringify({ name: 'Test Thng' });
     mockApi()
       .post('/thngs', payload)
-      .reply(201);
+      .reply(201, {});
     
     await cli(`url post /thngs ${payload}`);
   });
@@ -19,7 +19,7 @@ describe('url', () => {
   it('should make correct request for \'url get $url\'', async () => {
     mockApi()
       .get('/thngs?perPage=30')
-      .reply(200);
+      .reply(200, {});
     
     await cli('url get /thngs');
   });
@@ -28,7 +28,7 @@ describe('url', () => {
     const payload = JSON.stringify({ name: 'Updated Thng' });
     mockApi()
       .put(`/thngs/${ID}`, payload)
-      .reply(200);
+      .reply(200, {});
     
     await cli(`url put /thngs/${ID} ${payload}`);
   });
@@ -36,7 +36,7 @@ describe('url', () => {
   it('should make correct request for \'url delete $url\'', async () => {
     mockApi()
       .delete(`/thngs/${ID}`)
-      .reply(200);
+      .reply(200, {});
     
     await cli(`url delete /thngs/${ID}`);
   });

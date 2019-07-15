@@ -60,7 +60,7 @@ const TEST_ROWS = [
 ];
 
 describe('csvFile', () => {
-  after(async () => {
+  after(() => {
     fs.unlinkSync(CSV_PATH);
   });
 
@@ -165,9 +165,16 @@ describe('csvFile', () => {
       .post('/thngs?')
       .reply(201, {});
 
+    // Includes Operator creation
+    const accessMock = mockApi()
+      .persist()
+      .get('/access')
+      .reply(200, { actor: { id: '123' } })
+
     switches.FROM_CSV = CSV_PATH;
     await csvFile.read('thng');
     mock.persist(false);
+    accessMock.persist(false);
   });
 
   it('should escape commas and double quotes', () => {
@@ -198,7 +205,7 @@ describe('csvFile', () => {
       apiUrl: 'https://tn.gg',
       url: '/redirections',
       method: 'post',
-      authorization: 'abc',
+      apiKey: 'abc',
       headers: { Accept: 'application/json' },
       data: { evrythngId, defaultRedirectUrl, type },
     };
