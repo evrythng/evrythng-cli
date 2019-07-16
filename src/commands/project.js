@@ -3,8 +3,49 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const fs = require('fs');
 const http = require('../modules/http');
 const util = require('../modules/util');
+
+/** List of allowed Reactor script file types */
+const UPLOADABLE_TYPES = ['js'];
+
+/** Type the manifest must be */
+const MANIFEST_TYPE = 'json';
+
+/**
+ * Get a file extension from a path string.
+ *
+ * @param {string} path - File path string.
+ * @returns {string} The file extension from the last `.` onwards.
+ */
+const getFileExtension = path => path.split('.').pop();
+
+/**
+ * Upload Reactor script file(s) - either just the script, or including the manifest that includes
+ * the dependencies.
+ *
+ * @param {string[]} args - Launch arguments.
+ */
+const uploadReactorFiles = async ([projectId, , applicationId, , , , script, manifest]) => {
+  if (!UPLOADABLE_TYPES.includes(getFileExtension(script))) {
+    throw new Error(`File type must be one of ${UPLOADABLE_TYPES.join(', ')}`);
+  }
+
+  const scriptData = fs.readFileSync(script, 'utf8');
+  const payload = { script: scriptData };
+
+  if (manifest) {
+    if (getFileExtension(manifest) !== MANIFEST_TYPE) {
+      throw new Error(`Manifest must be a .${MANIFEST_TYPE} file, normally package.json`);
+    }
+
+    payload.manifest = fs.readFileSync(manifest, 'utf8');
+  }
+
+  const url = `/projects/${projectId}/applications/${applicationId}/reactor/script`;
+  return http.put(url, payload);
+};
 
 module.exports = {
   about: 'Work with project and application resources.',
@@ -110,6 +151,11 @@ module.exports = {
         return http.put(url, JSON.parse(json));
       },
       pattern: '$id applications $id reactor script update $payload',
+    },
+    uploadReactorScript: {
+      execute: uploadReactorFiles,
+      pattern: '$id applications $id reactor script upload $script $manifest',
+      helpPattern: '$id applications $id reactor script upload $script [$manifest]',
     },
     readReactorScriptStatus: {
       execute: async ([projectId, , applicationId]) => {
