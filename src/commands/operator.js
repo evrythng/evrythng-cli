@@ -120,7 +120,7 @@ const addOperator = async (args) => {
  */
 const removeOperator = (args) => {
   const [name] = args;
-  
+
   const operators = config.get('operators');
   delete operators[name];
   config.set('operators', operators);
@@ -174,7 +174,20 @@ const getCurrent = () => config.get('operators')[config.get('using')];
 // ------------------------------------ API ------------------------------------
 
 const getKey = () => {
-  const override = switches.API_KEY;
+  let override = switches.API_KEY;
+  if (override) {
+    // API key or operator name?
+    const operators = config.get('operators');
+    if (operators[override]) {
+      // Apply operator as override
+      const { apiKey, region } = operators[override];
+      override = apiKey;
+      evrythng.setup({ apiUrl: REGIONS[region] });
+    } else if (override.length !== 80) {
+      // It's not a valid API key either
+      throw new Error('Invalid API key provided to --api-key');
+    }
+  }
 
   const operator = config.get('using');
   if (!operator) {

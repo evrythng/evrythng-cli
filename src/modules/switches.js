@@ -42,7 +42,7 @@ const SWITCH_LIST = [{
   constant: 'SUMMARY',
 }, {
   name: '--api-key',
-  about: 'Use a specific API key instead of the current Operator\'s API Key.',
+  about: 'Use another API key (or operator name) instead of the current Operator\'s API key.',
   constant: 'API_KEY',
   valueLabel: '<API key>',
 }, {
