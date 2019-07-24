@@ -176,8 +176,9 @@ const getCurrent = () => config.get('operators')[config.get('using')];
 const getKey = () => {
   let override = switches.API_KEY;
   if (override) {
-    // API key or operator name?
     const operators = config.get('operators');
+
+    // API key or operator name?
     if (operators[override]) {
       // Apply operator as override
       const { apiKey, region } = operators[override];
