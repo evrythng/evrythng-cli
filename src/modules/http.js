@@ -116,7 +116,11 @@ const printRequest = (options) => {
   }
 };
 
-const extractUrlFromLink = (link) => {
+/**
+ * Usually an array with fetch
+ */
+const extractUrlFromLink = (links) => {
+  const [link] = links;
   const encodedUrl = link.slice(1, link.indexOf('>') - link.length);
   return parse(decodeURIComponent(encodedUrl)).path;
 };
@@ -157,6 +161,11 @@ const getMorePages = async (res, max) => {
       fullResponse,
       url,
     });
+
+    // Patch data and headers
+    res.data = await res.json();
+    res.headers = res.headers._headers;
+
     items.push(...res.data);
     logger.info(`Reading - ${items.length} items`, true);
   }
