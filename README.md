@@ -53,9 +53,10 @@ Authentication is provided in two ways.
    Any request that can be done as an Operator is done with the currently 
    selected Operator.
 
-2. Using the `--api-key` switch to either override the current operator, or 
-   provide a separately required key (such as the Application API Key when 
-   creating Application Users).
+2. Using the `--api-key` switch to either override the currently selected
+   operator's API key, or provide a required key (such as the Application API
+   Key when creating Application Users). An existing operator's name chosen
+   when using `operators add` is also accepted.
 
 > You must add at least one Operator before you can begin using the CLI.
 
