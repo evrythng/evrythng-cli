@@ -4,11 +4,13 @@
  */
 
 const fs = require('fs');
+const semverCompare = require('semver-compare');
 const { validate } = require('./util');
 const commands = require('./commands');
 const config = require('./config');
 const operator = require('../commands/operator');
 const switches = require('./switches');
+const { version } = require('../../package.json');
 
 const COMMAND_SCHEMA = {
   type: 'object',
@@ -39,28 +41,16 @@ const COMMAND_SCHEMA = {
 const NODE_MODULES_PATH = `${__dirname}/../../../`;
 const PREFIX = 'evrythng-cli-plugin-';
 
-/**
- * Run a list of args as a command.
- *
- * @param {string[]} args - The args to identify and run.
- */
-const runCommand = async (args) => {
-  const command = commands.identify(args);
-  if (!command) {
-    throw new Error(`Command '${args.join(' ')}' was not recognised.`);
-  }
-
-  operator.applyRegion();
-  const res = await command.execute(args.slice(1));
-  if (!res) {
-    return;
-  }
-
-  // Pass the data back for convenience, not the full fetch() response object
-  return res.data ? res.data : res;
-};
-
+/** API object passed to plugins as they are loading. */
 const API = {
+  /** Current CLI version loading the plugin */
+  version,
+
+  /**
+   * Register a new command (must satisfy COMMAND_SCHEMA)
+   *
+   * @param {object} command - The command to add.
+   */
   registerCommand: (command) => {
     const errors = validate(command, COMMAND_SCHEMA);
     if (errors.length) {
@@ -70,10 +60,61 @@ const API = {
     command.fromPlugin = true;
     commands.COMMAND_LIST.push(command);
   },
+
+  /**
+   * Get the config.options object.
+   *
+   * @returns {object} config.options.
+   */
   getOptions: () => config.get('options'),
+
+  /**
+   * Get an object of active switches, and their values.
+   *
+   * @returns {object} Object of active switches and their values.
+   */
   getSwitches: () => switches.active,
+
+  /**
+   * Get the config interface, including the get() and set() methods.
+   *
+   * @returns {object} config object.
+   */
   getConfig: () => config,
-  runCommand,
+
+  /**
+   * Run an existing CLI command, as a list of tokens.
+   *
+   * @param {string[]} args - The args to identify and run.
+   * @returns {Promise<object>} The command result, such as API response data.
+   */
+  runCommand: async (args) => {
+    const command = commands.identify(args);
+    if (!command) {
+      throw new Error(`Command '${args.join(' ')}' was not recognised.`);
+    }
+
+    operator.applyRegion();
+    const res = await command.execute(args.slice(1));
+    if (!res) {
+      return;
+    }
+
+    // Pass the data back for convenience, not the full fetch() response object
+    return res.data ? res.data : res;
+  },
+
+  /**
+   * Require a specific minimum CLI version to run.
+   *
+   * @params {string} Semver version to require, e.g: '1.7.0'.
+   * @throws If the version required is less than the current running CLI version.
+   */
+  requireVersion: (spec) => {
+    if (semverCompare(version, spec) < 0) {
+      throw new Error(`This plugin requires evrythng-cli version ${spec} or above. You are using version ${version}.`);
+    }
+  },
 };
 
 const loadPlugin = (moduleName) => {

@@ -2,8 +2,8 @@
 
 > Requires Node.js version 7.6 or greater
 
-Command Line Interface (CLI) for working with the 
-[EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with 
+Command Line Interface (CLI) for working with the
+[EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with
 ease.
 
 
@@ -16,7 +16,7 @@ $ npm i -g evrythng-cli
 ```
 
 Then add at least one Operator using an Operator API Key available
-from the 'Account Settings' page of the 
+from the 'Account Settings' page of the
 [EVRYTHNG Dashboard](https://dashboard.evrythng.com):
 
 ```
@@ -34,23 +34,23 @@ $ evrythng operators add prod us AGiWrH5OteA4aHiM...
 
 ## Usage and Help
 
-After installation, the global `npm` module can be used directly. In general, 
+After installation, the global `npm` module can be used directly. In general,
 the argument structure is:
 
 ```
 $ evrythng <command> <params>... [<payload>] [<switches>...]
 ```
 
-Run `evrythng` to see all commands, switches, and options. 
+Run `evrythng` to see all commands, switches, and options.
 
 
 ## Authentication
 
 Authentication is provided in two ways.
 
-1. Using the `operators` command to store Operator API Keys associated with 
-   different accounts and regions in the user's `~/.evrythng-cli-config` file. 
-   Any request that can be done as an Operator is done with the currently 
+1. Using the `operators` command to store Operator API Keys associated with
+   different accounts and regions in the user's `~/.evrythng-cli-config` file.
+   Any request that can be done as an Operator is done with the currently
    selected Operator.
 
 2. Using the `--api-key` switch to either override the currently selected
@@ -63,12 +63,12 @@ Authentication is provided in two ways.
 
 ## Plugins
 
-The EVRYTHNG CLI allows plugins to be created and installed in order to 
-add/extend custom functionality as the user requires. These plugins are provided 
-with an `api` parameter that contains methods and data they can use to implement 
+The EVRYTHNG CLI allows plugins to be created and installed in order to
+add/extend custom functionality as the user requires. These plugins are provided
+with an `api` parameter that contains methods and data they can use to implement
 additional functionality, such as adding new commands.
 
-See the 
+See the
 [_Plugins_](https://developers.evrythng.com/v3.0/docs/evrythng-cli-plugins#section-published-examples)
 page of the documentation for some example plugin implementations.
 
@@ -77,8 +77,8 @@ page of the documentation for some example plugin implementations.
 
 In order to be considered a plugin, its `npm` module must meet the following:
 
-* Be installed in the same directory as the CLI, as will be the case when 
-  installed globally with `-g` or as a project dependency (i.e: in 
+* Be installed in the same directory as the CLI, as will be the case when
+  installed globally with `-g` or as a project dependency (i.e: in
   `node_modules`).
 * Have a package name beginning the prefix `evrythng-cli-plugin-`.
 * Have a single source file identifyable when it is `require`d, such as setting
@@ -98,6 +98,10 @@ An example of such a plugin is shown below. The basic directory structure is:
 
 ```js
 module.exports = (api) => {
+  // Require minimum evrythng-cli version 1.6.0
+  api.requireVersion('1.6.0');
+
+  // Define a new command: 'greet $name'
   const newCommand = {
     about: 'Greet someone',
     firstArg: 'greet',
@@ -109,17 +113,17 @@ module.exports = (api) => {
     },
   };
 
-  // Register a new command
+  // Register the new command
   api.registerCommand(newCommand);
 };
 ```
 
-In the example above, a new command `greet` is added with one operation that 
-is provided the remaining arguments, in the same way as regular built-in 
-commands. This is validated against a schema before being loaded - it must match 
+In the example above, a new command `greet` is added with one operation that
+is provided the remaining arguments, in the same way as regular built-in
+commands. This is validated against a schema before being loaded - it must match
 the structure of the above example.
 
-The example command added in the example is then available as usual when using 
+The example command added in the example is then available as usual when using
 the CLI:
 
 ```
@@ -130,16 +134,18 @@ Hello there, Charles!
 
 ### Plugin API
 
-The `api` parameter provided to a plugin's exported function contains the 
+The `api` parameter provided to a plugin's exported function contains the
 following usable methods and data:
 
 * `registerCommand()` - Register a new command.
-* `getOptions()` - Retrieve an object describing the user's `options` from the 
+* `getOptions()` - Retrieve an object describing the user's `options` from the
   CLI configuration file, which defines the persistent `options` preferences.
 * `getSwitches()` - Retrieve an object describing the currently active switches.
 * `getConfig()` - Get a `get()`/`set()` interface to the config file.
-* `runCommand()` - Run a CLI command using a list of string arguments, such as 
+* `runCommand()` - Run a CLI command using a list of string arguments, such as
   `['thngs', 'list']`.
+* `version` - String of the current running `evrythng-cli` version.
+* `requireVersion()` - Require a minimum version of the `evrythng-cli` to load.
 
 
 ## Architecture
@@ -152,7 +158,7 @@ The structure of launch parameters is as follows:
 $ evrythng <command> <params>... [<payload>] [<switches>...]
 ```
 
-A command is implemented by adding to `commands.js`, and must have the following 
+A command is implemented by adding to `commands.js`, and must have the following
 exported structure:
 
 ```js
@@ -163,7 +169,7 @@ exported structure:
 }
 ```
 
-For example: 
+For example:
 
 ```js
 module.exports = {
@@ -178,12 +184,12 @@ module.exports = {
 };
 ```
 
-This is so that a command can safely implements its functionality using 
-parameters that were provided to it. A command is selected when all arguments 
+This is so that a command can safely implements its functionality using
+parameters that were provided to it. A command is selected when all arguments
 match the `pattern` provided by any given `operations` item, including keywords
 such as `$id` or `$type`.
 
-If no command is matched, the help text is displayed. If a command is not fully 
+If no command is matched, the help text is displayed. If a command is not fully
 matched, but the arguments do start with a module's `firstArg`, the syntax
 for the module's `operations` is printed to help guide the user.
 
@@ -191,8 +197,8 @@ So for example, the `thngs $id read` command:
 
 ```
 $ evrythng thngs UnghCKffVg8a9KwRwE5C9qBs read
-``` 
-would receive all tokens after its own name as `args` when the operation is 
+```
+would receive all tokens after its own name as `args` when the operation is
 called (i.e: all arguments matched its `pattern`):
 
 ```
@@ -221,28 +227,28 @@ or as entirely new commands that are all agnostic to each other.
 ### Requests
 
 HTTP requests are performed using the `post`, `get`, `put`, and `delete` methods
-exported by `src/modules/http.js`. 
+exported by `src/modules/http.js`.
 
-Switches that affect pre- and post-request behavior (such as printing extra 
-logs, applying query params, or formatting the API response) are handled 
-transparently in this module, so the commands do not have to handle them 
+Switches that affect pre- and post-request behavior (such as printing extra
+logs, applying query params, or formatting the API response) are handled
+transparently in this module, so the commands do not have to handle them
 themselves.
 
 
 ### Use of Swagger
 
-The EVRYTHNG CLI uses the 
-[`evrythng-swagger` `npm` module](https://www.npmjs.com/package/evrythng-swagger) 
-to allow interactive building of `POST` request payloads using the `definitions` 
-provided by the EVRYTHNG `swagger.json` API description. This is invoked with 
+The EVRYTHNG CLI uses the
+[`evrythng-swagger` `npm` module](https://www.npmjs.com/package/evrythng-swagger)
+to allow interactive building of `POST` request payloads using the `definitions`
+provided by the EVRYTHNG `swagger.json` API description. This is invoked with
 the `--build` switch:
 
 ```
 $ evrythng thngs create --build
 ```
 
-The CLI then asks for each field in the `definition` (that is not marked as 
-`readOnly`) specified in the command that implements `payloadBuilder.build()`, 
+The CLI then asks for each field in the `definition` (that is not marked as
+`readOnly`) specified in the command that implements `payloadBuilder.build()`,
 in this case `ThngDocument`:
 
 ```js
@@ -255,7 +261,7 @@ createThng: {
 },
 ```
 
-The user is then asked to input their values, including sub-objects such as 
+The user is then asked to input their values, including sub-objects such as
 `customFields`:
 
 ```
@@ -300,11 +306,11 @@ Provide values for each field (or leave blank to skip):
 
 ### Switches
 
-Any launch parameter that begins with `--` is treated as a switch, and is 
+Any launch parameter that begins with `--` is treated as a switch, and is
 extracted from the launch parameters by `switches.js` in the `extract()` method
 before the remaining `args` are provided to the matched command.
 
-After `extract()` is called, a switch's state in any given invocation can be 
+After `extract()` is called, a switch's state in any given invocation can be
 determined as shown below for an example command:
 
 ```
@@ -319,8 +325,8 @@ if (switches.SCOPES) {
 }
 ```
 
-If a switch is configured in `SWITCH_LIST` to be given with a value 
-(`hasValue`), it is made available as `value`. This is specified at invocation 
+If a switch is configured in `SWITCH_LIST` to be given with a value
+(`hasValue`), it is made available as `value`. This is specified at invocation
 time as follows:
 
 ```
@@ -346,7 +352,7 @@ Filter value was tags=test
 
 ### Running Tests
 
-Run `npm test` to run the Mocha tests in the `tests` directory. Ensure `use` an 
+Run `npm test` to run the Mocha tests in the `tests` directory. Ensure `use` an
 appropriate Operator first!
 
 Afterwards, see `reports/index.html` for code coverage results.

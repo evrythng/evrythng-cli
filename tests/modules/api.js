@@ -102,4 +102,24 @@ describe('api', () => {
     const using = config.get('using');
     expect(using).to.be.a('string');
   });
+
+  it('should provide access to the current CLI version', () => {
+    const { version } = api.API;
+
+    expect(version).to.be.a('string');
+  });
+
+  it('should accept a lesser plugin version requirement', () => {
+    const { version, requireVersion } = api.API;
+
+    expect(() => requireVersion(version)).to.not.throw();
+  });
+
+  it('should reject a larger plugin version requirement than the current', () => {
+    const { version, requireVersion } = api.API;
+    const [major, minor, patch] = version.split('.');
+    const futureVersion = `${major}.${parseInt(minor) + 1}.${patch}`;
+
+    expect(() => requireVersion(futureVersion)).to.throw();
+  });
 });
