@@ -22,16 +22,13 @@ const DEFAULT_CONFIG = {
 };
 
 const CONFIG_SCHEMA = {
-  type: 'object',
   additionalProperties: false,
   required: ['using', 'operators', 'options', 'regions'],
   properties: {
     using: { type: 'string' },
     operators: {
-      type: 'object',
       patternProperties: {
         '(.*)': {
-          type: 'object',
           additionalProperties: false,
           required: ['apiKey', 'region'],
           properties: {
@@ -46,7 +43,6 @@ const CONFIG_SCHEMA = {
       },
     },
     options: {
-      type: 'object',
       additionalProperties: false,
       required: ['errorDetail', 'noConfirm', 'showHttp', 'logLevel', 'defaultPerPage'],
       properties: {
