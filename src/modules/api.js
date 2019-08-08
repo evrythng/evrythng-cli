@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const evrythng = require('evrythng');
 const fs = require('fs');
 const semverCompare = require('semver-compare');
 const { validate } = require('./util');
@@ -114,6 +115,20 @@ const API = {
     if (semverCompare(version, spec) < 0) {
       throw new Error(`This plugin requires evrythng-cli version ${spec} or above. You are using version ${version}.`);
     }
+  },
+
+  /**
+   * Convenience method to get the current Operator as an SDK scope.
+   * The region is automatically applied.
+   *
+   * @returns {object} Operator scope for the currently selected operator.
+   */
+  getCurrentOperator: async () => {
+    const { apiKey } = operator.getCurrent();
+    operator.applyRegion();
+    const op = new evrythng.Operator(apiKey);
+    await op.init();
+    return op;
   },
 };
 

@@ -146,6 +146,8 @@ following usable methods and data:
   `['thngs', 'list']`.
 * `version` - String of the current running `evrythng-cli` version.
 * `requireVersion()` - Require a minimum version of the `evrythng-cli` to load.
+* `getCurrentOperator()` - Obtain an evrythng.js Operator scope for the
+  currently selected operator.
 
 
 ## Architecture

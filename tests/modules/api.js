@@ -122,4 +122,16 @@ describe('api', () => {
 
     expect(() => requireVersion(futureVersion)).to.throw();
   });
+
+  it('should provide access to the current Operator scope', async () => {
+    mockApi()
+      .persist()
+      .get('/access')
+      .reply(200, { actor: { id: 'foo' } });
+
+    const op = await api.API.getCurrentOperator();
+
+    expect(op.actor.id).to.equal('foo');
+    expect(op.apiKey).to.have.length(80);
+  });
 });
