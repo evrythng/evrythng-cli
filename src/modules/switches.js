@@ -44,7 +44,7 @@ const SWITCH_LIST = [{
   name: '--api-key',
   about: 'Use another API key (or operator name) instead of the current Operator\'s API key.',
   constant: 'API_KEY',
-  valueLabel: '<API key>',
+  valueLabel: '<API key|operator name>',
 }, {
   name: '--expand',
   about: 'Expand some ID fields, timestamps to date, etc.',
