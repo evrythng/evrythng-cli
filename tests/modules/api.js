@@ -129,7 +129,7 @@ describe('api', () => {
       .get('/access')
       .reply(200, { actor: { id: 'foo' } });
 
-    const op = await api.API.getCurrentOperator();
+    const op = await api.API.getOperatorScope();
 
     expect(op.actor.id).to.equal('foo');
     expect(op.apiKey).to.have.length(80);

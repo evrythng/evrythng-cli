@@ -123,7 +123,7 @@ const API = {
    *
    * @returns {object} Operator scope for the currently selected operator.
    */
-  getCurrentOperator: async () => {
+  getOperatorScope: async () => {
     operator.applyRegion();
     const op = new evrythng.Operator(operator.getKey());
     await op.init();
