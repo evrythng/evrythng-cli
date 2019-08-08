@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const nock = require('nock');
 const { ID, NAME, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 const switches = require('../../src/modules/switches');
@@ -125,39 +126,50 @@ describe('products', () => {
   });
 
   // Product redirection
-  it('should make correct request for \'products $id redirection create $payload\'', async () => {
-    const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/' });
-    mockApi()
-      .post(`/products/${ID}/redirector`, payload)
-      .reply(201, {});
+  it('should make correct request for \'products $id redirections $shortDomain create $payload\'',
+    async () => {
+      const payload = JSON.stringify({
+        defaultRedirectUrl: 'https://google.com/{shortId}/',
+        type: 'product',
+        evrythngId: ID
+      });
+      nock('https://tn.gg')
+        .post('/redirections', payload)
+        .reply(201, {});
 
-    await cli(`products ${ID} redirection create ${payload}`);
+      await cli(`products ${ID} redirections tn.gg create ${payload}`);
+    }
+  );
+
+  it('should make correct request for \'products $id redirections $shortDomain list\'', async () => {
+    nock('https://tn.gg')
+      .get(`/redirections?evrythngId=${ID}`)
+      .reply(200, [{}]);
+
+    await cli(`products ${ID} redirections tn.gg list`);
   });
 
-  it('should make correct request for \'products $id redirection read\'', async () => {
-    mockApi()
-      .get(`/products/${ID}/redirector?perPage=30`)
-      .reply(200, {});
+  it(
+    'should make correct request for \'products $id redirections $shortDomain $shortId update $payload\'',
+    async () => {
+      const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
+      nock('https://tn.gg')
+        .put('/redirections/foo', payload)
+        .reply(200, {});
 
-    await cli(`products ${ID} redirection read`);
-  });
+      await cli(`products ${ID} redirections tn.gg foo update ${payload}`);
+    }
+  );
 
-  it('should make correct request for \'products $id redirection update $payload\'', async () => {
-    const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
-    mockApi()
-      .put(`/products/${ID}/redirector`, payload)
-      .reply(200, {});
+  it('should make correct request for \'products $id redirections $shortDomain $shortId delete\'',
+    async () => {
+      nock('https://tn.gg')
+        .delete(`/redirections/foo`)
+        .reply(200);
 
-    await cli(`products ${ID} redirection update ${payload}`);
-  });
-
-  it('should make correct request for \'products $id redirection delete\'', async () => {
-    mockApi()
-      .delete(`/products/${ID}/redirector`)
-      .reply(200, {});
-
-    await cli(`products ${ID} redirection delete`);
-  });
+      await cli(`products ${ID} redirections tn.gg foo delete`);
+    }
+  );
 
   // Finally
   it('should make correct request for \'products $id delete\'', async () => {

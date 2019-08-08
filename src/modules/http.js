@@ -275,14 +275,6 @@ const sendRequest = options => evrythng.api(options).then((res) => {
   return res;
 });
 
-/**
- * Log a confirmation of a deletion, showing the path deleted.
- * This isn't done for CRU, since they could be piped to other inputs.
- *
- * @parm {string} url - API URL of the resource deleted.
- */
-const confirmDeletion = async url => logger.info(`\nDeleted ${url}`);
-
 const createApiRequest = async (options) => {
   if (!options.method) {
     options.method = 'GET';
@@ -311,59 +303,95 @@ const createApiRequest = async (options) => {
   return options;
 };
 
-const post = async (url, data) => createApiRequest({
+/**
+ * CLI wrapper for evrythng.api for any general set of options
+ *
+ * @param {object} options - evrythng.js compatible options.
+ * @returns {Promise}
+ */
+const api = async options => createApiRequest(Object.assign(options, {
+  apiKey: operator.getKey(),
+}))
+  .then(module.exports.sendRequest)
+  .then(printResponse);
+
+/**
+ * Perform a POST request.
+ *
+ * @param {string} url - API path.
+ * @param {object} data - Payload object data.
+ * @returns {Promise<object>}
+ */
+const post = async (url, data) => api({
   url: `${url}${buildParamString('post', url)}`,
   method: 'POST',
   apiKey: operator.getKey(),
   data,
-})
-  .then(module.exports.sendRequest)
-  .then(printResponse);
+});
 
+/**
+ * Perform a GET request.
+ *
+ * @param {string} url - API path.
+ * @param {boolean} silent - If true, don't print response to console.
+ * @returns {Promise<object>}
+ */
 const get = async (url, silent = false) => createApiRequest({
   url: `${url}${buildParamString('get', url)}`,
   apiKey: operator.getKey(),
 })
   .then(module.exports.sendRequest)
-  .then((res) => {
-    if (silent) {
-      return res;
-    }
+  .then(res => silent ? res : printResponse(res));
 
-    return printResponse(res);
-  });
-
-const put = async (url, data) => createApiRequest({
+/**
+ * Perform a PUT request.
+ *
+ * @param {string} url - API path.
+ * @param {object} data - Payload object data.
+ * @returns {Promise<object>}
+ */
+const put = async (url, data) => api({
   url: `${url}${buildParamString('put', url)}`,
   method: 'PUT',
   apiKey: operator.getKey(),
   data,
-})
-  .then(module.exports.sendRequest)
-  .then(printResponse);
+});
 
 /**
  * Perform a deletion request.
  *
  * @param {string} url - URL of the resource to delete.
  */
- const deleteMethod = async url => createApiRequest({
+ const deleteMethod = async url => api({
   url,
   method: 'DELETE',
   apiKey: operator.getKey(),
 })
-  .then(module.exports.sendRequest)
   .then((res) => {
-    confirmDeletion(url);
+    logger.info(`\nDeleted ${url}`);
     return res;
   });
+
+/**
+ * Helper for repetitive shortDomain focussed requests.
+ *
+ * @param {object} changes - Additional options.
+ * @returns {Promise<object>} API response.
+ */
+const shortDomainRequest = async (shortDomain, changes) => api(Object.assign({
+  apiUrl: `https://${shortDomain}`,
+  url: '/redirections',
+  headers: { Accept: 'application/json' },
+}, changes));
 
 module.exports = {
   post,
   get,
   put,
   delete: deleteMethod,
+  api,
   formatHeaders,
   printRequest,
   sendRequest,
+  shortDomainRequest,
 };

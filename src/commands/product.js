@@ -108,20 +108,37 @@ module.exports = {
 
     // Product redirection
     createProductRedirection: {
-      execute: async ([id, , , json]) => http.post(`/products/${id}/redirector`, JSON.parse(json)),
-      pattern: '$id redirection create $payload',
+      execute: async ([id, , shortDomain, , json]) => {
+        const body = Object.assign(JSON.parse(json), { evrythngId: id, type: 'product' });
+        return http.shortDomainRequest(shortDomain, {
+          method: 'post',
+          body: JSON.stringify(body),
+        });
+      },
+      pattern: '$id redirections $shortDomain create $payload',
     },
-    readProductRedirection: {
-      execute: async ([id]) => http.get(`/products/${id}/redirector`),
-      pattern: '$id redirection read',
+    listProductRedirections: {
+      execute: async ([id, , shortDomain]) => http.shortDomainRequest(shortDomain, {
+        params: { evrythngId: id },
+      }),
+      pattern: '$id redirections $shortDomain list',
     },
     updateProductRedirection: {
-      execute: async ([id, , , json]) => http.put(`/products/${id}/redirector`, JSON.parse(json)),
-      pattern: '$id redirection update $payload',
+      execute: async ([id, , shortDomain, shortId, , body]) => {
+        return http.shortDomainRequest(shortDomain, {
+          url: `/redirections/${shortId}`,
+          method: 'put',
+          body,
+        })
+      },
+      pattern: '$id redirections $shortDomain $shortId update $payload',
     },
     deleteProductRedirection: {
-      execute: async ([id]) => http.delete(`/products/${id}/redirector`),
-      pattern: '$id redirection delete',
+      execute: async ([id, , shortDomain, shortId]) => http.shortDomainRequest(shortDomain, {
+        url: `/redirections/${shortId}`,
+        method: 'delete',
+      }),
+      pattern: '$id redirections $shortDomain $shortId delete',
     },
   },
 };

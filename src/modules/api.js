@@ -124,9 +124,8 @@ const API = {
    * @returns {object} Operator scope for the currently selected operator.
    */
   getCurrentOperator: async () => {
-    const { apiKey } = operator.getCurrent();
     operator.applyRegion();
-    const op = new evrythng.Operator(apiKey);
+    const op = new evrythng.Operator(operator.getKey());
     await op.init();
     return op;
   },

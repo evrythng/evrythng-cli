@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const evrythng = require('evrythng');
 const csvFile = require('../modules/csvFile');
 const http = require('../modules/http');
 const jsonFile = require('../modules/jsonFile');
@@ -108,20 +109,37 @@ module.exports = {
 
     // Thng redirection
     createThngRedirection: {
-      execute: async ([id, , , json]) => http.post(`/thngs/${id}/redirector`, JSON.parse(json)),
-      pattern: '$id redirection create $payload',
+      execute: async ([id, , shortDomain, , json]) => {
+        const body = Object.assign(JSON.parse(json), { evrythngId: id, type: 'thng' });
+        return http.shortDomainRequest(shortDomain, {
+          method: 'post',
+          body: JSON.stringify(body),
+        });
+      },
+      pattern: '$id redirections $shortDomain create $payload',
     },
-    readThngRedirection: {
-      execute: async ([id]) => http.get(`/thngs/${id}/redirector`),
-      pattern: '$id redirection read',
+    listThngRedirections: {
+      execute: async ([id, , shortDomain]) => http.shortDomainRequest(shortDomain, {
+        params: { evrythngId: id },
+      }),
+      pattern: '$id redirections $shortDomain list',
     },
     updateThngRedirection: {
-      execute: async ([id, , , json]) => http.put(`/thngs/${id}/redirector`, JSON.parse(json)),
-      pattern: '$id redirection update $payload',
+      execute: async ([id, , shortDomain, shortId, , body]) => {
+        return http.shortDomainRequest(shortDomain, {
+          url: `/redirections/${shortId}`,
+          method: 'put',
+          body,
+        })
+      },
+      pattern: '$id redirections $shortDomain $shortId update $payload',
     },
     deleteThngRedirection: {
-      execute: async ([id]) => http.delete(`/thngs/${id}/redirector`),
-      pattern: '$id redirection delete',
+      execute: async ([id, , shortDomain, shortId]) => http.shortDomainRequest(shortDomain, {
+        url: `/redirections/${shortId}`,
+        method: 'delete',
+      }),
+      pattern: '$id redirections $shortDomain $shortId delete',
     },
 
     // Thng location
