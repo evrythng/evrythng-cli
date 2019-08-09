@@ -21,7 +21,7 @@
     "jsonschema": "^1.2.4",
     "lodash": "^4.17.15",
     "neat-csv": "^3.0.0",
-    "semver-compare": "^1.0.0"
+    "semver": "^6.3.0"
   },
   "devDependencies": {
     "@evrythng/eslint-config-evrythng": "0.0.1",

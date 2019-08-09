@@ -5,7 +5,7 @@
 
 const evrythng = require('evrythng');
 const fs = require('fs');
-const semverCompare = require('semver-compare');
+const semver = require('semver');
 const { validate } = require('./util');
 const commands = require('./commands');
 const config = require('./config');
@@ -112,7 +112,7 @@ const API = {
    * @throws If the version required is less than the current running CLI version.
    */
   requireVersion: (spec) => {
-    if (semverCompare(version, spec) < 0) {
+    if (!semver.satisfies(version, spec)) {
       throw new Error(`This plugin requires evrythng-cli version ${spec} or above. You are using version ${version}.`);
     }
   },

@@ -145,7 +145,8 @@ following usable methods and data:
 * `runCommand()` - Run a CLI command using a list of string arguments, such as
   `['thngs', 'list']`.
 * `version` - String of the current running `evrythng-cli` version.
-* `requireVersion()` - Require a minimum version of the `evrythng-cli` to load.
+* `requireVersion()` - Require a semver compatible version of `evrythng-cli` to
+  load the plugin.
 * `getOperatorScope()` - Obtain an evrythng.js Operator scope for the currently
   selected operator.
 

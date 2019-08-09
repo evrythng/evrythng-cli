@@ -123,6 +123,14 @@ describe('api', () => {
     expect(() => requireVersion(futureVersion)).to.throw();
   });
 
+  it('should reject a semver incompatible major requirement', () => {
+    const { version, requireVersion } = api.API;
+    const [major, minor, patch] = version.split('.');
+    const futureVersion = `${major + 1}.${minor}.${patch}`;
+
+    expect(() => requireVersion(futureVersion)).to.throw();
+  });
+
   it('should provide access to the current Operator scope', async () => {
     mockApi()
       .persist()
