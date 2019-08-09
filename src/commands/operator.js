@@ -105,10 +105,8 @@ const addOperator = async (args) => {
   config.set('operators', operators);
   logger.info(`\nAdded operator '${name}' in region '${region}'`);
 
-  // If this is the first one, automatically use it.
-  if (Object.keys(operators).length === 1) {
-    useOperator([name]);
-  }
+  // Automatically use it (likely we want to work with it right now)
+  useOperator([name]);
 
   return operators[name];
 };

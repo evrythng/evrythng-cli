@@ -1,9 +1,11 @@
 {
   "name": "evrythng-cli",
-  "version": "1.6.0",
-  "description": "CLI for the EVRYTHNG API.",
+  "version": "1.7.0",
+  "description": "Extensible command line interface for the EVRYTHNG API.",
   "main": "./src/main.js",
   "scripts": {
+    "show-notice": "echo '\n  Thank you for using evrythng-cli! Type `evrythng` to get started!\n'",
+    "postinstall": "npm run --silent show-notice",
     "start": "node ./src/main.js",
     "lint": "./node_modules/.bin/eslint src/",
     "test": "./node_modules/.bin/nyc ./node_modules/.bin/_mocha tests/main.js --slow 5000 --timeout 10000"
@@ -13,12 +15,13 @@
   },
   "author": "EVRYTHNG",
   "dependencies": {
-    "evrythng": "^5.0.0",
+    "evrythng": "^5.4.0",
     "evrythng-swagger": "^1.0.0",
     "json-schema-ref-parser": "^5.0.3",
     "jsonschema": "^1.2.4",
-    "lodash": "^4.17.11",
-    "neat-csv": "^3.0.0"
+    "lodash": "^4.17.15",
+    "neat-csv": "^3.0.0",
+    "semver": "^6.3.0"
   },
   "devDependencies": {
     "@evrythng/eslint-config-evrythng": "0.0.1",

@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const nock = require('nock');
 const { ID, NAME, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 const switches = require('../../src/modules/switches');
@@ -124,39 +125,50 @@ describe('thngs', () => {
   });
 
   // Thng redirection
-  it('should make correct request for \'thngs $id redirection create $payload\'', async () => {
-    const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/' });
-    mockApi()
-      .post(`/thngs/${ID}/redirector`, payload)
-      .reply(201, {});
+  it('should make correct request for \'thngs $id redirections $shortDomain create $payload\'',
+    async () => {
+      const payload = JSON.stringify({
+        defaultRedirectUrl: 'https://google.com/{shortId}/',
+        type: 'thng',
+        evrythngId: ID
+      });
+      nock('https://tn.gg')
+        .post('/redirections', payload)
+        .reply(201, {});
 
-    await cli(`thngs ${ID} redirection create ${payload}`);
+      await cli(`thngs ${ID} redirections tn.gg create ${payload}`);
+    }
+  );
+
+  it('should make correct request for \'thngs $id redirections $shortDomain list\'', async () => {
+    nock('https://tn.gg')
+      .get(`/redirections?evrythngId=${ID}`)
+      .reply(200, [{}]);
+
+    await cli(`thngs ${ID} redirections tn.gg list`);
   });
 
-  it('should make correct request for \'thngs $id redirection read\'', async () => {
-    mockApi()
-      .get(`/thngs/${ID}/redirector?perPage=30`)
-      .reply(200, {});
+  it(
+    'should make correct request for \'thngs $id redirections $shortDomain $shortId update $payload\'',
+    async () => {
+      const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
+      nock('https://tn.gg')
+        .put('/redirections/foo', payload)
+        .reply(200, {});
 
-    await cli(`thngs ${ID} redirection read`);
-  });
+      await cli(`thngs ${ID} redirections tn.gg foo update ${payload}`);
+    }
+  );
 
-  it('should make correct request for \'thngs $id redirection update $payload\'', async () => {
-    const payload = JSON.stringify({ defaultRedirectUrl: 'https://google.com/{shortId}/updates/' });
-    mockApi()
-      .put(`/thngs/${ID}/redirector`, payload)
-      .reply(200, {});
+  it('should make correct request for \'thngs $id redirections $shortDomain $shortId delete\'',
+    async () => {
+      nock('https://tn.gg')
+        .delete(`/redirections/foo`)
+        .reply(200);
 
-    await cli(`thngs ${ID} redirection update ${payload}`);
-  });
-
-  it('should make correct request for \'thngs $id redirection delete\'', async () => {
-    mockApi()
-      .delete(`/thngs/${ID}/redirector`)
-      .reply(200, {});
-
-    await cli(`thngs ${ID} redirection delete`);
-  });
+      await cli(`thngs ${ID} redirections tn.gg foo delete`);
+    }
+  );
 
   // Thng location
   it('should make correct request for \'thngs $id location read\'', async () => {

@@ -6,6 +6,7 @@
 const { COMMAND_LIST } = require('../modules/commands');
 const { OPTION_LIST } = require('../commands/option');
 const { SWITCH_LIST } = require('../modules/switches');
+const config = require('../modules/config');
 const indent = require('./indent');
 const logger = require('../modules/logger');
 const { description, name, version } = require('../../package.json');
@@ -73,12 +74,6 @@ module.exports = () => {
   logger.info(indent('Specify a command name below to see syntax for all its operations.\n', 4));
   formatList(COMMAND_LIST.filter(item => !item.fromPlugin), 'firstArg', 'about');
 
-  const thirdPartyCommands = COMMAND_LIST.filter(item => item.fromPlugin);
-  if (thirdPartyCommands.length) {
-    logger.info('\nAvailable Plugin Commands:\n');
-    formatList(thirdPartyCommands, 'firstArg', 'about');
-  }
-
   logger.info('\nAvailable Switches:\n');
   const switchList = SWITCH_LIST.map((item) => {
     item.name = `${item.name}${item.valueLabel ? ` ${item.valueLabel}` : ''}`;
@@ -92,4 +87,14 @@ module.exports = () => {
 
   logger.info('\nUsage Examples:\n');
   formatList(EXAMPLES, 'about', 'command', false);
+
+  const pluginCommands = COMMAND_LIST.filter(item => item.fromPlugin);
+  if (pluginCommands.length) {
+    logger.info('\nAvailable Plugin Commands:\n');
+    formatList(pluginCommands, 'firstArg', 'about');
+  }
+
+  const using = config.get('using');
+  const { region } = config.get('operators')[using];
+  logger.info(`\n\nUsing Operator '${using}' (region: ${region})\n`);
 };
