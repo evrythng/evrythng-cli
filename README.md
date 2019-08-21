@@ -1,6 +1,6 @@
 # evrythng-cli
 
-> Requires Node.js version 7.6 or greater
+> Requires Node.js version 10 or greater
 
 Command Line Interface (CLI) for working with the
 [EVRYTHNG API](https://developers.evrythng.com) from a terminal or scripts with
