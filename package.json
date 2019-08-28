@@ -24,7 +24,6 @@
     "semver": "^6.3.0"
   },
   "devDependencies": {
-    "@evrythng/eslint-config-evrythng": "0.0.1",
     "chai": "^4.1.2",
     "chai-as-promised": "^7.1.1",
     "eslint": "^4.19.1",
@@ -38,7 +37,7 @@
     "sinon": "^6.1.4"
   },
   "eslintConfig": {
-    "extends": "@evrythng/eslint-config-evrythng",
+    "extends": "eslint-config-airbnb-base",
     "rules": {
       "no-console": 0,
       "global-require": 0,
