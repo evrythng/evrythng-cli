@@ -107,6 +107,29 @@ module.exports = {
       pattern: '$id actions $id read',
     },
 
+    // Thng commissions
+    createThngCommissionsAction: {
+      execute: async ([identifier, , , , json]) => {
+        const payload = JSON.parse(json);
+        return http.post(`/thngs/${identifier}/actions/commissions`, payload);
+      },
+      pattern: '$identifier actions commissions create $payload',
+      helpPattern: '$identifier|$id actions commissions create $payload',
+    },
+    readThngCommissionState: {
+      execute: async ([identifier]) => http.get(`/thngs/${identifier}/commissionState`),
+      pattern: '$identifier commission-state read',
+      helpPattern: '$identifier|$id commission-state read',
+    },
+    createThngDecommissionsAction: {
+      execute: async ([identifier, , , , json]) => {
+        const payload = JSON.parse(json);
+        return http.post(`/thngs/${identifier}/actions/decommissions`, payload);
+      },
+      pattern: '$identifier actions decommissions create $payload',
+      helpPattern: '$identifier|$id actions decommissions create $payload',
+    },
+
     // Thng redirection
     createThngRedirection: {
       execute: async ([id, , shortDomain, , json]) => {
