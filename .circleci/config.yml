@@ -9,6 +9,3 @@ jobs:
           name: 'Install dependencies'
           command: 'npm ci'
       - run: node -v
-      - run:
-          name: 'Unit tests'
-          command: 'npm test'
