@@ -13,7 +13,6 @@ module.exports = {
     createAdiOrder: {
       execute: async ([, json]) => http.post('/adis/orders', JSON.parse(json)),
       pattern: 'create $payload',
-      helpPattern: 'create $payload',
     },
     readAdiOrder: {
       execute: async ([id]) => http.get(`/adis/orders/${id}`),
@@ -23,7 +22,6 @@ module.exports = {
     createAdiOrderEvent: {
       execute: async ([id, , , json]) => http.post(`/adis/orders/${id}/events`, JSON.parse(json)),
       pattern: '$id events create $payload',
-      helpPattern: '$id events create $payload',
     },
   },
 };
