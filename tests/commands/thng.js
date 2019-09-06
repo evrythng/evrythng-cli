@@ -124,6 +124,36 @@ describe('thngs', () => {
     await cli(`thngs ${ID} actions ${ID} read`);
   });
 
+  // Thng commissions actions
+  it('should make correct request for \'thngs $identifier actions commissions create $payload\'', async () => {
+    const identifier = 'gs1:01:43876';
+    const payload = JSON.stringify({});
+    mockApi()
+      .post(`/thngs/${identifier}/actions/commissions`, payload)
+      .reply(201);
+
+    await cli(`thngs ${identifier} actions commissions create ${payload}`);
+  });
+
+  it('should make correct request for \'thngs $identifier actions decommissions create $payload\'', async () => {
+    const identifier = 'gs1:01:43876';
+    const payload = JSON.stringify({});
+    mockApi()
+      .post(`/thngs/${identifier}/actions/decommissions`, payload)
+      .reply(201);
+
+    await cli(`thngs ${identifier} actions decommissions create ${payload}`);
+  });
+
+  it('should make correct request for \'thngs $identifier commission-state read\'', async () => {
+    const identifier = 'gs1:01:43876';
+    mockApi()
+      .get(`/thngs/${identifier}/commissionState?perPage=30`)
+      .reply(200);
+
+    await cli(`thngs ${identifier} commission-state read`);
+  });
+
   // Thng redirection
   it('should make correct request for \'thngs $id redirections $shortDomain create $payload\'',
     async () => {
