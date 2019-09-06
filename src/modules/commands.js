@@ -11,6 +11,7 @@ const COMMAND_LIST = [
   require('../commands/account'),
   require('../commands/action'),
   require('../commands/action-type'),
+  require('../commands/adi-order'),
   require('../commands/app-user'),
   require('../commands/batch'),
   require('../commands/collection'),
