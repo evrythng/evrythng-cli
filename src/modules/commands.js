@@ -22,6 +22,7 @@ const COMMAND_LIST = [
   require('../commands/place'),
   require('../commands/product'),
   require('../commands/project'),
+  require('../commands/purchase-order'),
   require('../commands/rateLimit'),
   require('../commands/redirector'),
   require('../commands/region'),
