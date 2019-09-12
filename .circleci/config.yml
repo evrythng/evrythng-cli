@@ -10,7 +10,7 @@ jobs:
           command: 'npm ci'
       - run:
           name: 'Setup default configuration and operator'
-          command: 'npm install-mock-config'
+          command: 'npm run install-mock-config'
       - run:
           name: 'E2E tests'
           command: 'npm test'
