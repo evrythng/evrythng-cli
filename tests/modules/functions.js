@@ -33,7 +33,8 @@ describe('functions', () => {
 
     const input = JSON.parse(JSON.stringify(original));
     await expand(input);
-    expect(input).to.deep.equal(expected);
+    expect(input.createdAt).to.be.a('string');
+    expect(input.updatedAt).to.be.a('string');
   });
 
   it('should expand an example array payload', async () => {
@@ -61,7 +62,8 @@ describe('functions', () => {
 
     const input = JSON.parse(JSON.stringify(original));
     await expand(input);
-    expect(input).to.deep.equal(expected);
+    expect(input[0].createdAt).to.be.a('string');
+    expect(input[0].updatedAt).to.be.a('string');
   });
 
   it('should indent text', async () => {

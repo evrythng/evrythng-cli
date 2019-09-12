@@ -2,10 +2,15 @@ version: 2.1
 jobs:
   build:
     docker:
-      - image: circleci/node:chakracore-10.13.0
+      - image: node:10.16-alpine
     steps:
       - checkout
       - run:
           name: 'Install dependencies'
           command: 'npm ci'
-      - run: node -v
+      - run:
+          name: 'Setup default configuration and operator'
+          command: 'npm run install-mock-config'
+      - run:
+          name: 'E2E tests'
+          command: 'npm test'

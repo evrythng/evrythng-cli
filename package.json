@@ -8,7 +8,8 @@
     "postinstall": "npm run --silent show-notice",
     "start": "node ./src/main.js",
     "lint": "./node_modules/.bin/eslint src/",
-    "test": "./node_modules/.bin/nyc ./node_modules/.bin/_mocha tests/main.js --slow 5000 --timeout 10000"
+    "test": "./node_modules/.bin/nyc ./node_modules/.bin/_mocha tests/main.js",
+    "install-mock-config": "cp ./tests/mockConfig.json /root/.evrythng-cli-config"
   },
   "bin": {
     "evrythng": "bin/cli.js"

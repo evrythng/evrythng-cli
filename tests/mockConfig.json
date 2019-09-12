@@ -1,0 +1,20 @@
+{
+  "using": "test",
+  "operators": {
+    "test": {
+      "apiKey": "12341234123412341234123412341234123412341234123412341234123412341234123412341234",
+      "region": "us"
+    }
+  },
+  "options": {
+    "errorDetail": false,
+    "noConfirm": false,
+    "showHttp": false,
+    "logLevel": "info",
+    "defaultPerPage": 30
+  },
+  "regions": {
+    "us": "https://api.evrythng.com",
+    "eu": "https://api-eu.evrythng.com"
+  }
+}
