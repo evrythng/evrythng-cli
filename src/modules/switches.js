@@ -55,6 +55,11 @@ const SWITCH_LIST = [
     about: 'Specify the \'withErrors=true\' query parameter.',
     constant: 'WITH_ERRORS',
   },
+  {
+    name: '--with-ids',
+    about: 'Specify the \'witIds=true\' query parameter.',
+    constant: 'WITH_IDS',
+  },
 
   // CLI helper switches
   {
