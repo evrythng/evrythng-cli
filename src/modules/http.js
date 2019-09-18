@@ -81,6 +81,9 @@ const buildQueryParams = (method, url) => {
   if (switches.WITH_ERRORS) {
     result.withErrors = true;
   }
+  if (switches.WITH_IDS) {
+    result.withIds = true;
+  }
   if (ids) {
     result.ids = ids;
   }

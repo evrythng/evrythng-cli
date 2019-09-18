@@ -40,6 +40,14 @@ describe('adi-orders', async () => {
     await cli(`adi-orders create ${payload}`);
   });
 
+  it('should make correct request for \'adi-orders list\'', async () => {
+    mockApi()
+      .get('/adis/orders?perPage=30')
+      .reply(200, {});
+
+    await cli('adi-orders list');
+  });
+
   it('should make correct request for \'adi-orders $id read\'', async () => {
     mockApi()
       .get(`/adis/orders/${ID}`)
@@ -68,5 +76,21 @@ describe('adi-orders', async () => {
       .reply(201, {});
 
     await cli(`adi-orders ${ID} events create ${payload}`);
+  });
+
+  it('should make correct request for \'adi-orders $id events list\'', async () => {
+    mockApi()
+      .get(`/adis/orders/${ID}/events?perPage=30`)
+      .reply(200, {});
+
+    await cli(`adi-orders ${ID} events list`);
+  });
+
+  it('should make correct request for \'adi-orders $id events $eventId read\'', async () => {
+    mockApi()
+      .get(`/adis/orders/${ID}/events/${ID}`)
+      .reply(200, {});
+
+    await cli(`adi-orders ${ID} events ${ID} read`);
   });
 });
