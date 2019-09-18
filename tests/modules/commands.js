@@ -50,7 +50,7 @@ describe('commands', () => {
   it('should throw to identify a partial match', () => {
     const args = ['thngs'];
     const match = () => commands.identify(args);
-    
+
     expect(match).to.throw();
   });
 
