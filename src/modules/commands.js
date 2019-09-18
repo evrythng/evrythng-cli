@@ -41,10 +41,17 @@ const showSyntax = (command) => {
   throw new Error(`Available operations for '${firstArg}':\n${specs.join('\n')}`);
 };
 
+/**
+ * Take an arg and pattern spec piece and validate they match.
+ *
+ * @param {string} arg - The argument value, such as 'Ur2Ta6GEFfVAfbCdFd7KnpTd'
+ * @param {string} spec - The pattern spec piece, such as '$id'
+ * @returns {boolean} true if the arg should validate.
+ */
 const matchArg = (arg = '', spec) => {
   const map = {
-    // Value must be an EVRYTHNG ID
-    $id: val => val.length === 24,
+    // Value can be an EVRYTHNG ID, an identifier string, or some customer ID format
+    $id: val => val.length > 0,
     // Value must be JSON
     $payload: (val) => {
       // Some switches work instead of a payload
