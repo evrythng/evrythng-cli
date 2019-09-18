@@ -3,6 +3,7 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const fs = require('fs');
 const { ID, mockApi } = require('../util');
 const cli = require('../../src/functions/cli');
 
@@ -129,6 +130,21 @@ describe('projects', () => {
         .reply(200, {});
 
       await cli(`projects ${ID} applications ${ID} reactor script update ${payload}`);
+    });
+
+  it(
+    'should make correct request for \'projects $id applications $id reactor script upload $scriptPath $manifestPath\'',
+    async () => {
+      const scriptPath = `${__dirname}/../testScript.js`;
+      const manifestPath = `${__dirname}/../testManifest.json`;
+      const script = fs.readFileSync(scriptPath, 'utf8');
+      const manifest = fs.readFileSync(manifestPath, 'utf8');
+      const payload = { script, manifest };
+      mockApi()
+        .put(`/projects/${ID}/applications/${ID}/reactor/script`, payload)
+        .reply(200, {});
+
+      await cli(`projects ${ID} applications ${ID} reactor script upload ${scriptPath} ${manifestPath}`);
     });
 
   it('should make correct request for \'projects $id applications $id reactor script status read\'',
