@@ -8,8 +8,7 @@ const http = require('../modules/http');
 const util = require('../modules/util');
 
 /** List of allowed Reactor script file types */
-const UPLOADABLE_TYPES = ['js'];
-
+const SCRIPT_TYPES = ['js'];
 /** Type the manifest must be */
 const MANIFEST_TYPE = 'json';
 
@@ -27,20 +26,19 @@ const getFileExtension = path => path.split('.').pop();
  *
  * @param {string[]} args - Launch arguments.
  */
-const uploadReactorFiles = async ([projectId, , applicationId, , , , script, manifest]) => {
-  if (!UPLOADABLE_TYPES.includes(getFileExtension(script))) {
-    throw new Error(`File type must be one of ${UPLOADABLE_TYPES.join(', ')}`);
+const uploadReactorFiles = async ([projectId, , applicationId, , , , scriptPath, manifestPath]) => {
+  if (!SCRIPT_TYPES.includes(getFileExtension(scriptPath))) {
+    throw new Error(`File type must be one of ${SCRIPT_TYPES.join(', ')}`);
   }
 
-  const scriptData = fs.readFileSync(script, 'utf8');
-  const payload = { script: scriptData };
-
-  if (manifest) {
-    if (getFileExtension(manifest) !== MANIFEST_TYPE) {
+  const script = fs.readFileSync(scriptPath, 'utf8');
+  const payload = { script };
+  if (manifestPath) {
+    if (getFileExtension(manifestPath) !== MANIFEST_TYPE) {
       throw new Error(`Manifest must be a .${MANIFEST_TYPE} file, normally package.json`);
     }
 
-    payload.manifest = fs.readFileSync(manifest, 'utf8');
+    payload.manifest = fs.readFileSync(manifestPath, 'utf8');
   }
 
   const url = `/projects/${projectId}/applications/${applicationId}/reactor/script`;
