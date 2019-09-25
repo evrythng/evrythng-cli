@@ -54,6 +54,7 @@ describe('CLI', () => {
   require('./commands/redirector');
   require('./commands/region');
   require('./commands/role');
+  require('./commands/shipment-notice');
   require('./commands/thng');
   require('./commands/url');
 
