@@ -16,7 +16,6 @@ const switches = require('./switches');
 const util = require('./util');
 
 const INDENT_SIZE = 2;
-const TO_PAGE_MAX = 30;
 const STATUS_LABELS = {
   200: 'OK',
   201: 'Created',
@@ -153,7 +152,6 @@ const goToPage = async (res, endPage) => {
 };
 
 const getMorePages = async (res, max) => {
-  max = max > TO_PAGE_MAX ? TO_PAGE_MAX : max;
   const items = [...res.data];
 
   for (let page = 1; page < max; page += 1) {
