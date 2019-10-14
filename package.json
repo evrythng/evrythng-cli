@@ -1,6 +1,6 @@
 {
   "name": "evrythng-cli",
-  "version": "1.11.0",
+  "version": "1.11.1",
   "description": "Extensible command line interface for the EVRYTHNG API.",
   "main": "./src/main.js",
   "scripts": {
