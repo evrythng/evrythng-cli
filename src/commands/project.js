@@ -48,6 +48,30 @@ const uploadReactorFiles = async (projectId, applicationId, scriptPath, manifest
   return http.put(url, payload);
 };
 
+/**
+ * Upload a bundle zip as a Reactor script.
+ *
+ * @param {string} projectId - Project ID.
+ * @param {string} applicationId - Application ID.
+ * @param {string} filePath - Path to the zip bundle to upload.
+ */
+const uploadBundle = (projectId, applicationId, filePath) => {
+  const uploadCmd = `curl -i -s \
+    -H "Authorization:${operator.getKey()}" \
+    -H "Content-Type:multipart/form-data;" \
+    -X PUT "${operator.getRegionUrl()}/projects/${projectId}/applications/${applicationId}/reactor/script" \
+    -F file=@"${filePath}"`;
+  const stdout = execSync(uploadCmd).toString();
+  logger.info(`\n${stdout.split('\n').pop()}`);
+};
+
+/**
+ * Upload a Reactor script from a public or private (with local credentials) repo.
+ *
+ * @param {string} projectId - Project ID.
+ * @param {string} applicationId - Application ID.
+ * @param {string} repoUrl - URL of the GitHub repository.
+ */
 const uploadReactorRepository = async (projectId, applicationId, repoUrl) => {
   // Copy files
   execSync('rm -rf repo');
@@ -57,13 +81,7 @@ const uploadReactorRepository = async (projectId, applicationId, repoUrl) => {
   execSync(`cd repo && zip -vr bundle.zip ./* -x "*.zip"`);
 
   // Push to Reactor script API
-  const uploadCmd = `curl -i -s \
-    -H "Authorization:${operator.getKey()}" \
-    -H "Content-Type:multipart/form-data;" \
-    -X PUT "${operator.getRegionUrl()}/projects/${projectId}/applications/${applicationId}/reactor/script" \
-    -F file=@"repo/bundle.zip"`;
-  const stdout = execSync(uploadCmd).toString();
-  logger.info(`\n${stdout.split('\n').pop()}`);
+  uploadBundle(projectId, applicationId, 'repo/bundle.zip');
 
   // Remove temp files
   execSync('rm -rf repo');
@@ -179,6 +197,11 @@ module.exports = {
         if (scriptPath.includes('github')) {
           // GitHub upload
           return uploadReactorRepository(projectId, applicationId, scriptPath);
+        }
+
+        if (scriptPath.includes('.zip')) {
+          uploadBundle(projectId, applicationId, scriptPath);
+          return;
         }
 
         // Local fies upload
