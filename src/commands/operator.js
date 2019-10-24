@@ -129,6 +129,22 @@ const removeOperator = (args) => {
   }
 };
 
+/**
+ * Get the current region URL
+ *
+ * @returns {string} The current region URL.
+ */
+const getRegionUrl = () => {
+  const name = config.get('using');
+  if (!name) {
+    logger.error(`Invalid operator: ${name}`);
+    return;
+  }
+
+  const { region } = config.get('operators')[name];
+  return REGIONS[region];
+};
+
 const applyRegion = () => {
   const name = config.get('using');
   if (!name) {
@@ -222,6 +238,7 @@ module.exports = {
     },
   },
   getKey,
+  getRegionUrl,
   applyRegion,
   checkFirstRun,
   resolveKey,

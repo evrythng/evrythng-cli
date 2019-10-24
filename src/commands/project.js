@@ -3,8 +3,11 @@
  * All rights reserved. Use of this material is subject to license.
  */
 
+const { execSync } = require('child_process');
 const fs = require('fs');
 const http = require('../modules/http');
+const logger = require('../modules/logger');
+const operator = require('./operator');
 const util = require('../modules/util');
 
 /** List of allowed Reactor script file types */
@@ -26,9 +29,9 @@ const getFileExtension = path => path.split('.').pop();
  *
  * @param {string[]} args - Launch arguments.
  */
-const uploadReactorFiles = async ([projectId, , applicationId, , , , scriptPath, manifestPath]) => {
+const uploadReactorFiles = async (projectId, applicationId, scriptPath, manifestPath) => {
   if (!SCRIPT_TYPES.includes(getFileExtension(scriptPath))) {
-    throw new Error(`File type must be one of ${SCRIPT_TYPES.join(', ')}`);
+    throw new Error(`Script file type must be one of ${SCRIPT_TYPES.join(', ')}`);
   }
 
   const script = fs.readFileSync(scriptPath, 'utf8');
@@ -43,6 +46,27 @@ const uploadReactorFiles = async ([projectId, , applicationId, , , , scriptPath,
 
   const url = `/projects/${projectId}/applications/${applicationId}/reactor/script`;
   return http.put(url, payload);
+};
+
+const uploadReactorRepository = async (projectId, applicationId, repoUrl) => {
+  // Copy files
+  execSync('rm -rf repo');
+  execSync(`git clone --quiet ${repoUrl} ./repo`);
+
+  // Zip up
+  execSync(`cd repo && zip -vr bundle.zip ./* -x "*.zip"`);
+
+  // Push to Reactor script API
+  const uploadCmd = `curl -i -s \
+    -H "Authorization:${operator.getKey()}" \
+    -H "Content-Type:multipart/form-data;" \
+    -X PUT "${operator.getRegionUrl()}/projects/${projectId}/applications/${applicationId}/reactor/script" \
+    -F file=@"repo/bundle.zip"`;
+  const stdout = execSync(uploadCmd).toString();
+  logger.info(`\n${stdout.split('\n').pop()}`);
+
+  // Remove temp files
+  execSync('rm -rf repo');
 };
 
 module.exports = {
@@ -151,9 +175,17 @@ module.exports = {
       pattern: '$id applications $id reactor script update $payload',
     },
     uploadReactorScript: {
-      execute: uploadReactorFiles,
+      execute: async ([projectId, , applicationId, , , , scriptPath, manifestPath]) => {
+        if (scriptPath.includes('github')) {
+          // GitHub upload
+          return uploadReactorRepository(projectId, applicationId, scriptPath);
+        }
+
+        // Local fies upload
+        return uploadReactorFiles(projectId, applicationId, scriptPath, manifestPath);
+      },
       pattern: '$id applications $id reactor script upload $scriptPath $manifestPath',
-      helpPattern: '$id applications $id reactor script upload $scriptPath [$manifestPath]',
+      helpPattern: '$id applications $id reactor script upload $scriptPathOrUrl [$manifestPath]',
     },
     readReactorScriptStatus: {
       execute: async ([projectId, , applicationId]) => {
