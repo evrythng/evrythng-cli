@@ -208,7 +208,7 @@ module.exports = {
         return uploadReactorFiles(projectId, applicationId, scriptPath, manifestPath);
       },
       pattern: '$id applications $id reactor script upload $scriptPath $manifestPath',
-      helpPattern: '$id applications $id reactor script upload $scriptPathOrUrl [$manifestPath]',
+      helpPattern: '$id applications $id reactor script upload $scriptBundleOrUrlPath [$manifestPath]',
     },
     readReactorScriptStatus: {
       execute: async ([projectId, , applicationId]) => {
